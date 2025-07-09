@@ -5,6 +5,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -86,34 +88,28 @@ fun App() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Navigation buttons
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+            // Navigation bar
+            NavigationBar(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                TextButton(
+                NavigationBarItem(
+                    selected = currentScreen == Screen.Home,
                     onClick = { currentScreen = Screen.Home },
-                    // Highlight the button if it's the current screen
-                    modifier = if (currentScreen == Screen.Home) Modifier.padding(bottom = 2.dp) else Modifier
-                ) {
-                    Text("Home")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                TextButton(
+                    label = { Text("Home") },
+                    icon = { Text("🏠") }
+                )
+                NavigationBarItem(
+                    selected = currentScreen == Screen.Projects,
                     onClick = { currentScreen = Screen.Projects },
-                    modifier = if (currentScreen == Screen.Projects) Modifier.padding(bottom = 2.dp) else Modifier
-                ) {
-                    Text("Projects")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                TextButton(
+                    label = { Text("Projects") },
+                    icon = { Text("📋") }
+                )
+                NavigationBarItem(
+                    selected = currentScreen == Screen.Blog,
                     onClick = { currentScreen = Screen.Blog },
-                    modifier = if (currentScreen == Screen.Blog) Modifier.padding(bottom = 2.dp) else Modifier
-                ) {
-                    Text("Blog")
-                }
+                    label = { Text("Blog") },
+                    icon = { Text("📝") }
+                )
             }
 
             // Content area - display the current screen
