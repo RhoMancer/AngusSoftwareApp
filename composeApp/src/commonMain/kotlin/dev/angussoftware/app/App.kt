@@ -60,6 +60,7 @@ fun ProjectsScreen() {
 
 // Blog screen composable
 @Composable
+@Preview
 fun BlogScreen() {
     Column(
         modifier = Modifier
