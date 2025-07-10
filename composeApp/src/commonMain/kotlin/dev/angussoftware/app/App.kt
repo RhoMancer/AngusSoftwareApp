@@ -7,6 +7,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,46 +83,96 @@ fun App() {
     // Create a navigation state to track the current screen
     var currentScreen by remember { mutableStateOf(Screen.Home) }
 
-    MaterialTheme {
-        Column(
-            modifier = Modifier
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            // Navigation bar
-            NavigationBar(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                NavigationBarItem(
-                    selected = currentScreen == Screen.Home,
-                    onClick = { currentScreen = Screen.Home },
-                    label = { Text("Home") },
-                    icon = { Text("🏠") }
-                )
-                NavigationBarItem(
-                    selected = currentScreen == Screen.Projects,
-                    onClick = { currentScreen = Screen.Projects },
-                    label = { Text("Projects") },
-                    icon = { Text("📋") }
-                )
-                NavigationBarItem(
-                    selected = currentScreen == Screen.Blog,
-                    onClick = { currentScreen = Screen.Blog },
-                    label = { Text("Blog") },
-                    icon = { Text("📝") }
-                )
-            }
+    // Get window size information
+    val windowInfo = currentWindowAdaptiveInfo()
 
-            // Content area - display the current screen
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
+    // Determine if we should use NavigationRail based on window width
+    val useNavigationRail = !windowInfo.isCompact
+
+    MaterialTheme {
+        if (useNavigationRail) {
+            // Layout with NavigationRail for medium and larger screens
+            Row(
+                modifier = Modifier
+                    .safeContentPadding()
+                    .fillMaxSize()
             ) {
-                when (currentScreen) {
-                    Screen.Home -> HomeScreen()
-                    Screen.Projects -> ProjectsScreen()
-                    Screen.Blog -> BlogScreen()
+                // Navigation rail
+                NavigationRail {
+                    NavigationRailItem(
+                        selected = currentScreen == Screen.Home,
+                        onClick = { currentScreen = Screen.Home },
+                        label = { Text("Home") },
+                        icon = { Text("🏠") }
+                    )
+                    NavigationRailItem(
+                        selected = currentScreen == Screen.Projects,
+                        onClick = { currentScreen = Screen.Projects },
+                        label = { Text("Projects") },
+                        icon = { Text("📋") }
+                    )
+                    NavigationRailItem(
+                        selected = currentScreen == Screen.Blog,
+                        onClick = { currentScreen = Screen.Blog },
+                        label = { Text("Blog") },
+                        icon = { Text("📝") }
+                    )
+                }
+
+                // Content area - display the current screen
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    when (currentScreen) {
+                        Screen.Home -> HomeScreen()
+                        Screen.Projects -> ProjectsScreen()
+                        Screen.Blog -> BlogScreen()
+                    }
+                }
+            }
+        } else {
+            // Layout with NavigationBar for small screens
+            Column(
+                modifier = Modifier
+                    .safeContentPadding()
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                // Navigation bar
+                NavigationBar(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    NavigationBarItem(
+                        selected = currentScreen == Screen.Home,
+                        onClick = { currentScreen = Screen.Home },
+                        label = { Text("Home") },
+                        icon = { Text("🏠") }
+                    )
+                    NavigationBarItem(
+                        selected = currentScreen == Screen.Projects,
+                        onClick = { currentScreen = Screen.Projects },
+                        label = { Text("Projects") },
+                        icon = { Text("📋") }
+                    )
+                    NavigationBarItem(
+                        selected = currentScreen == Screen.Blog,
+                        onClick = { currentScreen = Screen.Blog },
+                        label = { Text("Blog") },
+                        icon = { Text("📝") }
+                    )
+                }
+
+                // Content area - display the current screen
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    when (currentScreen) {
+                        Screen.Home -> HomeScreen()
+                        Screen.Projects -> ProjectsScreen()
+                        Screen.Blog -> BlogScreen()
+                    }
                 }
             }
         }
