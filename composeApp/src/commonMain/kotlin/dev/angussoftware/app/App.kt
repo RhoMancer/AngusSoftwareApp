@@ -6,6 +6,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
@@ -60,7 +61,6 @@ fun ProjectsScreen() {
 
 // Blog screen composable
 @Composable
-@Preview
 fun BlogScreen() {
     Column(
         modifier = Modifier
@@ -96,28 +96,39 @@ fun App() {
             Row(
                 modifier = Modifier
                     .safeContentPadding()
-                    .fillMaxSize()
+                    .fillMaxSize(),
             ) {
-                // Navigation rail
-                NavigationRail {
-                    NavigationRailItem(
-                        selected = currentScreen == Screen.Home,
-                        onClick = { currentScreen = Screen.Home },
-                        label = { Text("Home") },
-                        icon = { Text("🏠") }
-                    )
-                    NavigationRailItem(
-                        selected = currentScreen == Screen.Projects,
-                        onClick = { currentScreen = Screen.Projects },
-                        label = { Text("Projects") },
-                        icon = { Text("📋") }
-                    )
-                    NavigationRailItem(
-                        selected = currentScreen == Screen.Blog,
-                        onClick = { currentScreen = Screen.Blog },
-                        label = { Text("Blog") },
-                        icon = { Text("📝") }
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxHeight(),
+                    color = NavigationBarDefaults.containerColor
+                ) {
+                    // Navigation rail
+                    NavigationRail(
+                        Modifier
+                            .align(Alignment.CenterVertically)
+                            .wrapContentHeight(Alignment.CenterVertically,
+                                true),
+                        containerColor = NavigationBarDefaults.containerColor
+                    ) {
+                        NavigationRailItem(
+                            selected = currentScreen == Screen.Home,
+                            onClick = { currentScreen = Screen.Home },
+                            label = { Text("Home") },
+                            icon = { Text("🏠") }
+                        )
+                        NavigationRailItem(
+                            selected = currentScreen == Screen.Projects,
+                            onClick = { currentScreen = Screen.Projects },
+                            label = { Text("Projects") },
+                            icon = { Text("📋") }
+                        )
+                        NavigationRailItem(
+                            selected = currentScreen == Screen.Blog,
+                            onClick = { currentScreen = Screen.Blog },
+                            label = { Text("Blog") },
+                            icon = { Text("📝") }
+                        )
+                    }
                 }
 
                 // Content area - display the current screen
