@@ -1,19 +1,15 @@
 package dev.angussoftware.app
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.runtime.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import dev.angussoftware.app.navigation.displayCurrentScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Define an enum class for different screens
@@ -23,66 +19,15 @@ enum class Screen {
     Blog
 }
 
-// Home screen composable
-@Composable
-fun HomeScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Home Page",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-    }
-}
-
-// Projects screen composable
-@Composable
-fun ProjectsScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Projects Page",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        Text("My projects will be listed here")
-    }
-}
-
-// Blog screen composable
-@Composable
-fun BlogScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Blog Page",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        Text("My blog posts will be listed here")
-    }
-}
-
 @Composable
 @Preview
-fun App() {
+fun App(navController: NavHostController = rememberNavController()) {
+    // Get current back stack entry
+    val backStackEntry by navController.currentBackStackEntryAsState()
     // Create a navigation state to track the current screen
-    var currentScreen by remember { mutableStateOf(Screen.Home) }
+    var currentScreen = Screen.valueOf(
+        backStackEntry?.destination?.route ?: Screen.Home.name
+    )
 
     // Get window size information
     val windowInfo = currentWindowAdaptiveInfo()
@@ -106,42 +51,33 @@ fun App() {
                     NavigationRail(
                         Modifier
                             .align(Alignment.CenterVertically)
-                            .wrapContentHeight(Alignment.CenterVertically,
-                                true),
+                            .wrapContentHeight(
+                                Alignment.CenterVertically,
+                                true
+                            ),
                         containerColor = NavigationBarDefaults.containerColor
                     ) {
                         NavigationRailItem(
-                            selected = currentScreen == Screen.Home,
-                            onClick = { currentScreen = Screen.Home },
+                            selected = navController.currentDestination?.route == Screen.Home.name,
+                            onClick = { navController.navigate(Screen.Home.name) },
                             label = { Text("Home") },
                             icon = { Text("🏠") }
                         )
                         NavigationRailItem(
-                            selected = currentScreen == Screen.Projects,
-                            onClick = { currentScreen = Screen.Projects },
+                            selected = navController.currentDestination?.route == Screen.Projects.name,
+                            onClick = { navController.navigate(Screen.Projects.name) },
                             label = { Text("Projects") },
                             icon = { Text("📋") }
                         )
                         NavigationRailItem(
-                            selected = currentScreen == Screen.Blog,
-                            onClick = { currentScreen = Screen.Blog },
+                            selected = navController.currentDestination?.route == Screen.Blog.name,
+                            onClick = { navController.navigate(Screen.Blog.name) },
                             label = { Text("Blog") },
                             icon = { Text("📝") }
                         )
                     }
                 }
-
-                // Content area - display the current screen
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    when (currentScreen) {
-                        Screen.Home -> HomeScreen()
-                        Screen.Projects -> ProjectsScreen()
-                        Screen.Blog -> BlogScreen()
-                    }
-                }
+                displayCurrentScreen(navController)
             }
         } else {
             // Layout with NavigationBar for small screens
@@ -156,37 +92,28 @@ fun App() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     NavigationBarItem(
-                        selected = currentScreen == Screen.Home,
-                        onClick = { currentScreen = Screen.Home },
+                        selected = navController.currentDestination?.route == Screen.Home.name,
+                        onClick = { navController.navigate(Screen.Home.name) },
                         label = { Text("Home") },
                         icon = { Text("🏠") }
                     )
                     NavigationBarItem(
-                        selected = currentScreen == Screen.Projects,
-                        onClick = { currentScreen = Screen.Projects },
+                        selected = navController.currentDestination?.route == Screen.Projects.name,
+                        onClick = { navController.navigate(Screen.Projects.name) },
                         label = { Text("Projects") },
                         icon = { Text("📋") }
                     )
                     NavigationBarItem(
-                        selected = currentScreen == Screen.Blog,
-                        onClick = { currentScreen = Screen.Blog },
+                        selected = navController.currentDestination?.route == Screen.Blog.name,
+                        onClick = { navController.navigate(Screen.Blog.name) },
                         label = { Text("Blog") },
                         icon = { Text("📝") }
                     )
                 }
-
-                // Content area - display the current screen
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    when (currentScreen) {
-                        Screen.Home -> HomeScreen()
-                        Screen.Projects -> ProjectsScreen()
-                        Screen.Blog -> BlogScreen()
-                    }
-                }
+                displayCurrentScreen(navController)
             }
         }
     }
 }
+
+
