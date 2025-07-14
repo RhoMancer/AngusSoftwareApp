@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.angussoftware.theming.compose.ui.theme.AngusTheme
 import dev.angussoftware.app.navigation.displayCurrentScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -35,7 +36,7 @@ fun App(navController: NavHostController = rememberNavController()) {
     // Determine if we should use NavigationRail based on window width
     val useNavigationRail = !windowInfo.isCompact
 
-    MaterialTheme {
+    AngusTheme {
         if (useNavigationRail) {
             // Layout with NavigationRail for medium and larger screens
             Row(

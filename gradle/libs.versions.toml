@@ -13,9 +13,10 @@ androidx-testExt = "1.2.1"
 composeMultiplatform = "1.8.2"
 junit = "4.13.2"
 kotlin = "2.2.0"
-angusSoftware-theming-compose = "0.0.1.11"
+angusSoftware-theming = "0.0.2.5"
 compose-tooling = "1.8.3"
 nav_version = "2.9.0-beta03"
+firebaseDatabaseKtx = "21.0.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -31,7 +32,9 @@ androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:life
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-tooling" }
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "nav_version" }
-angusSoftware-theming-compose = { module = "com.angussoftware.theming:compose ", version.ref = "angusSoftware-theming-compose" }
+angusSoftware-theming-compose = { module = "com.angussoftware.theming:theming-compose", version.ref = "angusSoftware-theming" }
+angusSoftware-theming-base = { module = "com.angussoftware.theming:theming-base", version.ref = "angusSoftware-theming" }
+firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
