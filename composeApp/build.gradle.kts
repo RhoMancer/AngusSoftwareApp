@@ -57,7 +57,6 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.angusSoftware.theming.compose)
-//            implementation(libs.angusSoftware.theming.base)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
