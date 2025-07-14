@@ -40,10 +40,11 @@ kotlin {
     }
     
     sourceSets {
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.angusSoftware.theming.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -54,8 +55,9 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.angusSoftware.theming.compose)
             implementation(libs.androidx.navigation.compose)
+            implementation(libs.angusSoftware.theming.compose)
+//            implementation(libs.angusSoftware.theming.base)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
