@@ -2,6 +2,7 @@ package dev.angussoftware.app
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 
 /**
  * Android implementation of currentWindowAdaptiveInfo using LocalConfiguration
@@ -15,3 +16,4 @@ actual fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo {
     
     return WindowAdaptiveInfo(widthSizeClass)
 }
+

@@ -1,6 +1,8 @@
 package dev.angussoftware.app
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlinx.browser.window
 
 /**
