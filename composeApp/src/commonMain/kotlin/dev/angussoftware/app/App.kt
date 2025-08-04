@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 
 // Define an enum class for different screens
@@ -118,9 +119,7 @@ fun App(navController: NavHostController = rememberNavController()) {
                         icon = { Icon(Icons.Default.Create, contentDescription = "Blog") }
                     )
                 }
-            },
-            contentWindowInsets = WindowInsets.safeDrawing,
-        ) {
+            }) {
             // Layout with NavigationBar for small screens
             Column(
                 modifier = Modifier
