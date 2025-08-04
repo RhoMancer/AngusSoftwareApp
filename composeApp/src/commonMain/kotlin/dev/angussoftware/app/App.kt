@@ -15,9 +15,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
+import dev.angussoftware.app.navigation.DefaultNavigationBarHeight
+import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 
 
 // Define an enum class for different screens
@@ -42,6 +50,10 @@ fun App(navController: NavHostController = rememberNavController()) {
     val windowInfo = currentWindowAdaptiveInfo()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    
+    // Remember the navigation bar height state
+    val navigationBarHeightState = remember { mutableStateOf(DefaultNavigationBarHeight) }
+    val density = LocalDensity.current
 
     // Determine if we should use NavigationRail based on window width
     val isCompactScreen = windowInfo.isCompact
@@ -92,40 +104,52 @@ fun App(navController: NavHostController = rememberNavController()) {
             }
         }
     } else {
-        Scaffold(
-            bottomBar = {
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ) {
-                    NavigationBarItem(
-                        selected = navController.currentDestination?.route == Screen.Home.name,
-                        onClick = { navController.navigate(Screen.Home.name) },
-                        label = { Text("Home") },
-                        icon = { Icon(Icons.Default.Home, contentDescription = "Home") }
-                    )
-                    NavigationBarItem(
-                        selected = navController.currentDestination?.route == Screen.Projects.name,
-                        onClick = { navController.navigate(Screen.Projects.name) },
-                        label = { Text("Projects") },
-                        icon = { Icon(Icons.Default.List, contentDescription = "Projects") }
-                    )
-                    NavigationBarItem(
-                        selected = navController.currentDestination?.route == Screen.Blog.name,
-                        onClick = { navController.navigate(Screen.Blog.name) },
-                        label = { Text("Blog") },
-                        icon = { Icon(Icons.Default.Create, contentDescription = "Blog") }
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxSize()) {
-            // Layout with NavigationBar for small screens
-            Column(
+        // Provide the navigation bar height through CompositionLocal
+        CompositionLocalProvider(LocalNavigationBarHeight provides navigationBarHeightState.value) {
+            Scaffold(
+                bottomBar = {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier
+                            // Measure the height of the NavigationBar
+                            .onGloballyPositioned { coordinates ->
+                                // Convert pixels to dp and update the state
+                                val heightInDp = with(density) { coordinates.size.height.toDp() }
+                                if (heightInDp > 0.dp) {
+                                    navigationBarHeightState.value = heightInDp
+                                }
+                            }
+                    ) {
+                        NavigationBarItem(
+                            selected = navController.currentDestination?.route == Screen.Home.name,
+                            onClick = { navController.navigate(Screen.Home.name) },
+                            label = { Text("Home") },
+                            icon = { Icon(Icons.Default.Home, contentDescription = "Home") }
+                        )
+                        NavigationBarItem(
+                            selected = navController.currentDestination?.route == Screen.Projects.name,
+                            onClick = { navController.navigate(Screen.Projects.name) },
+                            label = { Text("Projects") },
+                            icon = { Icon(Icons.Default.List, contentDescription = "Projects") }
+                        )
+                        NavigationBarItem(
+                            selected = navController.currentDestination?.route == Screen.Blog.name,
+                            onClick = { navController.navigate(Screen.Blog.name) },
+                            label = { Text("Blog") },
+                            icon = { Icon(Icons.Default.Create, contentDescription = "Blog") }
+                        )
+                    }
+                },
                 modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                displayCurrentScreen(navController)
+                    .fillMaxSize()) {
+                // Layout with NavigationBar for small screens
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    displayCurrentScreen(navController)
+                }
             }
         }
     }
