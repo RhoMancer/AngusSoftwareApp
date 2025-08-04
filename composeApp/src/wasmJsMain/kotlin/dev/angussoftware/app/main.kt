@@ -1,5 +1,6 @@
 package dev.angussoftware.app
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import com.angussoftware.theming.compose.ui.theme.AngusTheme
