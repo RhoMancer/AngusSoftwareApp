@@ -12,6 +12,11 @@ import androidx.navigation.compose.rememberNavController
 import com.angussoftware.theming.compose.ui.theme.AngusTheme
 import dev.angussoftware.app.navigation.displayCurrentScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Create
+
 
 // Define an enum class for different screens
 enum class Screen {
@@ -62,19 +67,19 @@ fun App(navController: NavHostController = rememberNavController()) {
                             selected = navController.currentDestination?.route == Screen.Home.name,
                             onClick = { navController.navigate(Screen.Home.name) },
                             label = { Text("Home") },
-                            icon = { Text("🏠") }
+                            icon = { Icon(Icons.Default.Home, contentDescription = "Home") }
                         )
                         NavigationRailItem(
                             selected = navController.currentDestination?.route == Screen.Projects.name,
                             onClick = { navController.navigate(Screen.Projects.name) },
                             label = { Text("Projects") },
-                            icon = { Text("📋") }
+                            icon = { Icon(Icons.Default.List, contentDescription = "Projects") }
                         )
                         NavigationRailItem(
                             selected = navController.currentDestination?.route == Screen.Blog.name,
                             onClick = { navController.navigate(Screen.Blog.name) },
                             label = { Text("Blog") },
-                            icon = { Text("📝") }
+                            icon = { Icon(Icons.Default.Create, contentDescription = "Blog") }
                         )
                     }
                 }
@@ -114,6 +119,10 @@ fun App(navController: NavHostController = rememberNavController()) {
                 displayCurrentScreen(navController)
             }
         }
+    }
+
+    fun unicodeToString(unicode: Int): String{
+        return unicode.toChar().toString()
     }
 }
 
