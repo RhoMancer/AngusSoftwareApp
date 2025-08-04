@@ -96,9 +96,9 @@ fun App(navController: NavHostController = rememberNavController()) {
             bottomBar = {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    windowInsets = WindowInsets.systemBars
-                        .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
-                    // or just: windowInsets = NavigationBarDefaults.windowInsets
+//                    windowInsets = WindowInsets.systemBars
+//                        .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+//                     windowInsets = NavigationBarDefaults.windowInsets
                 ) {
                     NavigationBarItem(
                         selected = navController.currentDestination?.route == Screen.Home.name,
@@ -123,7 +123,6 @@ fun App(navController: NavHostController = rememberNavController()) {
             // Layout with NavigationBar for small screens
             Column(
                 modifier = Modifier
-                    .safeContentPadding()
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
