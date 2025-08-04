@@ -16,8 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.WindowInsets
 
 /**
  * HomeScreen is the main landing page of the application.
@@ -26,6 +28,9 @@ import androidx.compose.ui.unit.dp
  * 
  * The screen uses a scrollable layout to accommodate all content
  * and implements a fade-in animation for a polished user experience.
+ * 
+ * Top and bottom padding are added to account for the status bar and navigation bar,
+ * while maintaining the edge-to-edge effect.
  */
 @Composable
 fun HomeScreen() {
@@ -45,14 +50,27 @@ fun HomeScreen() {
         isVisible = true
     }
     
+    // Get the status bar height and navigation bar height
+    val statusBarHeightPx = WindowInsets.statusBars.getTop(LocalDensity.current)
+    val navigationBarHeightPx = WindowInsets.navigationBars.getBottom(LocalDensity.current)
+    
+    // Convert to DP
+    val density = LocalDensity.current
+    val statusBarHeightDp = with(density) { statusBarHeightPx.toDp() }
+    val navigationBarHeightDp = with(density) { navigationBarHeightPx.toDp() }
+    
+    // Add horizontal padding
+    val verticalPadding = 16.dp
+    
     // Main container for all sections
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(statusBarHeightDp))
+
         // Hero Section - displays profile image, name, title, and tagline
         HeroSection(alpha)
         
@@ -65,6 +83,8 @@ fun HomeScreen() {
         
         // Contact Information Section - displays email, location, and social media links
         ContactSection(alpha)
+
+        Spacer(modifier = Modifier.height(navigationBarHeightDp))
     }
 }
 

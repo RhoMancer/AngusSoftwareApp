@@ -95,10 +95,7 @@ fun App(navController: NavHostController = rememberNavController()) {
         Scaffold(
             bottomBar = {
                 NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-//                    windowInsets = WindowInsets.systemBars
-//                        .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
-//                     windowInsets = NavigationBarDefaults.windowInsets
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
                 ) {
                     NavigationBarItem(
                         selected = navController.currentDestination?.route == Screen.Home.name,
@@ -119,7 +116,9 @@ fun App(navController: NavHostController = rememberNavController()) {
                         icon = { Icon(Icons.Default.Create, contentDescription = "Blog") }
                     )
                 }
-            }) {
+            },
+            modifier = Modifier
+                .fillMaxSize()) {
             // Layout with NavigationBar for small screens
             Column(
                 modifier = Modifier
