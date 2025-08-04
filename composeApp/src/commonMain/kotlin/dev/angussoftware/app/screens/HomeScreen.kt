@@ -57,7 +57,13 @@ fun HomeScreen() {
     // Convert to DP
     val density = LocalDensity.current
     val statusBarHeightDp = with(density) { statusBarHeightPx.toDp() }
-    val navigationBarHeightDp = with(density) { navigationBarHeightPx.toDp() }
+    val systemNavigationBarHeightDp = with(density) { navigationBarHeightPx.toDp() }
+    
+    // Add the height of the app's NavigationBar component (standard Material Design height)
+    val appNavigationBarHeightDp = 80.dp
+    
+    // Calculate total navigation bar height (system + app)
+    val navigationBarHeightDp = systemNavigationBarHeightDp + appNavigationBarHeightDp
     
     // Add horizontal padding
     val verticalPadding = 16.dp
