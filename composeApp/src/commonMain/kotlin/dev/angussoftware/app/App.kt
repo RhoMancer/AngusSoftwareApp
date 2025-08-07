@@ -93,19 +93,22 @@ fun App(navController: NavHostController = rememberNavController()) {
                             selected = navController.currentDestination?.route == Screen.Home.name,
                             onClick = { navController.navigate(Screen.Home.name) },
                             label = { Text("Home") },
-                            icon = { Icon(Icons.Default.Home, contentDescription = "Home") }
+                            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         )
                         NavigationRailItem(
                             selected = navController.currentDestination?.route == Screen.Projects.name,
                             onClick = { navController.navigate(Screen.Projects.name) },
                             label = { Text("Projects") },
-                            icon = { Icon(Icons.Default.List, contentDescription = "Projects") }
+                            icon = { Icon(Icons.Default.List, contentDescription = "Projects") },
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         )
                         NavigationRailItem(
                             selected = navController.currentDestination?.route == Screen.Blog.name,
                             onClick = { navController.navigate(Screen.Blog.name) },
                             label = { Text("Blog") },
-                            icon = { Icon(Icons.Default.Create, contentDescription = "Blog") }
+                            icon = { Icon(Icons.Default.Create, contentDescription = "Blog") },
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         )
                     }
                 }
