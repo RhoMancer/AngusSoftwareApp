@@ -1,6 +1,5 @@
 package dev.angussoftware.app
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import com.angussoftware.theming.compose.ui.theme.AngusTheme
@@ -10,7 +9,7 @@ import kotlinx.browser.document
 fun main() {
     ComposeViewport(document.body!!) {
         AngusTheme {
-            App()
+            AngusSoftwareAppScreen()
         }
     }
 }
