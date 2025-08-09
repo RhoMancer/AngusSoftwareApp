@@ -75,9 +75,8 @@ fun App(navController: NavHostController = rememberNavController()) {
             ) {
                 Surface(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Start)),
-                    color = NavigationBarDefaults.containerColor
+                        .fillMaxHeight(),
+                    color = MaterialTheme.colorScheme.primaryContainer
                 ) {
                     // Navigation rail
                     NavigationRail(
@@ -87,7 +86,7 @@ fun App(navController: NavHostController = rememberNavController()) {
                                 Alignment.CenterVertically,
                                 true
                             ),
-                        containerColor = NavigationBarDefaults.containerColor
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
                     ) {
                         NavigationRailItem(
                             selected = navController.currentDestination?.route == Screen.Home.name,
