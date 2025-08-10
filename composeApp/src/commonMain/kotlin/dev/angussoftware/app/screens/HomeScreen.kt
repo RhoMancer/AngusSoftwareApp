@@ -20,7 +20,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.WindowInsets
+import dev.angussoftware.app.currentWindowAdaptiveInfo
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
+import org.jetbrains.compose.ui.tooling.preview.Preview
+
+private const val SKILL_CHIPS_PER_ROW = 3
 
 /**
  * HomeScreen is the main landing page of the application.
@@ -34,9 +38,11 @@ import dev.angussoftware.app.navigation.LocalNavigationBarHeight
  * while maintaining the edge-to-edge effect.
  */
 @Composable
+@Preview
 fun HomeScreen() {
     // Scroll state for the entire screen to enable scrolling through all sections
     val scrollState = rememberScrollState()
+
 
     // Animation states for fade-in effect when the screen is first displayed
     var isVisible by remember { mutableStateOf(false) }
@@ -153,7 +159,6 @@ fun HeroSection(alpha: Float) {
         }
     }
 }
-
 /**
  * AboutMeSection displays professional information about the user,
  * including a summary of their background and skills.
@@ -162,6 +167,9 @@ fun HeroSection(alpha: Float) {
  */
 @Composable
 fun AboutMeSection(alpha: Float) {
+
+    val isCompactScreen = currentWindowAdaptiveInfo().isCompact
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -204,36 +212,32 @@ fun AboutMeSection(alpha: Float) {
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            // Skills as chips in rows
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SkillChip("Kotlin")
-                SkillChip("Compose")
-                SkillChip("Android")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SkillChip("JavaScript")
-                SkillChip("React")
-                SkillChip("Node.js")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SkillChip("UI/UX")
-                SkillChip("Git")
-                SkillChip("CI/CD")
+            val skillChipList = listOf(
+                "Kotlin", "Compose", "Android",
+                "JavaScript", "React", "Node.js",
+                "UI/UX", "Git", "CI/CD"
+            )
+            if (isCompactScreen && SKILL_CHIPS_PER_ROW > 0) {
+                for (i in 0..skillChipList.size - 1 step SKILL_CHIPS_PER_ROW) {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        skillChipList.subList(i, minOf(i + SKILL_CHIPS_PER_ROW, skillChipList.size))
+                            .forEach {
+                            SkillChip(it)
+                        }
+                    }
+                }
+            } else {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    skillChipList.forEach {
+                        SkillChip(it)
+                    }
+                }
             }
         }
     }
@@ -309,7 +313,7 @@ fun ContactSection(alpha: Float) {
             )
 
             // Social Media Links
-            Row(
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {

@@ -47,8 +47,6 @@ fun AngusSoftwareAppScreen(navController: NavHostController = rememberNavControl
     // Get window size information
     val windowInfo = currentWindowAdaptiveInfo()
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    
     // Remember the navigation bar height state
     val navigationBarHeightState = remember { mutableStateOf(DefaultNavigationBarHeight) }
     val density = LocalDensity.current
