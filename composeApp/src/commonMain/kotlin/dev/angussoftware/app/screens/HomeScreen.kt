@@ -1,27 +1,22 @@
 package dev.angussoftware.app.screens
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.WindowInsets
 import dev.angussoftware.app.currentWindowAdaptiveInfo
-import dev.angussoftware.app.navigation.LocalNavigationBarHeight
+import dev.angussoftware.app.ui.components.ScreenContainer
+import dev.angussoftware.app.ui.components.SectionCard
+import dev.angussoftware.app.ui.components.SkillChip
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private const val SKILL_CHIPS_PER_ROW = 3
@@ -40,51 +35,7 @@ private const val SKILL_CHIPS_PER_ROW = 3
 @Composable
 @Preview
 fun HomeScreen() {
-    // Scroll state for the entire screen to enable scrolling through all sections
-    val scrollState = rememberScrollState()
-
-
-    // Animation states for fade-in effect when the screen is first displayed
-    var isVisible by remember { mutableStateOf(false) }
-    val alpha by animateFloatAsState(
-        targetValue = if (isVisible) 1f else 0f,
-        animationSpec = tween(durationMillis = 1000),
-        label = "fadeIn"
-    )
-
-    // Trigger animation on composition
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
-    // Get the status bar height and navigation bar height
-    val statusBarHeightPx = WindowInsets.statusBars.getTop(LocalDensity.current)
-    val navigationBarHeightPx = WindowInsets.navigationBars.getBottom(LocalDensity.current)
-
-    // Convert to DP
-    val density = LocalDensity.current
-    val statusBarHeightDp = with(density) { statusBarHeightPx.toDp() }
-    val systemNavigationBarHeightDp = with(density) { navigationBarHeightPx.toDp() }
-
-    // Get the height of the app's NavigationBar component from CompositionLocal
-    val appNavigationBarHeightDp = LocalNavigationBarHeight.current
-
-    // Calculate total navigation bar height (system + app)
-    val navigationBarHeightDp = systemNavigationBarHeightDp + appNavigationBarHeightDp
-
-    // Add horizontal padding
-    val tilePadding = 16.dp
-
-    // Main container for all sections
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(statusBarHeightDp + tilePadding))
-
+    ScreenContainer { alpha, tilePadding ->
         // Hero Section - displays profile image, name, title, and tagline
         HeroSection(alpha)
 
@@ -97,8 +48,6 @@ fun HomeScreen() {
 
         // Contact Information Section - displays email, location, and social media links
         ContactSection(alpha)
-
-        Spacer(modifier = Modifier.height(navigationBarHeightDp + tilePadding))
     }
 }
 
@@ -110,16 +59,10 @@ fun HomeScreen() {
  */
 @Composable
 fun HeroSection(alpha: Float) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .alpha(alpha),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
+    SectionCard(alpha = alpha) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Profile Image (using a colored Box as placeholder)
@@ -170,16 +113,10 @@ fun AboutMeSection(alpha: Float) {
 
     val isCompactScreen = currentWindowAdaptiveInfo().isCompact
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .alpha(alpha),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
+    SectionCard(alpha = alpha) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp)
         ) {
             // Section Title
             Text(
@@ -248,21 +185,6 @@ fun AboutMeSection(alpha: Float) {
  *
  * @param text The name of the skill to display
  */
-@Composable
-fun SkillChip(text: String) {
-    Card(
-        modifier = Modifier.padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-        )
-    }
-}
 
 /**
  * ContactSection displays the user's contact information and social media links.
@@ -271,16 +193,10 @@ fun SkillChip(text: String) {
  */
 @Composable
 fun ContactSection(alpha: Float) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .alpha(alpha),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
+    SectionCard(alpha = alpha) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp)
         ) {
             // Section Title
             Text(
