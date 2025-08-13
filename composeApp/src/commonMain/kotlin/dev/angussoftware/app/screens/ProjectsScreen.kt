@@ -10,6 +10,21 @@ import androidx.compose.ui.unit.dp
 import dev.angussoftware.app.ui.components.ScreenContainer
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
+import org.jetbrains.compose.resources.stringResource
+import angussoftwareapp.composeapp.generated.resources.Res
+import angussoftwareapp.composeapp.generated.resources.project_api_gateway_desc
+import angussoftwareapp.composeapp.generated.resources.project_api_gateway_title
+import angussoftwareapp.composeapp.generated.resources.project_portfolio_desc
+import angussoftwareapp.composeapp.generated.resources.project_portfolio_title
+import angussoftwareapp.composeapp.generated.resources.project_task_tracker_desc
+import angussoftwareapp.composeapp.generated.resources.project_task_tracker_title
+import angussoftwareapp.composeapp.generated.resources.tech_compose
+import angussoftwareapp.composeapp.generated.resources.tech_docker
+import angussoftwareapp.composeapp.generated.resources.tech_jwt
+import angussoftwareapp.composeapp.generated.resources.tech_kotlin
+import angussoftwareapp.composeapp.generated.resources.tech_ktor
+import angussoftwareapp.composeapp.generated.resources.tech_multiplatform
+import angussoftwareapp.composeapp.generated.resources.tech_sqlite
 
 private data class Project(
     val title: String,
@@ -21,19 +36,32 @@ private data class Project(
 fun ProjectsScreen() {
     val projects = listOf(
         Project(
-            title = "Portfolio Website",
-            description = "A responsive personal portfolio built with Compose Multiplatform, featuring dynamic content and smooth animations.",
-            technologies = listOf("Kotlin", "Compose", "Multiplatform")
+            title = stringResource(Res.string.project_portfolio_title),
+            description = stringResource(Res.string.project_portfolio_desc),
+            technologies = listOf(
+                stringResource(Res.string.tech_kotlin),
+                stringResource(Res.string.tech_compose),
+                stringResource(Res.string.tech_multiplatform)
+            )
         ),
         Project(
-            title = "Task Tracker App",
-            description = "Cross-platform task management app with offline support and sync.",
-            technologies = listOf("Kotlin", "Compose", "SQLite", "Ktor")
+            title = stringResource(Res.string.project_task_tracker_title),
+            description = stringResource(Res.string.project_task_tracker_desc),
+            technologies = listOf(
+                stringResource(Res.string.tech_kotlin),
+                stringResource(Res.string.tech_compose),
+                stringResource(Res.string.tech_sqlite),
+                stringResource(Res.string.tech_ktor)
+            )
         ),
         Project(
-            title = "API Gateway",
-            description = "Lightweight API gateway with authentication and rate limiting.",
-            technologies = listOf("Ktor", "JWT", "Docker")
+            title = stringResource(Res.string.project_api_gateway_title),
+            description = stringResource(Res.string.project_api_gateway_desc),
+            technologies = listOf(
+                stringResource(Res.string.tech_ktor),
+                stringResource(Res.string.tech_jwt),
+                stringResource(Res.string.tech_docker)
+            )
         )
     )
 

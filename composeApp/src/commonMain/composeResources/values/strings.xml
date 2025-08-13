@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Project titles -->
+    <string name="project_portfolio_title">Portfolio Website</string>
+    <string name="project_task_tracker_title">Task Tracker App</string>
+    <string name="project_api_gateway_title">API Gateway</string>
+
+    <!-- Project descriptions -->
+    <string name="project_portfolio_desc">A responsive personal portfolio built with Compose Multiplatform, featuring dynamic content and smooth animations.</string>
+    <string name="project_task_tracker_desc">Cross-platform task management app with offline support and sync.</string>
+    <string name="project_api_gateway_desc">Lightweight API gateway with authentication and rate limiting.</string>
+
+    <!-- Technology names -->
+    <string name="tech_kotlin">Kotlin</string>
+    <string name="tech_compose">Compose</string>
+    <string name="tech_multiplatform">Multiplatform</string>
+    <string name="tech_sqlite">SQLite</string>
+    <string name="tech_ktor">Ktor</string>
+    <string name="tech_jwt">JWT</string>
+    <string name="tech_docker">Docker</string>
+</resources>
