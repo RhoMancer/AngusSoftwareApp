@@ -18,6 +18,33 @@ import dev.angussoftware.app.ui.components.ScreenContainer
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import angussoftwareapp.composeapp.generated.resources.Res
+import angussoftwareapp.composeapp.generated.resources.home_name
+import angussoftwareapp.composeapp.generated.resources.home_title
+import angussoftwareapp.composeapp.generated.resources.home_tagline
+import angussoftwareapp.composeapp.generated.resources.home_about_title
+import angussoftwareapp.composeapp.generated.resources.home_about_paragraph1
+import angussoftwareapp.composeapp.generated.resources.home_about_paragraph2
+import angussoftwareapp.composeapp.generated.resources.home_skills_title
+import angussoftwareapp.composeapp.generated.resources.tech_kotlin
+import angussoftwareapp.composeapp.generated.resources.tech_compose
+import angussoftwareapp.composeapp.generated.resources.home_skill_android
+import angussoftwareapp.composeapp.generated.resources.home_skill_javascript
+import angussoftwareapp.composeapp.generated.resources.home_skill_react
+import angussoftwareapp.composeapp.generated.resources.home_skill_nodejs
+import angussoftwareapp.composeapp.generated.resources.home_skill_uiux
+import angussoftwareapp.composeapp.generated.resources.home_skill_git
+import angussoftwareapp.composeapp.generated.resources.home_skill_cicd
+import angussoftwareapp.composeapp.generated.resources.home_contact_title
+import angussoftwareapp.composeapp.generated.resources.home_contact_email_label
+import angussoftwareapp.composeapp.generated.resources.home_contact_email_value
+import angussoftwareapp.composeapp.generated.resources.home_contact_location_label
+import angussoftwareapp.composeapp.generated.resources.home_contact_location_value
+import angussoftwareapp.composeapp.generated.resources.home_connect_with_me
+import angussoftwareapp.composeapp.generated.resources.platform_linkedin
+import angussoftwareapp.composeapp.generated.resources.platform_github
+import angussoftwareapp.composeapp.generated.resources.platform_twitter
 
 private const val SKILL_CHIPS_PER_ROW = 3
 
@@ -77,7 +104,7 @@ fun HeroSection(alpha: Float) {
 
             // Name
             Text(
-                text = "John Doe",
+                text = stringResource(Res.string.home_name),
                 style = MaterialTheme.typography.headlineLarge
             )
 
@@ -85,7 +112,7 @@ fun HeroSection(alpha: Float) {
 
             // Professional Title
             Text(
-                text = "Full-Stack Developer",
+                text = stringResource(Res.string.home_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -94,7 +121,7 @@ fun HeroSection(alpha: Float) {
 
             // Tagline
             Text(
-                text = "Building innovative solutions with cutting-edge technologies",
+                text = stringResource(Res.string.home_tagline),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -120,40 +147,42 @@ fun AboutMeSection(alpha: Float) {
         ) {
             // Section Title
             Text(
-                text = "About Me",
+                text = stringResource(Res.string.home_about_title),
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             // Professional Summary
             Text(
-                text = "I am a passionate Full-Stack Developer with expertise in modern web and mobile technologies. " +
-                        "With a strong foundation in both frontend and backend development, I create seamless, " +
-                        "user-centered applications that solve real-world problems.",
+                text = stringResource(Res.string.home_about_paragraph1),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             Text(
-                text = "My approach combines technical excellence with creative problem-solving. " +
-                        "I'm dedicated to writing clean, maintainable code and staying current with " +
-                        "industry best practices and emerging technologies.",
+                text = stringResource(Res.string.home_about_paragraph2),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             // Skills Section
             Text(
-                text = "Key Skills",
+                text = stringResource(Res.string.home_skills_title),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
             val skillChipList = listOf(
-                "Kotlin", "Compose", "Android",
-                "JavaScript", "React", "Node.js",
-                "UI/UX", "Git", "CI/CD"
-            )
+                Res.string.tech_kotlin,
+                Res.string.tech_compose,
+                Res.string.home_skill_android,
+                Res.string.home_skill_javascript,
+                Res.string.home_skill_react,
+                Res.string.home_skill_nodejs,
+                Res.string.home_skill_uiux,
+                Res.string.home_skill_git,
+                Res.string.home_skill_cicd,
+            ).map { stringResource(it) }
             if (isCompactScreen && SKILL_CHIPS_PER_ROW > 0) {
                 for (i in 0..skillChipList.size - 1 step SKILL_CHIPS_PER_ROW) {
                     FlowRow(
@@ -200,30 +229,30 @@ fun ContactSection(alpha: Float) {
         ) {
             // Section Title
             Text(
-                text = "Contact Information",
+                text = stringResource(Res.string.home_contact_title),
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             // Email
             ContactItem(
-                title = "Email",
-                content = "john.doe@example.com"
+                title = stringResource(Res.string.home_contact_email_label),
+                content = stringResource(Res.string.home_contact_email_value)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             // Location
             ContactItem(
-                title = "Location",
-                content = "San Francisco, CA"
+                title = stringResource(Res.string.home_contact_location_label),
+                content = stringResource(Res.string.home_contact_location_value)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             // Social Media
             Text(
-                text = "Connect with me",
+                text = stringResource(Res.string.home_connect_with_me),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
@@ -233,9 +262,9 @@ fun ContactSection(alpha: Float) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                SocialMediaButton("LinkedIn")
-                SocialMediaButton("GitHub")
-                SocialMediaButton("Twitter")
+                SocialMediaButton(stringResource(Res.string.platform_linkedin))
+                SocialMediaButton(stringResource(Res.string.platform_github))
+                SocialMediaButton(stringResource(Res.string.platform_twitter))
             }
         }
     }

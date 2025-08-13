@@ -4,32 +4,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import angussoftwareapp.composeapp.generated.resources.*
 import dev.angussoftware.app.ui.components.ScreenContainer
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
 import org.jetbrains.compose.resources.stringResource
-import angussoftwareapp.composeapp.generated.resources.Res
-import angussoftwareapp.composeapp.generated.resources.project_api_gateway_desc
-import angussoftwareapp.composeapp.generated.resources.project_api_gateway_title
-import angussoftwareapp.composeapp.generated.resources.project_portfolio_desc
-import angussoftwareapp.composeapp.generated.resources.project_portfolio_title
-import angussoftwareapp.composeapp.generated.resources.project_task_tracker_desc
-import angussoftwareapp.composeapp.generated.resources.project_task_tracker_title
-import angussoftwareapp.composeapp.generated.resources.tech_compose
-import angussoftwareapp.composeapp.generated.resources.tech_docker
-import angussoftwareapp.composeapp.generated.resources.tech_jwt
-import angussoftwareapp.composeapp.generated.resources.tech_kotlin
-import angussoftwareapp.composeapp.generated.resources.tech_ktor
-import angussoftwareapp.composeapp.generated.resources.tech_multiplatform
-import angussoftwareapp.composeapp.generated.resources.tech_sqlite
 
 private data class Project(
     val title: String,
     val description: String,
-    val technologies: List<String>
+    val technologies: List<String>,
 )
 
 @Composable
@@ -39,29 +25,35 @@ fun ProjectsScreen() {
             title = stringResource(Res.string.project_portfolio_title),
             description = stringResource(Res.string.project_portfolio_desc),
             technologies = listOf(
-                stringResource(Res.string.tech_kotlin),
-                stringResource(Res.string.tech_compose),
-                stringResource(Res.string.tech_multiplatform)
-            )
+                Res.string.tech_kotlin,
+                Res.string.tech_compose,
+                Res.string.tech_multiplatform
+            ).map {
+                stringResource(it)
+            }
         ),
         Project(
             title = stringResource(Res.string.project_task_tracker_title),
             description = stringResource(Res.string.project_task_tracker_desc),
             technologies = listOf(
-                stringResource(Res.string.tech_kotlin),
-                stringResource(Res.string.tech_compose),
-                stringResource(Res.string.tech_sqlite),
-                stringResource(Res.string.tech_ktor)
-            )
+                Res.string.tech_kotlin,
+                Res.string.tech_compose,
+                Res.string.tech_sqlite,
+                Res.string.tech_ktor
+            ).map {
+                stringResource(it)
+            }
         ),
         Project(
             title = stringResource(Res.string.project_api_gateway_title),
             description = stringResource(Res.string.project_api_gateway_desc),
             technologies = listOf(
-                stringResource(Res.string.tech_ktor),
-                stringResource(Res.string.tech_jwt),
-                stringResource(Res.string.tech_docker)
-            )
+                Res.string.tech_ktor,
+                Res.string.tech_jwt,
+                Res.string.tech_docker
+            ).map {
+                stringResource(it)
+            }
         )
     )
 
