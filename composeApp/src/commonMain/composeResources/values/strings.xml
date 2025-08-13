@@ -18,4 +18,38 @@
     <string name="tech_ktor">Ktor</string>
     <string name="tech_jwt">JWT</string>
     <string name="tech_docker">Docker</string>
+
+    <!-- Home screen: Hero -->
+    <string name="home_name">John Doe</string>
+    <string name="home_title">Full-Stack Developer</string>
+    <string name="home_tagline">Building innovative solutions with cutting-edge technologies</string>
+
+    <!-- Home screen: About -->
+    <string name="home_about_title">About Me</string>
+    <string name="home_about_paragraph1">I am a passionate Full-Stack Developer with expertise in modern web and mobile technologies. With a strong foundation in both frontend and backend development, I create seamless, user-centered applications that solve real-world problems.</string>
+    <string name="home_about_paragraph2">My approach combines technical excellence with creative problem-solving. I'm dedicated to writing clean, maintainable code and staying current with industry best practices and emerging technologies.</string>
+    <string name="home_skills_title">Key Skills</string>
+
+    <!-- Home screen: Skills list -->
+    <!-- Reuse tech_kotlin and tech_compose where appropriate -->
+    <string name="home_skill_android">Android</string>
+    <string name="home_skill_javascript">JavaScript</string>
+    <string name="home_skill_react">React</string>
+    <string name="home_skill_nodejs">Node.js</string>
+    <string name="home_skill_uiux">UI/UX</string>
+    <string name="home_skill_git">Git</string>
+    <string name="home_skill_cicd">CI/CD</string>
+
+    <!-- Home screen: Contact -->
+    <string name="home_contact_title">Contact Information</string>
+    <string name="home_contact_email_label">Email</string>
+    <string name="home_contact_email_value">john.doe@example.com</string>
+    <string name="home_contact_location_label">Location</string>
+    <string name="home_contact_location_value">San Francisco, CA</string>
+    <string name="home_connect_with_me">Connect with me</string>
+
+    <!-- Home screen: Social platforms -->
+    <string name="platform_linkedin">LinkedIn</string>
+    <string name="platform_github">GitHub</string>
+    <string name="platform_twitter">Twitter</string>
 </resources>
