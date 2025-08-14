@@ -56,4 +56,10 @@
     <string name="url_linkedin">https://www.linkedin.com/</string>
     <string name="url_github">https://github.com/</string>
     <string name="url_bluesky">https://bsky.app/</string>
+    
+    <!-- Projects: Angus Paint -->
+    <string name="project_angus_paint_title">Angus Paint</string>
+    <string name="project_angus_paint_desc">Paint your own masterpiece with Angus Paint
+Available on the Google Play Store
+Use your finger as your painting tool. Paint with any color of the rainbow. Paint with different brush sizes. Save your paintings to your device. Paint upon a picture from your device. Paint in portrait or landscape mode. Have fun, and please rate on Google Play!</string>
 </resources>
