@@ -62,4 +62,22 @@
     <string name="project_angus_paint_desc">Paint your own masterpiece with Angus Paint
 Available on the Google Play Store
 Use your finger as your painting tool. Paint with any color of the rainbow. Paint with different brush sizes. Save your paintings to your device. Paint upon a picture from your device. Paint in portrait or landscape mode. Have fun, and please rate on Google Play!</string>
+    
+    <!-- Projects: Angus Solitaire -->
+    <string name="project_angus_solitaire_title">Angus Solitaire</string>
+    <string name="project_angus_solitaire_desc">A new version of Solitaire invented by Angus Software
+Available on the Google Play Store
+The objective of the game is to score as many points as possible before the deck runs out of cards.</string>
+
+    <!-- Projects: Blink Reader -->
+    <string name="project_blink_reader_title">Blink Reader</string>
+    <string name="project_blink_reader_desc">Read at an enhanced speed with Blink Reader
+Available on the Google Play Store
+Blink Reader is an Application for the Android mobile Operating System. The purpose of the Blink Reader app is to provide its users with an Application for reading text at an enhanced speed. This enhanced reading speed is achieved by displaying one word of the text which the user is reading at a time. By displaying one word at a time, the user doesn't have to move their eyes, and can manually control the words per minute at which the text displays.</string>
+
+    <!-- Projects: Tap Target Booster -->
+    <string name="project_tap_target_booster_title">Tap Target Booster</string>
+    <string name="project_tap_target_booster_desc">Improve your touching and pressing aim with this targeting game
+Available on the Google Play Store
+With four different modes to help improve you accuracy and speed, Tap Target Booster is fun way to measure and hone your touch screen skills!</string>
 </resources>
