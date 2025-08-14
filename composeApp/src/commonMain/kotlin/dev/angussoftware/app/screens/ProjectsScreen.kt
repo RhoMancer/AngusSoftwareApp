@@ -108,7 +108,7 @@ fun ProjectsScreen() {
                                 Text(
                                     text = it,
                                     style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.padding(top = 4.dp)
+                                    modifier = Modifier.padding(top = 6.dp)
                                 )
                             }
                             project.description?.let {
