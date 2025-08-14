@@ -54,6 +54,14 @@ fun ProjectsScreen() {
             ).map {
                 stringResource(it)
             }
+        ),
+        Project(
+            title = stringResource(Res.string.project_angus_paint_title),
+            description = stringResource(Res.string.project_angus_paint_desc),
+            technologies = listOf(
+                Res.string.tech_kotlin,
+                Res.string.tech_compose
+            ).map { stringResource(it) }
         )
     )
 
