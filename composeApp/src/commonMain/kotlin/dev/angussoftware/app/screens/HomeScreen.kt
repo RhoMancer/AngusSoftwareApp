@@ -42,9 +42,11 @@ import angussoftwareapp.composeapp.generated.resources.home_contact_email_value
 import angussoftwareapp.composeapp.generated.resources.home_contact_location_label
 import angussoftwareapp.composeapp.generated.resources.home_contact_location_value
 import angussoftwareapp.composeapp.generated.resources.home_connect_with_me
+import angussoftwareapp.composeapp.generated.resources.platform_bluesky
 import angussoftwareapp.composeapp.generated.resources.platform_linkedin
 import angussoftwareapp.composeapp.generated.resources.platform_github
-import angussoftwareapp.composeapp.generated.resources.platform_twitter
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.foundation.clickable
 
 private const val SKILL_CHIPS_PER_ROW = 3
 
@@ -129,6 +131,7 @@ fun HeroSection(alpha: Float) {
         }
     }
 }
+
 /**
  * AboutMeSection displays professional information about the user,
  * including a summary of their background and skills.
@@ -191,8 +194,8 @@ fun AboutMeSection(alpha: Float) {
                     ) {
                         skillChipList.subList(i, minOf(i + SKILL_CHIPS_PER_ROW, skillChipList.size))
                             .forEach {
-                            SkillChip(it)
-                        }
+                                SkillChip(it)
+                            }
                     }
                 }
             } else {
@@ -260,11 +263,21 @@ fun ContactSection(alpha: Float) {
             // Social Media Links
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                SocialMediaButton(stringResource(Res.string.platform_linkedin))
-                SocialMediaButton(stringResource(Res.string.platform_github))
-                SocialMediaButton(stringResource(Res.string.platform_twitter))
+                SocialMediaButton(
+                    platform = stringResource(Res.string.platform_linkedin),
+                    url = "https://www.linkedin.com/in/harry-cliff/"
+                )
+                SocialMediaButton(
+                    platform = stringResource(Res.string.platform_github),
+                    url = "https://github.com/RhoMancer/Blink-Reader"
+                )
+                SocialMediaButton(
+                    platform = stringResource(Res.string.platform_bluesky),
+                    url = "https://bsky.app/profile/rhomancer.bsky.social"
+                )
             }
         }
     }
@@ -297,8 +310,10 @@ fun ContactItem(title: String, content: String) {
  * @param platform The name of the social media platform
  */
 @Composable
-fun SocialMediaButton(platform: String) {
+fun SocialMediaButton(platform: String, url: String) {
+    val uriHandler = LocalUriHandler.current
     Card(
+        modifier = Modifier.clickable { uriHandler.openUri(url) },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
