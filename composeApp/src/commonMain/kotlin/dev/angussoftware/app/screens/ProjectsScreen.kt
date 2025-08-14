@@ -62,6 +62,30 @@ fun ProjectsScreen() {
                 Res.string.tech_kotlin,
                 Res.string.tech_compose
             ).map { stringResource(it) }
+        ),
+        Project(
+            title = stringResource(Res.string.project_angus_solitaire_title),
+            description = stringResource(Res.string.project_angus_solitaire_desc),
+            technologies = listOf(
+                Res.string.tech_kotlin,
+                Res.string.tech_compose
+            ).map { stringResource(it) }
+        ),
+        Project(
+            title = stringResource(Res.string.project_blink_reader_title),
+            description = stringResource(Res.string.project_blink_reader_desc),
+            technologies = listOf(
+                Res.string.tech_kotlin,
+                Res.string.tech_compose
+            ).map { stringResource(it) }
+        ),
+        Project(
+            title = stringResource(Res.string.project_tap_target_booster_title),
+            description = stringResource(Res.string.project_tap_target_booster_desc),
+            technologies = listOf(
+                Res.string.tech_kotlin,
+                Res.string.tech_compose
+            ).map { stringResource(it) }
         )
     )
 
