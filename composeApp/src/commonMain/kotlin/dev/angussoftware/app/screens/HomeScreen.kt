@@ -312,16 +312,27 @@ fun ContactItem(title: String, content: String) {
 @Composable
 fun SocialMediaButton(platform: String, url: String) {
     val uriHandler = LocalUriHandler.current
-    Card(
+    androidx.compose.material3.OutlinedCard(
         modifier = Modifier.clickable { uriHandler.openUri(url) },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
-        Text(
-            text = platform,
-            style = MaterialTheme.typography.bodyMedium,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
+        ) {
+            Text(
+                text = platform,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "↗",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
     }
 }
