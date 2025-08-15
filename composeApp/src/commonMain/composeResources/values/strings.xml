@@ -83,4 +83,10 @@
     <string name="project_tap_target_booster_subtitle">Improve your touching and pressing aim with this targeting game</string>
     <string name="project_tap_target_booster_desc">With four different modes to help improve you accuracy and speed, Tap Target Booster is fun way to measure and hone your touch screen skills!
     </string>
+    
+    <!-- Blog screen -->
+    <string name="blog_title">Blog</string>
+    <string name="blog_loading">Loading posts...</string>
+    <string name="blog_empty">There are no new Posts to display.</string>
+    <string name="blog_paging_todo">TODO: implement paging at bottom of scroll</string>
 </resources>
