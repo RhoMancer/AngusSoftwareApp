@@ -45,12 +45,7 @@ fun ProjectsScreen() {
                 Res.string.tech_multiplatform
             ).map {
                 stringResource(it)
-            },
-            images = listOf(
-                Res.drawable.project_test1,
-                Res.drawable.project_test2,
-                Res.drawable.project_test3
-            ),
+            }
             // link = "https://your-portfolio-url.example" // Optional: provide when available
         ),
         Project(
@@ -65,6 +60,15 @@ fun ProjectsScreen() {
                 Res.string.tech_kotlin,
                 Res.string.tech_xml
             ).map { stringResource(it) },
+            images = listOf(
+                Res.drawable.angus_paint_1,
+                Res.drawable.angus_paint_2,
+                Res.drawable.angus_paint_3,
+                Res.drawable.angus_paint_4,
+                Res.drawable.angus_paint_5,
+                Res.drawable.angus_paint_6,
+                Res.drawable.angus_paint_7
+            ),
             link = "https://play.google.com/store/apps/details?id=gms.angusgaming.anguspaint"
         ),
         Project(
@@ -75,6 +79,11 @@ fun ProjectsScreen() {
                 Res.string.tech_kotlin,
                 Res.string.tech_xml
             ).map { stringResource(it) },
+            images = listOf(
+                Res.drawable.angus_solitaire_1,
+                Res.drawable.angus_solitaire_2,
+                Res.drawable.angus_solitaire_3
+            ),
             link = "https://play.google.com/store/apps/details?id=gms.angus.angussoli"
         ),
         Project(
@@ -85,6 +94,11 @@ fun ProjectsScreen() {
                 Res.string.tech_kotlin,
                 Res.string.tech_xml
             ).map { stringResource(it) },
+            images = listOf(
+                Res.drawable.blink_reader_1,
+                Res.drawable.blink_reader_2,
+                Res.drawable.blink_reader_3
+            ),
             link = "https://play.google.com/store/apps/details?id=com.woods.blinkreader"
         ),
         Project(
@@ -95,6 +109,12 @@ fun ProjectsScreen() {
                 Res.string.tech_kotlin,
                 Res.string.tech_compose
             ).map { stringResource(it) },
+            images = listOf(
+                Res.drawable.tap_target_1,
+                Res.drawable.tap_target_2,
+                Res.drawable.tap_target_3,
+                Res.drawable.tap_target_4
+            ),
             link = "https://play.google.com/store/apps/details?id=angus.gaming.taptargetbooster"
         )
     )
