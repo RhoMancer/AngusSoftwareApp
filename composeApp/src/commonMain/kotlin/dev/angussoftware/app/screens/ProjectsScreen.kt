@@ -153,7 +153,7 @@ fun ProjectsScreen() {
                                     state = pagerState,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(180.dp)
+                                        .aspectRatio(16f/9f)
                                         .padding(top = 8.dp)
                                 ) { page ->
                                     val res = project.images[page]
@@ -161,7 +161,7 @@ fun ProjectsScreen() {
                                         painter = painterResource(res),
                                         contentDescription = null,
                                         modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
+                                        contentScale = ContentScale.Fit
                                     )
                                 }
                                 if (project.images.size > 1) {
