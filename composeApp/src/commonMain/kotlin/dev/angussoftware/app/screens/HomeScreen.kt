@@ -1,20 +1,26 @@
 package dev.angussoftware.app.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.angussoftware.app.currentWindowAdaptiveInfo
-import dev.angussoftware.app.ui.components.ScreenContainer
+import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -45,8 +51,6 @@ import angussoftwareapp.composeapp.generated.resources.home_connect_with_me
 import angussoftwareapp.composeapp.generated.resources.platform_bluesky
 import angussoftwareapp.composeapp.generated.resources.platform_linkedin
 import angussoftwareapp.composeapp.generated.resources.platform_github
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.foundation.clickable
 
 private const val SKILL_CHIPS_PER_ROW = 3
 
@@ -61,22 +65,81 @@ private const val SKILL_CHIPS_PER_ROW = 3
  * Top and bottom padding are added to account for the status bar and navigation bar,
  * while maintaining the edge-to-edge effect.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun HomeScreen() {
-    ScreenContainer { alpha, tilePadding ->
-        // Hero Section - displays profile image, name, title, and tagline
-        HeroSection(alpha)
+    // Insets similar to ScreenContainer
+    val statusBarHeightPx = WindowInsets.statusBars.getTop(LocalDensity.current)
+    val navigationBarHeightPx = WindowInsets.navigationBars.getBottom(LocalDensity.current)
+    val density = LocalDensity.current
+    val statusBarHeightDp = with(density) { statusBarHeightPx.toDp() }
+    val systemNavigationBarHeightDp = with(density) { navigationBarHeightPx.toDp() }
 
-        Spacer(modifier = Modifier.height(tilePadding * 2))
+    val appNavigationBarHeightDp = LocalNavigationBarHeight.current
+    val bottomInset = systemNavigationBarHeightDp + appNavigationBarHeightDp
 
-        // About Me Section - displays professional summary and skills
-        AboutMeSection(alpha)
+    // Scroll state and collapse logic
+    val listState = rememberLazyListState()
+    val collapseThresholdPx = with(density) { 120.dp.toPx() }
+    val isCollapsed by remember {
+        derivedStateOf {
+            val index = listState.firstVisibleItemIndex
+            val offset = listState.firstVisibleItemScrollOffset
+            index > 0 || offset > collapseThresholdPx.toInt()
+        }
+    }
 
-        Spacer(modifier = Modifier.height(tilePadding * 2))
+    // Fade-in alpha reused from ScreenContainer
+    var isVisible by remember { mutableStateOf(false) }
+    val alpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(durationMillis = 1000),
+        label = "fadeIn"
+    )
+    LaunchedEffect(Unit) { isVisible = true }
 
-        // Contact Information Section - displays email, location, and social media links
-        ContactSection(alpha)
+    val tilePadding = 16.dp
+
+    Scaffold(
+        topBar = {
+            AnimatedVisibility(visible = isCollapsed) {
+                TopAppBar(title = { Text("Angus Software") })
+            }
+        },
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(
+                top = statusBarHeightDp + tilePadding + innerPadding.calculateTopPadding(),
+                bottom = bottomInset + tilePadding + innerPadding.calculateBottomPadding()
+            )
+        ) {
+            // HERO (no card)
+            item {
+                HeroSection(alpha)
+            }
+
+            // Spacer similar to ScreenContainer spacing between tiles
+            item { Spacer(modifier = Modifier.height(tilePadding * 2)) }
+
+            // ABOUT ME
+            item {
+                AboutMeSection(alpha)
+            }
+
+            item { Spacer(modifier = Modifier.height(tilePadding * 2)) }
+
+            // CONTACT
+            item {
+                ContactSection(alpha)
+            }
+        }
     }
 }
 
@@ -88,47 +151,47 @@ fun HomeScreen() {
  */
 @Composable
 fun HeroSection(alpha: Float) {
-    SectionCard(alpha = alpha) {
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .alpha(alpha)
+            .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Profile Image (using a colored Box as placeholder)
+        Box(
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Profile Image (using a colored Box as placeholder)
-            Box(
-                modifier = Modifier
-                    .size(150.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
-            )
+                .size(150.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            // Name
-            Text(
-                text = stringResource(Res.string.home_name),
-                style = MaterialTheme.typography.headlineLarge
-            )
+        // Name
+        Text(
+            text = stringResource(Res.string.home_name),
+            style = MaterialTheme.typography.headlineLarge
+        )
 
-            Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-            // Professional Title
-            Text(
-                text = stringResource(Res.string.home_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
+        // Professional Title
+        Text(
+            text = stringResource(Res.string.home_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            // Tagline
-            Text(
-                text = stringResource(Res.string.home_tagline),
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-        }
+        // Tagline
+        Text(
+            text = stringResource(Res.string.home_tagline),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
     }
 }
 
