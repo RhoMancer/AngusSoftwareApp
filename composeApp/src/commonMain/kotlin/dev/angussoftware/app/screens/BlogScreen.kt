@@ -3,6 +3,7 @@ package dev.angussoftware.app.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -24,11 +25,16 @@ fun BlogScreen() {
     val feedUrl = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
     var isLoading by remember { mutableStateOf(true) }
-    var posts by remember { mutableStateOf<List<BlogPost>>(emptyList()) }
+    var allPosts by remember { mutableStateOf<List<BlogPost>>(emptyList()) }
+    val pageSize = 20
+    var visibleCount by remember { mutableStateOf(pageSize) }
 
     LaunchedEffect(feedUrl) {
         val repository = BlogRepository(feedUrl)
-        posts = repository.fetchPosts(limit = 20)
+        // Fetch all posts once, then paginate locally
+        allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
+        // Ensure initial visible count doesn't exceed size
+        visibleCount = minOf(pageSize, allPosts.size)
         isLoading = false
     }
 
@@ -49,7 +55,7 @@ fun BlogScreen() {
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            posts.isEmpty() -> {
+            allPosts.isEmpty() -> {
                 Text(
                     text = stringResource(Res.string.blog_empty),
                     style = MaterialTheme.typography.bodyMedium,
@@ -57,11 +63,12 @@ fun BlogScreen() {
                 )
             }
             else -> {
+                val visiblePosts = remember(allPosts, visibleCount) { allPosts.take(visibleCount) }
                 Column(
                     verticalArrangement = Arrangement.spacedBy(tilePadding),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    posts.forEach { post ->
+                    visiblePosts.forEach { post ->
                         SectionCard(alpha = alpha) {
                             Column(
                                 modifier = Modifier
@@ -111,18 +118,19 @@ fun BlogScreen() {
                             )
                         }
                     }
+
+                    if (visibleCount < allPosts.size) {
+                        Button(
+                            onClick = { visibleCount = minOf(visibleCount + pageSize, allPosts.size) },
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(top = 8.dp)
+                        ) {
+                            Text(text = stringResource(Res.string.blog_load_more))
+                        }
+                    }
                 }
             }
         }
-
-        // TODO note for paging at bottom of scroll
-        Text(
-            text = stringResource(Res.string.blog_paging_todo),
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp)
-        )
     }
 }
