@@ -152,8 +152,8 @@ fun HomeScreen() {
             TopAppBar(
                 title = { Text("Angus Software", modifier = Modifier.alpha(titleAlpha)) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha),
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha)
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
+                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha)
                 )
             )
         }
