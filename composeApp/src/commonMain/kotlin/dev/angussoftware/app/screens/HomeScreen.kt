@@ -108,20 +108,14 @@ fun HomeScreen() {
         label = "topBarBgAlpha"
     )
 
+    val isCompactScreen = currentWindowAdaptiveInfo().isCompact
+
     val tilePadding = 16.dp
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Angus Software", modifier = Modifier.alpha(titleAlpha)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha),
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha)
-                )
-            )
-        },
-        modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -129,8 +123,8 @@ fun HomeScreen() {
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(
-                top = tilePadding + innerPadding.calculateTopPadding(),
-                bottom = bottomInset + tilePadding + innerPadding.calculateBottomPadding()
+                top = statusBarHeightDp + tilePadding,
+                bottom = bottomInset + tilePadding
             )
         ) {
             // HERO (no card)
@@ -152,6 +146,16 @@ fun HomeScreen() {
             item {
                 ContactSection(alpha)
             }
+        }
+
+        if (isCompactScreen) {
+            TopAppBar(
+                title = { Text("Angus Software", modifier = Modifier.alpha(titleAlpha)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha),
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha)
+                )
+            )
         }
     }
 }

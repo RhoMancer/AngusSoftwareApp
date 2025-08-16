@@ -16,9 +16,18 @@ import angussoftwareapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.blog.BlogRepository
-import dev.angussoftware.app.ui.components.ScreenContainer
 import dev.angussoftware.app.ui.components.SectionCard
+import dev.angussoftware.app.navigation.LocalNavigationBarHeight
+import dev.angussoftware.app.currentWindowAdaptiveInfo
+import androidx.compose.material3.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.alpha
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlogScreen() {
     val uriHandler = LocalUriHandler.current
@@ -38,37 +47,96 @@ fun BlogScreen() {
         isLoading = false
     }
 
-    ScreenContainer { alpha, tilePadding ->
-        Text(
-            text = stringResource(Res.string.blog_title),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .fillMaxWidth()
-        )
+    // Insets similar to HomeScreen
+    val statusBarHeightPx = WindowInsets.statusBars.getTop(LocalDensity.current)
+    val navigationBarHeightPx = WindowInsets.navigationBars.getBottom(LocalDensity.current)
+    val density = LocalDensity.current
+    val statusBarHeightDp = with(density) { statusBarHeightPx.toDp() }
+    val systemNavigationBarHeightDp = with(density) { navigationBarHeightPx.toDp() }
+    val appNavigationBarHeightDp = LocalNavigationBarHeight.current
+    val bottomInset = systemNavigationBarHeightDp + appNavigationBarHeightDp
 
-        when {
-            isLoading -> {
+    // Scroll/collapse behavior
+    val listState = rememberLazyListState()
+    val collapseThresholdPx = with(density) { 120.dp.toPx() }
+    val isCollapsed by remember {
+        derivedStateOf {
+            val index = listState.firstVisibleItemIndex
+            val offset = listState.firstVisibleItemScrollOffset
+            index > 0 || offset > collapseThresholdPx.toInt()
+        }
+    }
+
+    // Animations
+    var isVisible by remember { mutableStateOf(false) }
+    val alpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(durationMillis = 1000),
+        label = "fadeIn"
+    )
+    LaunchedEffect(Unit) { isVisible = true }
+
+    val titleAlpha by animateFloatAsState(
+        targetValue = if (isCollapsed) 1f else 0f,
+        label = "topBarTitleAlpha"
+    )
+    val bgAlpha by animateFloatAsState(
+        targetValue = if (isCollapsed) 1f else 0f,
+        label = "topBarBgAlpha"
+    )
+
+    val isCompactScreen = currentWindowAdaptiveInfo().isCompact
+
+    val tilePadding = 16.dp
+
+    Box(
+    ) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(
+                top = statusBarHeightDp + tilePadding,
+                bottom = bottomInset + tilePadding
+            )
+        ) {
+            // Title
+            item {
                 Text(
-                    text = stringResource(Res.string.blog_loading),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.fillMaxWidth()
+                    text = stringResource(Res.string.blog_title),
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .fillMaxWidth()
+                        .alpha(alpha)
                 )
             }
-            allPosts.isEmpty() -> {
-                Text(
-                    text = stringResource(Res.string.blog_empty),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            else -> {
-                val visiblePosts = remember(allPosts, visibleCount) { allPosts.take(visibleCount) }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(tilePadding),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    visiblePosts.forEach { post ->
+
+            // Content states
+            when {
+                isLoading -> {
+                    item {
+                        Text(
+                            text = stringResource(Res.string.blog_loading),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+                allPosts.isEmpty() -> {
+                    item {
+                        Text(
+                            text = stringResource(Res.string.blog_empty),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+                else -> {
+                    items(allPosts.take(visibleCount).size) { idx ->
+                        val visiblePosts = allPosts.take(visibleCount)
+                        val post = visiblePosts[idx]
                         SectionCard(alpha = alpha) {
                             Column(
                                 modifier = Modifier
@@ -94,7 +162,6 @@ fun BlogScreen() {
                                     )
                                 }
                                 if (!post.imageUrl.isNullOrBlank()) {
-                                    // Placeholder for image (no loader in v1)
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -118,19 +185,34 @@ fun BlogScreen() {
                             )
                         }
                     }
-
                     if (visibleCount < allPosts.size) {
-                        Button(
-                            onClick = { visibleCount = minOf(visibleCount + pageSize, allPosts.size) },
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(top = 8.dp)
-                        ) {
-                            Text(text = stringResource(Res.string.blog_load_more))
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Button(
+                                    onClick = { visibleCount = minOf(visibleCount + pageSize, allPosts.size) }
+                                ) {
+                                    Text(text = stringResource(Res.string.blog_load_more))
+                                }
+                            }
                         }
                     }
                 }
             }
+        }
+
+        if (isCompactScreen) {
+            TopAppBar(
+                title = { Text("Angus Software", modifier = Modifier.alpha(titleAlpha)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha),
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha)
+                )
+            )
         }
     }
 }
