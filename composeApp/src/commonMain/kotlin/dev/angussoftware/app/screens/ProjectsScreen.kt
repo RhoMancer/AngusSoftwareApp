@@ -16,12 +16,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
-import dev.angussoftware.app.ui.components.ScreenContainer
+import dev.angussoftware.app.navigation.LocalNavigationBarHeight
+import dev.angussoftware.app.currentWindowAdaptiveInfo
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.material3.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.alpha
 
 private data class Project(
     val title: String,
@@ -32,7 +41,7 @@ private data class Project(
     val images: List<DrawableResource> = emptyList(),
 )
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen() {
     val projects = listOf(
@@ -121,13 +130,66 @@ fun ProjectsScreen() {
 
     val uriHandler = LocalUriHandler.current
 
-    ScreenContainer { alpha, tilePadding ->
+    // Insets similar to HomeScreen
+    val statusBarHeightPx = WindowInsets.statusBars.getTop(LocalDensity.current)
+    val navigationBarHeightPx = WindowInsets.navigationBars.getBottom(LocalDensity.current)
+    val density = LocalDensity.current
+    val statusBarHeightDp = with(density) { statusBarHeightPx.toDp() }
+    val systemNavigationBarHeightDp = with(density) { navigationBarHeightPx.toDp() }
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(tilePadding),
-            modifier = Modifier.fillMaxWidth()
+    val appNavigationBarHeightDp = LocalNavigationBarHeight.current
+    val bottomInset = systemNavigationBarHeightDp + appNavigationBarHeightDp
+
+    // Scroll and collapse logic
+    val listState = rememberLazyListState()
+    val collapseThresholdPx = with(density) { 120.dp.toPx() }
+    val isCollapsed by remember {
+        derivedStateOf {
+            val index = listState.firstVisibleItemIndex
+            val offset = listState.firstVisibleItemScrollOffset
+            index > 0 || offset > collapseThresholdPx.toInt()
+        }
+    }
+
+    // Fade-in for content and app bar visuals
+    var isVisible by remember { mutableStateOf(false) }
+    val alpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(durationMillis = 1000),
+        label = "fadeIn"
+    )
+    LaunchedEffect(Unit) { isVisible = true }
+
+    val titleAlpha by animateFloatAsState(
+        targetValue = if (isCollapsed) 1f else 0f,
+        label = "topBarTitleAlpha"
+    )
+    val bgAlpha by animateFloatAsState(
+        targetValue = if (isCollapsed) 1f else 0f,
+        label = "topBarBgAlpha"
+    )
+
+    val isCompactScreen = currentWindowAdaptiveInfo().isCompact
+
+    val tilePadding = 16.dp
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(
+                top = statusBarHeightDp + tilePadding,
+                bottom = bottomInset + tilePadding
+            ),
+            verticalArrangement = Arrangement.spacedBy(tilePadding)
         ) {
-            projects.forEach { project ->
+            items(projects.size) { idx ->
+                val project = projects[idx]
                 val clickableModifier = if (!project.link.isNullOrBlank()) {
                     Modifier.clickable { uriHandler.openUri(project.link!!) }
                 } else {
@@ -195,7 +257,9 @@ fun ProjectsScreen() {
                             }
                             if (project.technologies.isNotEmpty()) {
                                 FlowRow(
-                                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     project.technologies.forEach { tech ->
@@ -214,6 +278,15 @@ fun ProjectsScreen() {
                     }
                 }
             }
+        }
+        if (isCompactScreen) {
+            TopAppBar(
+                title = { Text("Angus Software", modifier = Modifier.alpha(titleAlpha)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha),
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha)
+                )
+            )
         }
     }
 }
