@@ -99,13 +99,26 @@ fun HomeScreen() {
     )
     LaunchedEffect(Unit) { isVisible = true }
 
+    val titleAlpha by animateFloatAsState(
+        targetValue = if (isCollapsed) 1f else 0f,
+        label = "topBarTitleAlpha"
+    )
+    val bgAlpha by animateFloatAsState(
+        targetValue = if (isCollapsed) 1f else 0f,
+        label = "topBarBgAlpha"
+    )
+
     val tilePadding = 16.dp
 
     Scaffold(
         topBar = {
-            AnimatedVisibility(visible = isCollapsed) {
-                TopAppBar(title = { Text("Angus Software") })
-            }
+            TopAppBar(
+                title = { Text("Angus Software", modifier = Modifier.alpha(titleAlpha)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha),
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = bgAlpha)
+                )
+            )
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -116,7 +129,7 @@ fun HomeScreen() {
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(
-                top = statusBarHeightDp + tilePadding + innerPadding.calculateTopPadding(),
+                top = tilePadding + innerPadding.calculateTopPadding(),
                 bottom = bottomInset + tilePadding + innerPadding.calculateBottomPadding()
             )
         ) {
