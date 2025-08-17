@@ -5,12 +5,14 @@ internal object RssParser {
         val items = ITEM_REGEX.findAll(xml).map { it.value }.take(limit)
         val posts = mutableListOf<BlogPost>()
         for (itemXml in items) {
-            val link = extractTag(itemXml, "link")?.trim().orEmpty()
+            val guid = extractTag(itemXml, "guid")?.let { stripCdata(it).trim() }
+            val link = extractLink(itemXml).ifBlank {
+                guid?.takeIf { it.startsWith("http://") || it.startsWith("https://") } ?: ""
+            }
             if (link.isBlank()) continue
-            val guid = extractTag(itemXml, "guid")?.trim()
             val title = extractTag(itemXml, "title")?.let { decodeXmlEntities(stripCdata(it)).trim() }.orEmpty()
             val pubDate = extractTag(itemXml, "pubDate")?.let { stripCdata(it).trim() }
-            val descriptionRaw = extractTag(itemXml, "description")
+            val descriptionRaw = extractTag(itemXml, "description") ?: extractTag(itemXml, "content:encoded")
             val description = descriptionRaw?.let { stripHtml(decodeXmlEntities(stripCdata(it))).trim() }?.take(400)
             val imageUrl = extractEnclosureUrl(itemXml) ?: extractMediaUrl(itemXml)
 
@@ -27,7 +29,21 @@ internal object RssParser {
     }
 
     private fun extractTag(xml: String, tag: String): String? {
-        val regex = Regex("<${'$'}tag(?:[^>]*)>([\\s\\S]*?)</${'$'}tag>", RegexOption.IGNORE_CASE)
+        val pattern = "<${tag}(?:[^>]*)>([\\s\\S]*?)</${tag}>"
+        val regex = Regex(pattern, RegexOption.IGNORE_CASE)
+        return regex.find(xml)?.groupValues?.get(1)
+    }
+
+    private fun extractLink(xml: String): String {
+        // 1) Standard RSS link content
+        extractTag(xml, "link")?.let { return stripCdata(it).trim() }
+        // 2) Atom-style link href attribute
+        extractAtomLinkHref(xml)?.let { return it.trim() }
+        return ""
+    }
+
+    private fun extractAtomLinkHref(xml: String): String? {
+        val regex = Regex("<link[^>]*href=\"([^\"]+)\"[^>]*/?>", RegexOption.IGNORE_CASE)
         return regex.find(xml)?.groupValues?.get(1)
     }
 
