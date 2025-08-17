@@ -12,8 +12,17 @@ internal object RssParser {
             if (link.isBlank()) continue
             val title = extractTag(itemXml, "title")?.let { decodeXmlEntities(stripCdata(it)).trim() }.orEmpty()
             val pubDate = extractTag(itemXml, "pubDate")?.let { stripCdata(it).trim() }
-            val descriptionRaw = extractTag(itemXml, "description") ?: extractTag(itemXml, "content:encoded")
-            val description = descriptionRaw?.let { stripHtml(decodeXmlEntities(stripCdata(it))).trim() }?.take(400)
+
+            // Full content: prefer content:encoded, then <content> if present
+            val contentRaw = extractTag(itemXml, "content:encoded") ?: extractTag(itemXml, "content")
+            val contentPlain = contentRaw?.let { stripHtml(decodeXmlEntities(stripCdata(it))).trim() }
+
+            // Summary: prefer <description>, else derive from content
+            val descriptionRaw = extractTag(itemXml, "description")
+            val summary = (descriptionRaw ?: contentRaw)
+                ?.let { stripHtml(decodeXmlEntities(stripCdata(it))).trim() }
+                ?.take(400)
+
             val imageUrl = extractEnclosureUrl(itemXml) ?: extractMediaUrl(itemXml)
 
             posts += BlogPost(
@@ -21,8 +30,9 @@ internal object RssParser {
                 title = if (title.isBlank()) "Untitled" else title,
                 url = link,
                 pubDate = pubDate,
-                summary = description,
-                imageUrl = imageUrl
+                summary = summary,
+                imageUrl = imageUrl,
+                content = contentPlain
             )
         }
         return posts

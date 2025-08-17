@@ -6,5 +6,6 @@ data class BlogPost(
     val url: String,
     val pubDate: String?,
     val summary: String?,
-    val imageUrl: String?
+    val imageUrl: String?,
+    val content: String?
 )
