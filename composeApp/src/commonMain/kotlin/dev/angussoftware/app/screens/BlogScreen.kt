@@ -22,6 +22,8 @@ import dev.angussoftware.app.currentWindowAdaptiveInfo
 import androidx.compose.material3.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -37,6 +39,7 @@ fun BlogScreen() {
     var allPosts by remember { mutableStateOf<List<BlogPost>>(emptyList()) }
     val pageSize = 20
     var visibleCount by remember { mutableStateOf(pageSize) }
+    var selectedPost by remember { mutableStateOf<BlogPost?>(null) }
 
     LaunchedEffect(feedUrl) {
         val repository = BlogRepository(feedUrl)
@@ -137,7 +140,7 @@ fun BlogScreen() {
                     items(allPosts.take(visibleCount).size) { idx ->
                         val visiblePosts = allPosts.take(visibleCount)
                         val post = visiblePosts[idx]
-                        val clickableModifier = Modifier.clickable { uriHandler.openUri(post.url) }
+                        val clickableModifier = Modifier.clickable { selectedPost = post }
                         SectionCard(alpha = alpha, modifier = clickableModifier) {
                             Box(modifier = Modifier.fillMaxWidth()) {
                                 Column(
@@ -214,6 +217,76 @@ fun BlogScreen() {
                     scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha)
                 )
             )
+        }
+
+        // In-app reader overlay
+        selectedPost?.let { post ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize(),
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp)
+                        .padding(top = statusBarHeightDp + tilePadding, bottom = bottomInset + tilePadding)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Close",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable { selectedPost = null }
+                        )
+                        Text(
+                            text = "\u2197 Open",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable { uriHandler.openUri(post.url) }
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = post.title,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    post.pubDate?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                    if (!post.imageUrl.isNullOrBlank()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .padding(top = 12.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Image placeholder",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    post.summary?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(top = 12.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
