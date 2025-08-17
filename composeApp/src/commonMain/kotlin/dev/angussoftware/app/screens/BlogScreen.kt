@@ -137,52 +137,53 @@ fun BlogScreen() {
                     items(allPosts.take(visibleCount).size) { idx ->
                         val visiblePosts = allPosts.take(visibleCount)
                         val post = visiblePosts[idx]
-                        SectionCard(alpha = alpha) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { uriHandler.openUri(post.url) }
-                            ) {
-                                Text(
-                                    text = post.title,
-                                    style = MaterialTheme.typography.titleLarge
-                                )
-                                post.pubDate?.let {
+                        val clickableModifier = Modifier.clickable { uriHandler.openUri(post.url) }
+                        SectionCard(alpha = alpha, modifier = clickableModifier) {
+                            Box(modifier = Modifier.fillMaxWidth()) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
                                     Text(
-                                        text = it,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.padding(top = 4.dp)
+                                        text = post.title,
+                                        style = MaterialTheme.typography.titleLarge
                                     )
-                                }
-                                post.summary?.let {
-                                    Text(
-                                        text = it,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.padding(top = 8.dp)
-                                    )
-                                }
-                                if (!post.imageUrl.isNullOrBlank()) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(160.dp)
-                                            .padding(top = 8.dp)
-                                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                                        contentAlignment = Alignment.Center
-                                    ) {
+                                    post.pubDate?.let {
                                         Text(
-                                            text = "Image placeholder",
+                                            text = it,
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            modifier = Modifier.padding(top = 4.dp)
                                         )
                                     }
+                                    post.summary?.let {
+                                        Text(
+                                            text = it,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.padding(top = 8.dp)
+                                        )
+                                    }
+                                    if (!post.imageUrl.isNullOrBlank()) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(160.dp)
+                                                .padding(top = 8.dp)
+                                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = "Image placeholder",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
                                 }
+                                Text(
+                                    text = "\u2197",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    modifier = Modifier.align(androidx.compose.ui.Alignment.TopEnd)
+                                )
                             }
-                            Text(
-                                text = "\u2197",
-                                style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier.align(Alignment.End)
-                            )
                         }
                     }
                     if (visibleCount < allPosts.size) {
