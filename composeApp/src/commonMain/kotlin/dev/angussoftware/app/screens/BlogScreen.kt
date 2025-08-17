@@ -278,12 +278,20 @@ fun BlogScreen() {
                             )
                         }
                     }
-                    post.summary?.let {
+                    if (!post.content.isNullOrBlank()) {
                         Text(
-                            text = it,
+                            text = post.content!!,
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(top = 12.dp)
                         )
+                    } else {
+                        post.summary?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(top = 12.dp)
+                            )
+                        }
                     }
                 }
             }
