@@ -30,6 +30,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.draw.alpha
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.OpenInNew
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -200,9 +202,10 @@ fun BlogScreen() {
                                         }
                                     }
                                 }
-                                Text(
-                                    text = "\u2197",
-                                    style = MaterialTheme.typography.titleLarge,
+                                Icon(
+                                    imageVector = Icons.Outlined.OpenInNew,
+                                    contentDescription = "Open",
+                                    tint = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.align(androidx.compose.ui.Alignment.TopEnd)
                                 )
                             }
@@ -262,12 +265,22 @@ fun BlogScreen() {
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.clickable { selectedPost = null }
                         )
-                        Text(
-                            text = "\u2197 Open",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.clickable { uriHandler.openUri(post.url) }
-                        )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.OpenInNew,
+                                contentDescription = "Open in browser",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Open",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(

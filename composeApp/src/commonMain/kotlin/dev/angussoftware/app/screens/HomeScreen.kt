@@ -52,6 +52,8 @@ import angussoftwareapp.composeapp.generated.resources.home_connect_with_me
 import angussoftwareapp.composeapp.generated.resources.platform_bluesky
 import angussoftwareapp.composeapp.generated.resources.platform_linkedin
 import angussoftwareapp.composeapp.generated.resources.platform_github
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.OpenInNew
 
 private const val SKILL_CHIPS_PER_ROW = 3
 
@@ -420,10 +422,10 @@ fun SocialMediaButton(platform: String, url: String) {
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = "↗",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+            Icon(
+                imageVector = Icons.Outlined.OpenInNew,
+                contentDescription = "Open",
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }

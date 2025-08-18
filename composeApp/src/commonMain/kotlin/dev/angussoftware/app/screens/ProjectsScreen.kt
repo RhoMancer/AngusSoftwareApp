@@ -32,6 +32,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.OpenInNew
 
 private data class Project(
     val title: String,
@@ -272,9 +274,10 @@ fun ProjectsScreen() {
                             }
                         }
                         if (!project.link.isNullOrBlank()) {
-                            Text(
-                                text = "\u2197",
-                                style = MaterialTheme.typography.titleLarge,
+                            Icon(
+                                imageVector = Icons.Outlined.OpenInNew,
+                                contentDescription = "Open",
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.align(androidx.compose.ui.Alignment.TopEnd)
                             )
                         }
