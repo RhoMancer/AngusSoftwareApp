@@ -2,6 +2,7 @@ package dev.angussoftware.app
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 
 /**
@@ -9,10 +10,9 @@ import androidx.compose.ui.unit.Dp
  */
 @Composable
 actual fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo {
-    val configuration = LocalConfiguration.current
-    val widthDp = configuration.screenWidthDp
+    val widthDp = LocalWindowInfo.current.containerSize
     
-    val widthSizeClass = WindowWidthSizeClass.fromWidth(widthDp)
+    val widthSizeClass = WindowWidthSizeClass.fromWidth(widthDp.width)
     
     return WindowAdaptiveInfo(widthSizeClass)
 }
