@@ -6,7 +6,8 @@
     <title>Angus Software App</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
     <script type="application/javascript">
-        // External JavaScript function to handle fetch for WASM
+        // External JavaScript network function for Kotlin/WASM
+        // Avoids WASM type casting issues with Response objects
         async function fetchUrlTextExternal(url) {
             console.log('[DEBUG_LOG] External JavaScript fetch starting for:', url);
             try {
@@ -19,7 +20,6 @@
                     throw new Error(errorMsg);
                 }
                 
-                console.log('[DEBUG_LOG] About to extract text in external function');
                 const text = await response.text();
                 console.log('[DEBUG_LOG] Text extracted successfully, length:', text.length);
                 console.log('[DEBUG_LOG] First 100 chars:', text.substring(0, 100));
@@ -30,7 +30,7 @@
             }
         }
         
-        // Make function globally available
+        // Make function globally available for Kotlin/WASM
         window.fetchUrlTextExternal = fetchUrlTextExternal;
     </script>
     <script type="application/javascript" src="composeApp.js"></script>
