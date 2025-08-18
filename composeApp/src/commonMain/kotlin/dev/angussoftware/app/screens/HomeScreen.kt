@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
@@ -111,6 +112,8 @@ fun HomeScreen() {
     val isCompactScreen = currentWindowAdaptiveInfo().isCompact
 
     val tilePadding = 16.dp
+    val appBarHeightDp = 64.dp
+    val topContentPadding = if (!isCompactScreen) statusBarHeightDp + appBarHeightDp + tilePadding else statusBarHeightDp + tilePadding
 
     Box(
         modifier = Modifier
@@ -123,7 +126,7 @@ fun HomeScreen() {
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(
-                top = statusBarHeightDp + tilePadding,
+                top = topContentPadding,
                 bottom = bottomInset + tilePadding
             )
         ) {
@@ -154,6 +157,15 @@ fun HomeScreen() {
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
                     scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha)
+                )
+            )
+        } else {
+            TopAppBar(
+                modifier = Modifier.shadow(4.dp),
+                title = { Text("Angus Software") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
