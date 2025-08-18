@@ -1,11 +1,15 @@
 package dev.angussoftware.app.blog
 
-import kotlinx.browser.window
 import kotlinx.coroutines.await
-import org.w3c.fetch.RequestInit
-import org.w3c.fetch.Response
+import kotlin.js.Promise
+import kotlin.js.JsAny
+
+// External JavaScript function declaration
+@JsName("fetchUrlTextExternal")
+external fun fetchUrlTextExternal(url: String): Promise<JsAny>
 
 internal actual suspend fun fetchUrlText(url: String): String {
-    val response: Response = window.fetch(url, RequestInit()).await()
-    return response.text().await()
+    // Call external JavaScript function to avoid type casting issues
+    val jsResult: JsAny = fetchUrlTextExternal(url).await()
+    return jsResult.toString()
 }
