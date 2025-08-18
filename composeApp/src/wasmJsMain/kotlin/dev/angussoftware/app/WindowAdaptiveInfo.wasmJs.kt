@@ -1,23 +1,32 @@
 package dev.angussoftware.app
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalDensity
 import kotlinx.browser.window
+import org.w3c.dom.events.Event
 
 /**
  * WasmJs implementation of currentWindowAdaptiveInfo
- * Using JavaScript's window.innerWidth to determine the window size
+ * Now observes browser resize events and converts pixels to dp using LocalDensity
  */
 @Composable
 actual fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo {
-    // Get window width in pixels
-    val widthPx = window.innerWidth
-    
-    // Convert to dp (assuming a standard density of 96 dpi)
-    val widthDp = (widthPx / 1.0).toInt()
-    
+    val density = LocalDensity.current
+
+    var widthPx by remember { mutableStateOf(window.innerWidth) }
+
+    // Listen for window resize and update state to trigger recomposition
+    DisposableEffect(Unit) {
+        val listener: (Event) -> Unit = {
+            widthPx = window.innerWidth
+        }
+        window.addEventListener("resize", listener)
+        onDispose {
+            window.removeEventListener("resize", listener)
+        }
+    }
+
+    val widthDp = with(density) { widthPx.toFloat().toDp().value.toInt() }
     val widthSizeClass = WindowWidthSizeClass.fromWidth(widthDp)
-    
     return WindowAdaptiveInfo(widthSizeClass)
 }
