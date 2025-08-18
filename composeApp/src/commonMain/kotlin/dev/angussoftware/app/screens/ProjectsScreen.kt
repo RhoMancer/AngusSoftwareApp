@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
 
 private data class Project(
     val title: String,
@@ -172,6 +173,8 @@ fun ProjectsScreen() {
     val isCompactScreen = currentWindowAdaptiveInfo().isCompact
 
     val tilePadding = 16.dp
+    val appBarHeightDp = 64.dp
+    val topContentPadding = if (!isCompactScreen) statusBarHeightDp + appBarHeightDp + tilePadding else statusBarHeightDp + tilePadding
 
     Box(
         modifier = Modifier
@@ -183,7 +186,7 @@ fun ProjectsScreen() {
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
             contentPadding = PaddingValues(
-                top = statusBarHeightDp + tilePadding,
+                top = topContentPadding,
                 bottom = bottomInset + tilePadding
             ),
             verticalArrangement = Arrangement.spacedBy(tilePadding)
@@ -285,6 +288,15 @@ fun ProjectsScreen() {
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
                     scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha)
+                )
+            )
+        } else {
+            TopAppBar(
+                modifier = Modifier.shadow(4.dp),
+                title = { Text("Angus Software") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
