@@ -9,7 +9,7 @@ import kotlin.js.JsAny
  * Uses external JS to avoid WASM type casting issues with Response objects.
  */
 
-// External JavaScript function implemented in index.html
+// External JavaScript function implemented in network.js
 @JsName("fetchUrlTextExternal")
 external fun fetchUrlTextExternal(url: String): Promise<JsAny>
 internal actual suspend fun fetchUrlText(url: String): String {
