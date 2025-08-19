@@ -10,7 +10,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.OpenInNew
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -198,7 +198,7 @@ fun BlogScreen() {
                                     }
                                 }
                                 Icon(
-                                    imageVector = Icons.Outlined.OpenInNew,
+                                    imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
                                     contentDescription = "Open",
                                     tint = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.align(Alignment.TopEnd)
@@ -265,7 +265,7 @@ fun BlogScreen() {
                             modifier = Modifier.clickable { uriHandler.openUri(post.url) }
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.OpenInNew,
+                                imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
                                 contentDescription = "Open in browser",
                                 tint = MaterialTheme.colorScheme.primary
                             )

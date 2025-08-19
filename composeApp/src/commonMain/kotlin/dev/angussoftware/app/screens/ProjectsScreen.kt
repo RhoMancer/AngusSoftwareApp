@@ -33,7 +33,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.OpenInNew
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
+import androidx.compose.material.icons.outlined.ChevronLeft
+import androidx.compose.material.icons.outlined.ChevronRight
+import kotlinx.coroutines.launch
+import dev.angussoftware.app.isWasm
 
 private data class Project(
     val title: String,
@@ -216,20 +220,63 @@ fun ProjectsScreen() {
                             }
                             if (project.images.isNotEmpty()) {
                                 val pagerState = rememberPagerState(initialPage = 0, pageCount = { project.images.size })
-                                HorizontalPager(
-                                    state = pagerState,
+                                val scope = rememberCoroutineScope()
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .aspectRatio(16f/9f)
                                         .padding(top = 8.dp)
-                                ) { page ->
-                                    val res = project.images[page]
-                                    Image(
-                                        painter = painterResource(res),
-                                        contentDescription = null,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Fit
-                                    )
+                                ) {
+                                    HorizontalPager(
+                                        state = pagerState,
+                                        modifier = Modifier.fillMaxSize()
+                                    ) { page ->
+                                        val res = project.images[page]
+                                        Image(
+                                            painter = painterResource(res),
+                                            contentDescription = null,
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Fit
+                                        )
+                                    }
+                                    if (isWasm() && project.images.size > 1) {
+                                        IconButton(
+                                            onClick = {
+                                                scope.launch {
+                                                    val prev = pagerState.currentPage - 1
+                                                    if (prev >= 0) pagerState.animateScrollToPage(prev)
+                                                }
+                                            },
+                                            enabled = pagerState.currentPage > 0,
+                                            modifier = Modifier
+                                                .align(androidx.compose.ui.Alignment.CenterStart)
+                                                .size(72.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.ChevronLeft,
+                                                contentDescription = "Previous",
+                                                modifier = Modifier.size(48.dp)
+                                            )
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                scope.launch {
+                                                    val next = pagerState.currentPage + 1
+                                                    if (next < project.images.size) pagerState.animateScrollToPage(next)
+                                                }
+                                            },
+                                            enabled = pagerState.currentPage < project.images.size - 1,
+                                            modifier = Modifier
+                                                .align(androidx.compose.ui.Alignment.CenterEnd)
+                                                .size(72.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.ChevronRight,
+                                                contentDescription = "Next",
+                                                modifier = Modifier.size(48.dp)
+                                            )
+                                        }
+                                    }
                                 }
                                 if (project.images.size > 1) {
                                     Row(
@@ -275,7 +322,7 @@ fun ProjectsScreen() {
                         }
                         if (!project.link.isNullOrBlank()) {
                             Icon(
-                                imageVector = Icons.Outlined.OpenInNew,
+                                imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
                                 contentDescription = "Open",
                                 tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.align(androidx.compose.ui.Alignment.TopEnd)
