@@ -1,37 +1,33 @@
 package dev.angussoftware.app.screens
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.dp
-import angussoftwareapp.composeapp.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
-import dev.angussoftware.app.blog.BlogPost
-import dev.angussoftware.app.blog.BlogRepository
-import dev.angussoftware.app.ui.components.SectionCard
-import dev.angussoftware.app.navigation.LocalNavigationBarHeight
-import dev.angussoftware.app.currentWindowAdaptiveInfo
-import androidx.compose.material3.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.ui.draw.alpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.OpenInNew
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
+import angussoftwareapp.composeapp.generated.resources.*
+import dev.angussoftware.app.blog.BlogPost
+import dev.angussoftware.app.blog.BlogRepository
+import dev.angussoftware.app.currentWindowAdaptiveInfo
+import dev.angussoftware.app.navigation.LocalNavigationBarHeight
+import dev.angussoftware.app.ui.components.SectionCard
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,8 +96,7 @@ fun BlogScreen() {
 
     val tilePadding = 16.dp
 
-    Box(
-    ) {
+    Box {
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -206,7 +201,7 @@ fun BlogScreen() {
                                     imageVector = Icons.Outlined.OpenInNew,
                                     contentDescription = "Open",
                                     tint = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.align(androidx.compose.ui.Alignment.TopEnd)
+                                    modifier = Modifier.align(Alignment.TopEnd)
                                 )
                             }
                         }

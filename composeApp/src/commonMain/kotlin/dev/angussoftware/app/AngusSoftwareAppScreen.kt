@@ -1,29 +1,26 @@
 package dev.angussoftware.app
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import dev.angussoftware.app.navigation.displayCurrentScreen
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Create
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import dev.angussoftware.app.navigation.DefaultNavigationBarHeight
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
-import androidx.compose.foundation.layout.padding
+import dev.angussoftware.app.navigation.displayCurrentScreen
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 // Define an enum class for different screens
@@ -37,13 +34,6 @@ enum class Screen {
 @Composable
 @Preview
 fun AngusSoftwareAppScreen(navController: NavHostController = rememberNavController()) {
-    // Get current back stack entry
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    // Create a navigation state to track the current screen
-    var currentScreen = Screen.valueOf(
-        backStackEntry?.destination?.route ?: Screen.Home.name
-    )
-
     // Get window size information
     val windowInfo = currentWindowAdaptiveInfo()
 

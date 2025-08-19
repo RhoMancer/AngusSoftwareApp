@@ -1,6 +1,5 @@
 package dev.angussoftware.app.screens
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -9,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,40 +21,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import angussoftwareapp.composeapp.generated.resources.*
 import dev.angussoftware.app.currentWindowAdaptiveInfo
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
-import angussoftwareapp.composeapp.generated.resources.Res
-import angussoftwareapp.composeapp.generated.resources.home_name
-import angussoftwareapp.composeapp.generated.resources.home_title
-import angussoftwareapp.composeapp.generated.resources.home_tagline
-import angussoftwareapp.composeapp.generated.resources.home_about_title
-import angussoftwareapp.composeapp.generated.resources.home_about_paragraph1
-import angussoftwareapp.composeapp.generated.resources.home_about_paragraph2
-import angussoftwareapp.composeapp.generated.resources.home_skills_title
-import angussoftwareapp.composeapp.generated.resources.tech_kotlin
-import angussoftwareapp.composeapp.generated.resources.tech_compose
-import angussoftwareapp.composeapp.generated.resources.home_skill_android
-import angussoftwareapp.composeapp.generated.resources.home_skill_javascript
-import angussoftwareapp.composeapp.generated.resources.home_skill_react
-import angussoftwareapp.composeapp.generated.resources.home_skill_nodejs
-import angussoftwareapp.composeapp.generated.resources.home_skill_uiux
-import angussoftwareapp.composeapp.generated.resources.home_skill_git
-import angussoftwareapp.composeapp.generated.resources.home_skill_cicd
-import angussoftwareapp.composeapp.generated.resources.home_contact_title
-import angussoftwareapp.composeapp.generated.resources.home_contact_email_label
-import angussoftwareapp.composeapp.generated.resources.home_contact_email_value
-import angussoftwareapp.composeapp.generated.resources.home_contact_location_label
-import angussoftwareapp.composeapp.generated.resources.home_contact_location_value
-import angussoftwareapp.composeapp.generated.resources.home_connect_with_me
-import angussoftwareapp.composeapp.generated.resources.platform_bluesky
-import angussoftwareapp.composeapp.generated.resources.platform_linkedin
-import angussoftwareapp.composeapp.generated.resources.platform_github
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.OpenInNew
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private const val SKILL_CHIPS_PER_ROW = 3
 
@@ -307,12 +281,6 @@ fun AboutMeSection(alpha: Float) {
 }
 
 /**
- * SkillChip displays a single skill as a chip/tag with appropriate styling.
- *
- * @param text The name of the skill to display
- */
-
-/**
  * ContactSection displays the user's contact information and social media links.
  *
  * @param alpha The opacity value for the fade-in animation
@@ -406,7 +374,7 @@ fun ContactItem(title: String, content: String) {
 @Composable
 fun SocialMediaButton(platform: String, url: String) {
     val uriHandler = LocalUriHandler.current
-    androidx.compose.material3.OutlinedCard(
+    OutlinedCard(
         modifier = Modifier.clickable { uriHandler.openUri(url) },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
