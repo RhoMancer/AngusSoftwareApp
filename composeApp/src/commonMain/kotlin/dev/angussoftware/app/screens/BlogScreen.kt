@@ -54,47 +54,16 @@ fun BlogScreen() {
         isLoading = false
     }
 
-    // Insets similar to HomeScreen
-    val statusBarHeightPx = WindowInsets.statusBars.getTop(LocalDensity.current)
-    val navigationBarHeightPx = WindowInsets.navigationBars.getBottom(LocalDensity.current)
-    val density = LocalDensity.current
-    val statusBarHeightDp = with(density) { statusBarHeightPx.toDp() }
-    val systemNavigationBarHeightDp = with(density) { navigationBarHeightPx.toDp() }
-    val appNavigationBarHeightDp = LocalNavigationBarHeight.current
-    val bottomInset = systemNavigationBarHeightDp + appNavigationBarHeightDp
+    val common = dev.angussoftware.app.ui.utils.rememberCommonScreenState()
 
-    // Scroll/collapse behavior
-    val listState = rememberLazyListState()
-    val collapseThresholdPx = with(density) { 120.dp.toPx() }
-    val isCollapsed by remember {
-        derivedStateOf {
-            val index = listState.firstVisibleItemIndex
-            val offset = listState.firstVisibleItemScrollOffset
-            index > 0 || offset > collapseThresholdPx.toInt()
-        }
-    }
-
-    // Animations
-    var isVisible by remember { mutableStateOf(false) }
-    val alpha by animateFloatAsState(
-        targetValue = if (isVisible) 1f else 0f,
-        animationSpec = tween(durationMillis = 1000),
-        label = "fadeIn"
-    )
-    LaunchedEffect(Unit) { isVisible = true }
-
-    val titleAlpha by animateFloatAsState(
-        targetValue = if (isCollapsed) 1f else 0f,
-        label = "topBarTitleAlpha"
-    )
-    val bgAlpha by animateFloatAsState(
-        targetValue = if (isCollapsed) 1f else 0f,
-        label = "topBarBgAlpha"
-    )
-
-    val isCompactScreen = currentWindowAdaptiveInfo().isCompact
-
-    val tilePadding = 16.dp
+    val statusBarHeightDp = common.statusBarHeightDp
+    val bottomInset = common.bottomInset
+    val listState = common.listState
+    val alpha = common.alpha
+    val titleAlpha = common.titleAlpha
+    val bgAlpha = common.bgAlpha
+    val isCompactScreen = common.isCompactScreen
+    val tilePadding = common.tilePadding
 
     Box {
         LazyColumn(
