@@ -27,7 +27,7 @@ internal object RssParser {
 
             posts += BlogPost(
                 id = (guid ?: link),
-                title = if (title.isBlank()) "Untitled" else title,
+                title = title.ifBlank { "Untitled" },
                 url = link,
                 pubDate = pubDate,
                 summary = summary,
