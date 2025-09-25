@@ -148,7 +148,8 @@ fun ProjectsScreen() {
     val isCompactScreen = common.isCompactScreen
     val tilePadding = common.tilePadding
     val appBarHeightDp = common.appBarHeightDp
-    val topContentPadding = if (!isCompactScreen) statusBarHeightDp + appBarHeightDp + tilePadding else statusBarHeightDp + tilePadding
+    val topContentPadding =
+        if (!isCompactScreen) statusBarHeightDp + appBarHeightDp + tilePadding else statusBarHeightDp + tilePadding
 
     Box(
         modifier = Modifier
@@ -187,12 +188,13 @@ fun ProjectsScreen() {
                                 )
                             }
                             if (project.images.isNotEmpty()) {
-                                val pagerState = rememberPagerState(initialPage = 0, pageCount = { project.images.size })
+                                val pagerState =
+                                    rememberPagerState(initialPage = 0, pageCount = { project.images.size })
                                 val scope = rememberCoroutineScope()
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .aspectRatio(16f/9f)
+                                        .aspectRatio(16f / 9f)
                                         .padding(top = 8.dp)
                                 ) {
                                     HorizontalPager(
@@ -260,7 +262,9 @@ fun ProjectsScreen() {
                                                     .padding(horizontal = 3.dp)
                                                     .size(if (selected) 8.dp else 6.dp)
                                                     .background(
-                                                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
+                                                            alpha = 0.3f
+                                                        ),
                                                         shape = CircleShape
                                                     )
                                             )
