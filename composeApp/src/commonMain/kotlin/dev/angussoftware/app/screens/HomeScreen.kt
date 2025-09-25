@@ -303,7 +303,7 @@ fun ContactSection(alpha: Float) {
                 )
                 SocialMediaButton(
                     platform = stringResource(Res.string.platform_github),
-                    url = "https://github.com/RhoMancer/Blink-Reader"
+                    url = "https://github.com/RhoMancer/"
                 )
                 SocialMediaButton(
                     platform = stringResource(Res.string.platform_bluesky),
