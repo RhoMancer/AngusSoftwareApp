@@ -29,7 +29,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 enum class Screen {
     Home,
     Projects,
-    Blog
+    Blog,
+    BlogPost
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
