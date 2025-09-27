@@ -21,6 +21,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import dev.angussoftware.app.Screen
 import angussoftwareapp.composeapp.generated.resources.*
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.blog.BlogRepository
@@ -31,7 +33,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BlogScreen() {
+fun BlogScreen(navController: NavHostController? = null) {
     val uriHandler = LocalUriHandler.current
     val feedUrl = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
@@ -39,7 +41,7 @@ fun BlogScreen() {
     var allPosts by remember { mutableStateOf<List<BlogPost>>(emptyList()) }
     val pageSize = 20
     var visibleCount by remember { mutableStateOf(pageSize) }
-    var selectedPost by remember { mutableStateOf<BlogPost?>(null) }
+    
     println("Fetching initial posts 0")
 
 
@@ -125,7 +127,9 @@ fun BlogScreen() {
                     items(allPosts.take(visibleCount).size) { idx ->
                         val visiblePosts = allPosts.take(visibleCount)
                         val post = visiblePosts[idx]
-                        val clickableModifier = Modifier.clickable { selectedPost = post }
+                        val clickableModifier = Modifier.clickable { 
+                            navController?.navigate("${Screen.BlogPost.name}/$idx") 
+                        }
                         SectionCard(alpha = alpha, modifier = clickableModifier) {
                             Box(modifier = Modifier.fillMaxWidth()) {
                                 Column(
@@ -205,92 +209,5 @@ fun BlogScreen() {
             )
         }
 
-        // In-app reader overlay
-        selectedPost?.let { post ->
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize(),
-                color = MaterialTheme.colorScheme.surface
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 16.dp)
-                        .padding(top = statusBarHeightDp + tilePadding, bottom = bottomInset + tilePadding)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Close",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.clickable { selectedPost = null }
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable { uriHandler.openUri(post.url) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
-                                contentDescription = "Open in browser",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Open",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = post.title,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                    post.pubDate?.let {
-                        Text(
-                            text = it,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                    if (!post.imageUrl.isNullOrBlank()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .padding(top = 12.dp)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Image placeholder",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                    if (!post.content.isNullOrBlank()) {
-                        Text(
-                            text = post.content!!,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(top = 12.dp)
-                        )
-                    } else {
-                        post.summary?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(top = 12.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
     }
 }

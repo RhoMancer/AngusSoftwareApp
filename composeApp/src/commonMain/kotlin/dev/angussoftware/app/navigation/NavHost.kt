@@ -7,10 +7,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
+import androidx.compose.runtime.*
 import dev.angussoftware.app.Screen
 import dev.angussoftware.app.screens.BlogScreen
+import dev.angussoftware.app.screens.BlogPostScreen
 import dev.angussoftware.app.screens.HomeScreen
 import dev.angussoftware.app.screens.ProjectsScreen
+import dev.angussoftware.app.blog.BlogRepository
 
 @Composable
 fun displayCurrentScreen(navController: NavHostController) {
@@ -28,7 +33,69 @@ fun displayCurrentScreen(navController: NavHostController) {
                 ProjectsScreen()
             }
             composable(route = Screen.Blog.name) {
-                BlogScreen()
+                BlogScreen(navController)
+            }
+            composable(
+                route = "${Screen.BlogPost.name}/{postIndex}",
+                arguments = listOf(navArgument("postIndex") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val postIndex = try {
+                    val route = backStackEntry.destination.route ?: ""
+                    val indexStr = route.substringAfterLast("/")
+                    indexStr.toIntOrNull() ?: 0
+                } catch (e: Exception) {
+                    0
+                }
+                val feedUrl = "https://rhomancer.github.io/angus-blog-content/rss.xml"
+                
+                var blogPost by remember { mutableStateOf<dev.angussoftware.app.blog.BlogPost?>(null) }
+                var isLoading by remember { mutableStateOf(true) }
+                
+                LaunchedEffect(postIndex) {
+                    try {
+                        val repository = BlogRepository(feedUrl)
+                        val allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
+                        blogPost = if (postIndex < allPosts.size) allPosts[postIndex] else null
+                        isLoading = false
+                    } catch (e: Exception) {
+                        isLoading = false
+                    }
+                }
+                
+                if (isLoading) {
+                    BlogPostScreen(
+                        blogPost = dev.angussoftware.app.blog.BlogPost(
+                            id = "loading",
+                            title = "Loading...",
+                            url = "",
+                            pubDate = null,
+                            summary = null,
+                            imageUrl = null,
+                            content = null
+                        ),
+                        onBackClick = { navController.popBackStack() }
+                    )
+                } else {
+                    blogPost?.let { post ->
+                        BlogPostScreen(
+                            blogPost = post,
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    } ?: run {
+                        BlogPostScreen(
+                            blogPost = dev.angussoftware.app.blog.BlogPost(
+                                id = "error",
+                                title = "Post not found",
+                                url = "",
+                                pubDate = null,
+                                summary = null,
+                                imageUrl = null,
+                                content = null
+                            ),
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
+                }
             }
         }
     }
