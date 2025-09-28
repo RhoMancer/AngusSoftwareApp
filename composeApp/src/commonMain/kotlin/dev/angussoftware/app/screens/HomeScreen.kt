@@ -100,7 +100,12 @@ fun HomeScreen() {
         CommonTopAppBar(
             isCompactScreen = isCompactScreen,
             titleAlpha = titleAlpha,
-            bgAlpha = bgAlpha
+            bgAlpha = bgAlpha,
+            icon = painterResource(if (isSystemInDarkTheme()) {
+                AngusResources.Drawables.angusCowDark
+            } else {
+                AngusResources.Drawables.angusCowLight
+            })
         )
     }
 }
