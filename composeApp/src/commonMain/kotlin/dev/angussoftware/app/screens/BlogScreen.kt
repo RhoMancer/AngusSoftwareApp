@@ -28,6 +28,7 @@ import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.blog.BlogRepository
 import dev.angussoftware.app.currentWindowAdaptiveInfo
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
+import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import org.jetbrains.compose.resources.stringResource
 
@@ -41,7 +42,7 @@ fun BlogScreen(navController: NavHostController? = null) {
     var allPosts by remember { mutableStateOf<List<BlogPost>>(emptyList()) }
     val pageSize = 20
     var visibleCount by remember { mutableStateOf(pageSize) }
-    
+
     println("Fetching initial posts 0")
 
 
@@ -114,6 +115,7 @@ fun BlogScreen(navController: NavHostController? = null) {
                         )
                     }
                 }
+
                 allPosts.isEmpty() -> {
                     item {
                         Text(
@@ -123,12 +125,13 @@ fun BlogScreen(navController: NavHostController? = null) {
                         )
                     }
                 }
+
                 else -> {
                     items(allPosts.take(visibleCount).size) { idx ->
                         val visiblePosts = allPosts.take(visibleCount)
                         val post = visiblePosts[idx]
-                        val clickableModifier = Modifier.clickable { 
-                            navController?.navigate("${Screen.BlogPost.name}/$idx") 
+                        val clickableModifier = Modifier.clickable {
+                            navController?.navigate("${Screen.BlogPost.name}/$idx")
                         }
                         SectionCard(alpha = alpha, modifier = clickableModifier) {
                             Box(modifier = Modifier.fillMaxWidth()) {
@@ -199,15 +202,12 @@ fun BlogScreen(navController: NavHostController? = null) {
             }
         }
 
-        if (isCompactScreen) {
-            TopAppBar(
-                title = { Text("Angus Software", modifier = Modifier.alpha(titleAlpha)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
-                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha)
-                )
-            )
-        }
+        CommonTopAppBar(
+            isCompactScreen = isCompactScreen,
+            titleAlpha = titleAlpha,
+            bgAlpha = bgAlpha,
+            showNonCompact = false
+        )
 
     }
 }

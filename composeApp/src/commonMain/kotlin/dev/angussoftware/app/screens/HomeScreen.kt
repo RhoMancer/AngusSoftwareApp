@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
 import com.angussoftware.theming.compose.resources.AngusResources
 import dev.angussoftware.app.currentWindowAdaptiveInfo
+import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
 import org.jetbrains.compose.resources.painterResource
@@ -96,24 +97,11 @@ fun HomeScreen() {
             }
         }
 
-        if (isCompactScreen) {
-            TopAppBar(
-                title = { Text("Angus Software", modifier = Modifier.alpha(titleAlpha)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
-                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha)
-                )
-            )
-        } else {
-            TopAppBar(
-                modifier = Modifier.shadow(4.dp),
-                title = { Text("Angus Software") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        }
+        CommonTopAppBar(
+            isCompactScreen = isCompactScreen,
+            titleAlpha = titleAlpha,
+            bgAlpha = bgAlpha
+        )
     }
 }
 
@@ -143,7 +131,8 @@ fun HeroSection(alpha: Float) {
             painter = painterResource(profileDrawable),
             contentDescription = "Profile Image",
             modifier = Modifier
-                .size(150.dp),
+                .fillMaxWidth(fraction = 1f/3f)
+                .aspectRatio(1f),
             contentScale = ContentScale.Crop
         )
 
