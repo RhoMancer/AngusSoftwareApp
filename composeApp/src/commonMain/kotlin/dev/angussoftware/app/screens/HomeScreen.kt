@@ -21,6 +21,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
 import com.angussoftware.theming.compose.resources.AngusResources
+import com.angussoftware.theming.compose.resources.getAngusLogo
+import com.angussoftware.theming.compose.resources.getAngusLogoSystem
+import com.angussoftware.theming.compose.resources.getAngusSimpleLogo
+import com.angussoftware.theming.compose.resources.getAngusSimpleLogoSystem
 import dev.angussoftware.app.currentWindowAdaptiveInfo
 import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
@@ -101,11 +105,7 @@ fun HomeScreen() {
             isCompactScreen = isCompactScreen,
             titleAlpha = titleAlpha,
             bgAlpha = bgAlpha,
-            icon = painterResource(if (isSystemInDarkTheme()) {
-                AngusResources.Drawables.angusCowDark
-            } else {
-                AngusResources.Drawables.angusCowLight
-            })
+            icon = painterResource(getAngusSimpleLogoSystem())
         )
     }
 }
@@ -125,15 +125,9 @@ fun HeroSection(alpha: Float) {
             .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Profile Image (theme-aware)
-        val profileDrawable = if (isSystemInDarkTheme()) {
-            AngusResources.Drawables.angusCowDark
-        } else {
-            AngusResources.Drawables.angusCowLight
-        }
 
         Image(
-            painter = painterResource(profileDrawable),
+            painter = painterResource(getAngusLogoSystem()),
             contentDescription = "Profile Image",
             modifier = Modifier
                 .fillMaxWidth(fraction = 1f/3f)
