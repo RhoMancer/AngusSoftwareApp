@@ -3,9 +3,12 @@ package dev.angussoftware.app.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 
 /**
@@ -61,15 +64,43 @@ fun SkillChip(text: String) {
  * Handles both compact and non-compact screen layouts with appropriate styling.
  *
  * @param title The title text to display in the app bar
+ * @param icon Optional icon to display at the start of the title (null = no icon shown)
  * @param isCompactScreen Whether the screen is in compact mode
  * @param titleAlpha Alpha value for the title (used in compact mode)
  * @param bgAlpha Alpha value for the background (used in compact mode)
  * @param showNonCompact Whether to show the non-compact version when not in compact mode (default: true)
  */
+@Composable
+private fun TitleWithIcon(
+    title: String,
+    icon: Painter?,
+    modifier: Modifier = Modifier
+) {
+    if (icon != null) {
+        Row(
+            modifier = modifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = title)
+        }
+    } else {
+        Text(text = title, modifier = modifier)
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopAppBar(
     title: String = "Angus Software",
+    icon: Painter? = null,
     isCompactScreen: Boolean,
     titleAlpha: Float = 1f,
     bgAlpha: Float = 1f,
@@ -77,7 +108,13 @@ fun CommonTopAppBar(
 ) {
     if (isCompactScreen) {
         TopAppBar(
-            title = { Text(title, modifier = Modifier.alpha(titleAlpha)) },
+            title = { 
+                TitleWithIcon(
+                    title = title,
+                    icon = icon,
+                    modifier = Modifier.alpha(titleAlpha)
+                )
+            },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha)
@@ -86,7 +123,12 @@ fun CommonTopAppBar(
     } else if (showNonCompact) {
         TopAppBar(
             modifier = Modifier.shadow(4.dp),
-            title = { Text(title) },
+            title = { 
+                TitleWithIcon(
+                    title = title,
+                    icon = icon
+                )
+            },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 scrolledContainerColor = MaterialTheme.colorScheme.surface
