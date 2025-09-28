@@ -1,31 +1,30 @@
 package dev.angussoftware.app.screens
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
+import com.angussoftware.theming.compose.resources.AngusResources
 import dev.angussoftware.app.currentWindowAdaptiveInfo
-import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -58,7 +57,8 @@ fun HomeScreen() {
     val tilePadding = common.tilePadding
     val appBarHeightDp = common.appBarHeightDp
 
-    val topContentPadding = if (!isCompactScreen) statusBarHeightDp + appBarHeightDp + tilePadding else statusBarHeightDp + tilePadding
+    val topContentPadding =
+        if (!isCompactScreen) statusBarHeightDp + appBarHeightDp + tilePadding else statusBarHeightDp + tilePadding
 
     Box(
         modifier = Modifier
@@ -132,12 +132,19 @@ fun HeroSection(alpha: Float) {
             .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Profile Image (using a colored Box as placeholder)
-        Box(
+        // Profile Image (theme-aware)
+        val profileDrawable = if (isSystemInDarkTheme()) {
+            AngusResources.Drawables.angusCowDark
+        } else {
+            AngusResources.Drawables.angusCowLight
+        }
+
+        Image(
+            painter = painterResource(profileDrawable),
+            contentDescription = "Profile Image",
             modifier = Modifier
-                .size(150.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary)
+                .size(150.dp),
+            contentScale = ContentScale.Crop
         )
 
         Spacer(modifier = Modifier.height(16.dp))
