@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.currentWindowAdaptiveInfo
+import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
 import org.jetbrains.compose.resources.DrawableResource
@@ -304,23 +305,10 @@ fun ProjectsScreen() {
                 }
             }
         }
-        if (isCompactScreen) {
-            TopAppBar(
-                title = { Text("Angus Software", modifier = Modifier.alpha(titleAlpha)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
-                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha)
-                )
-            )
-        } else {
-            TopAppBar(
-                modifier = Modifier.shadow(4.dp),
-                title = { Text("Angus Software") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        }
+        CommonTopAppBar(
+            isCompactScreen = isCompactScreen,
+            titleAlpha = titleAlpha,
+            bgAlpha = bgAlpha
+        )
     }
 }

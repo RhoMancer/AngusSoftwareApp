@@ -1,13 +1,11 @@
 package dev.angussoftware.app.ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 
 /**
@@ -54,6 +52,45 @@ fun SkillChip(text: String) {
             text = text,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+        )
+    }
+}
+
+/**
+ * Reusable TopAppBar component used across screens to eliminate duplication.
+ * Handles both compact and non-compact screen layouts with appropriate styling.
+ *
+ * @param title The title text to display in the app bar
+ * @param isCompactScreen Whether the screen is in compact mode
+ * @param titleAlpha Alpha value for the title (used in compact mode)
+ * @param bgAlpha Alpha value for the background (used in compact mode)
+ * @param showNonCompact Whether to show the non-compact version when not in compact mode (default: true)
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CommonTopAppBar(
+    title: String = "Angus Software",
+    isCompactScreen: Boolean,
+    titleAlpha: Float = 1f,
+    bgAlpha: Float = 1f,
+    showNonCompact: Boolean = true
+) {
+    if (isCompactScreen) {
+        TopAppBar(
+            title = { Text(title, modifier = Modifier.alpha(titleAlpha)) },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
+                scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha)
+            )
+        )
+    } else if (showNonCompact) {
+        TopAppBar(
+            modifier = Modifier.shadow(4.dp),
+            title = { Text(title) },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                scrolledContainerColor = MaterialTheme.colorScheme.surface
+            )
         )
     }
 }
