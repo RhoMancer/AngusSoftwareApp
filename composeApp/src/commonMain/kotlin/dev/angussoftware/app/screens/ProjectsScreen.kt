@@ -37,8 +37,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.ChevronLeft
 import androidx.compose.material.icons.outlined.ChevronRight
+import com.angussoftware.theming.compose.resources.getAngusSimpleLogoSystem
 import kotlinx.coroutines.launch
 import dev.angussoftware.app.isWasm
+import dev.angussoftware.app.ui.utils.rememberCommonScreenState
 
 private data class Project(
     val title: String,
@@ -138,7 +140,7 @@ fun ProjectsScreen() {
 
     val uriHandler = LocalUriHandler.current
 
-    val common = dev.angussoftware.app.ui.utils.rememberCommonScreenState()
+    val common = rememberCommonScreenState()
 
     val statusBarHeightDp = common.statusBarHeightDp
     val bottomInset = common.bottomInset
@@ -225,7 +227,7 @@ fun ProjectsScreen() {
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Outlined.ChevronLeft,
-                                                contentDescription = "Previous",
+                                                contentDescription = stringResource(Res.string.ui_previous),
                                                 modifier = Modifier.size(48.dp)
                                             )
                                         }
@@ -243,7 +245,7 @@ fun ProjectsScreen() {
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Outlined.ChevronRight,
-                                                contentDescription = "Next",
+                                                contentDescription = stringResource(Res.string.ui_next),
                                                 modifier = Modifier.size(48.dp)
                                             )
                                         }
@@ -296,7 +298,7 @@ fun ProjectsScreen() {
                         if (!project.link.isNullOrBlank()) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
-                                contentDescription = "Open",
+                                contentDescription = stringResource(Res.string.ui_open),
                                 tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.align(androidx.compose.ui.Alignment.TopEnd)
                             )
@@ -308,7 +310,8 @@ fun ProjectsScreen() {
         CommonTopAppBar(
             isCompactScreen = isCompactScreen,
             titleAlpha = titleAlpha,
-            bgAlpha = bgAlpha
+            bgAlpha = bgAlpha,
+            icon = painterResource(getAngusSimpleLogoSystem())
         )
     }
 }

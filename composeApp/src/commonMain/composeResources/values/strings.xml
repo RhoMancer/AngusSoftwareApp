@@ -90,4 +90,22 @@
     <string name="blog_empty">There are no new Posts to display.</string>
     <string name="blog_paging_todo">TODO: implement paging at bottom of scroll</string>
     <string name="blog_load_more">Load more posts</string>
+    
+    <!-- Navigation labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_projects">Projects</string>
+    <string name="nav_blog">Blog</string>
+    
+    <!-- Common UI strings -->
+    <string name="ui_back">Back</string>
+    <string name="ui_open">Open</string>
+    <string name="ui_open_in_browser">Open in browser</string>
+    <string name="ui_previous">Previous</string>
+    <string name="ui_next">Next</string>
+    <string name="ui_loading">Loading...</string>
+    <string name="ui_image_placeholder">Image placeholder</string>
+    <string name="ui_profile_image">Profile Image</string>
+    
+    <!-- Blog post states -->
+    <string name="blog_post_not_found">Post not found</string>
 </resources>
