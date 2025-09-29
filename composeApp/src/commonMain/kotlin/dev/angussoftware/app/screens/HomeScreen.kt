@@ -2,10 +2,8 @@ package dev.angussoftware.app.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material3.*
@@ -13,17 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
-import com.angussoftware.theming.compose.resources.AngusResources
-import com.angussoftware.theming.compose.resources.getAngusLogo
 import com.angussoftware.theming.compose.resources.getAngusLogoSystem
-import com.angussoftware.theming.compose.resources.getAngusSimpleLogo
 import com.angussoftware.theming.compose.resources.getAngusSimpleLogoSystem
 import dev.angussoftware.app.currentWindowAdaptiveInfo
 import dev.angussoftware.app.ui.components.CommonTopAppBar
