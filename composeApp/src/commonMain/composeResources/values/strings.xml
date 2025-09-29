@@ -85,10 +85,8 @@
     </string>
     
     <!-- Blog screen -->
-    <string name="blog_title">Blog</string>
     <string name="blog_loading">Loading posts...</string>
     <string name="blog_empty">There are no new Posts to display.</string>
-    <string name="blog_paging_todo">TODO: implement paging at bottom of scroll</string>
     <string name="blog_load_more">Load more posts</string>
     
     <!-- Navigation labels -->

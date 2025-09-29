@@ -83,7 +83,7 @@ fun BlogScreen(navController: NavHostController? = null) {
             // Title
             item {
                 Text(
-                    text = stringResource(Res.string.blog_title),
+                    text = stringResource(Res.string.nav_blog),
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier
                         .padding(bottom = 16.dp)
