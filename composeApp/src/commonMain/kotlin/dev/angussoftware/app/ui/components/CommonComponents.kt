@@ -1,5 +1,6 @@
 package dev.angussoftware.app.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -75,10 +76,9 @@ private fun TitleWithIcon(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Icon(
+            Image(
                 painter = icon,
                 contentDescription = null,
-                tint = Color.Unspecified,
                 modifier = Modifier.fillMaxHeight()
                     .padding(vertical = 8.dp)
             )

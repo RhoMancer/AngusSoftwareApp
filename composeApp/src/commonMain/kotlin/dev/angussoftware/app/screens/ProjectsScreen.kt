@@ -17,10 +17,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
+import com.angussoftware.theming.compose.resources.AngusResources
 import com.angussoftware.theming.compose.resources.getAngusSimpleLogoSystem
 import dev.angussoftware.app.isWasm
 import dev.angussoftware.app.ui.components.CommonTopAppBar
@@ -39,6 +41,7 @@ private data class Project(
     val description: String? = null,
     val link: String? = null,
     val images: List<DrawableResource> = emptyList(),
+    val icon: DrawableResource? = null,
 )
 
 private const val IMAGE_ASPECT_RATIO = 16f / 9f
@@ -56,12 +59,12 @@ internal fun ProjectsScreen() {
                 Res.string.tech_multiplatform
             ).map {
                 stringResource(it)
-            }
-            // link = "https://your-portfolio-url.example" // Optional: provide when available
+            },
+            icon = getAngusSimpleLogoSystem()
         ),
         Project(
             title = stringResource(Res.string.project_google_play_developer_account),
-            link = "https://play.google.com/store/apps/dev?id=7308269362866323199"
+            link = "https://play.google.com/store/apps/dev?id=7308269362866323199",
         ),
         Project(
             title = stringResource(Res.string.project_angus_paint_title),
@@ -171,10 +174,23 @@ internal fun ProjectsScreen() {
                 SectionCard(alpha = alpha, modifier = clickableModifier) {
                     Box(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            Text(
-                                text = project.title,
-                                style = MaterialTheme.typography.titleLarge,
-                            )
+                            Row(
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                project.icon?.let { iconResource ->
+                                    Image(
+                                        painter = painterResource(iconResource),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .padding(end = 8.dp)
+                                    )
+                                }
+                                Text(
+                                    text = project.title,
+                                    style = MaterialTheme.typography.titleLarge,
+                                )
+                            }
                             project.subtitle?.let {
                                 Text(
                                     text = it,
