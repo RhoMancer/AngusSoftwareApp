@@ -6,7 +6,7 @@ import com.angussoftware.theming.compose.ui.theme.AngusTheme
 import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)
-fun main() {
+internal fun main() {
     ComposeViewport(document.body!!) {
         AngusTheme {
             AngusSoftwareAppScreen()

@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 /**
  * Enum class representing window width size classes
  */
-enum class WindowWidthSizeClass {
+internal enum class WindowWidthSizeClass {
     COMPACT,
     MEDIUM,
     EXPANDED;
@@ -26,7 +26,7 @@ enum class WindowWidthSizeClass {
 /**
  * Class containing window size information
  */
-data class WindowAdaptiveInfo(
+internal data class WindowAdaptiveInfo(
     val widthSizeClass: WindowWidthSizeClass
 ) {
     val isCompact: Boolean get() = widthSizeClass == WindowWidthSizeClass.COMPACT
@@ -38,5 +38,5 @@ data class WindowAdaptiveInfo(
  * Get current window adaptive information
  */
 @Composable
-expect fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo
+internal expect fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo
 

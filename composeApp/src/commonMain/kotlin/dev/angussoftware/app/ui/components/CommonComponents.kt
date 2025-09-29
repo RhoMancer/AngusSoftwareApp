@@ -22,7 +22,7 @@ import org.jetbrains.compose.resources.stringResource
  * - Supports fade-in alpha passed by parent
  */
 @Composable
-fun SectionCard(
+internal fun SectionCard(
     alpha: Float = 1f,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
@@ -47,7 +47,7 @@ fun SectionCard(
  * Shared SkillChip used across screens for displaying tags/skills.
  */
 @Composable
-fun SkillChip(text: String) {
+internal fun SkillChip(text: String) {
     Card(
         modifier = Modifier.padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(
@@ -103,7 +103,7 @@ private fun TitleWithIcon(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommonTopAppBar(
+internal fun CommonTopAppBar(
     title: String = stringResource(Res.string.home_name),
     icon: Painter? = null,
     isCompactScreen: Boolean,

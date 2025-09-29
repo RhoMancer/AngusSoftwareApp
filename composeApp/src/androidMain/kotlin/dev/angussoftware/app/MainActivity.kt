@@ -10,7 +10,7 @@ import androidx.compose.ui.tooling.preview.Devices.TABLET
 import androidx.compose.ui.tooling.preview.Preview
 import com.angussoftware.theming.compose.ui.theme.AngusTheme
 
-class MainActivity : ComponentActivity() {
+internal class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
     heightDp = 332
 )
 @Composable
-fun SmallAndroidPreview() {
+private fun SmallAndroidPreview() {
     AngusSoftwareAppScreen()
 }
 
@@ -41,7 +41,7 @@ fun SmallAndroidPreview() {
     device = PHONE
 )
 @Composable
-fun AppAndroidPreview() {
+private fun AppAndroidPreview() {
     AngusSoftwareAppScreen()
 }
 
@@ -51,6 +51,6 @@ fun AppAndroidPreview() {
     device = TABLET
 )
 @Composable
-fun TabletAndroidPreview() {
+private fun TabletAndroidPreview() {
     AngusSoftwareAppScreen()
 }

@@ -1,3 +1,3 @@
 package dev.angussoftware.app
 
-actual fun isWasm(): Boolean = true
+internal actual fun isWasm(): Boolean = true

@@ -1,6 +1,6 @@
 package dev.angussoftware.app.blog
 
-data class BlogPost(
+internal data class BlogPost(
     val id: String,
     val title: String,
     val url: String,

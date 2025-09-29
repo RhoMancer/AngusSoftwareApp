@@ -21,7 +21,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BlogPostScreen(blogPost: BlogPost, onBackClick: () -> Unit) {
+internal fun BlogPostScreen(blogPost: BlogPost, onBackClick: () -> Unit) {
     val uriHandler = LocalUriHandler.current
     val windowInfo = currentWindowAdaptiveInfo()
     val isCompactScreen = windowInfo.isCompact
