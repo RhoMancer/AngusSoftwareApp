@@ -255,9 +255,12 @@ fun ProjectsScreen() {
                                                     .padding(horizontal = 3.dp)
                                                     .size(if (selected) 8.dp else 6.dp)
                                                     .background(
-                                                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
-                                                            alpha = 0.3f
-                                                        ),
+                                                        color = if (selected)
+                                                            MaterialTheme.colorScheme.primary
+                                                        else
+                                                            MaterialTheme.colorScheme.onSurface.copy(
+                                                                alpha = 0.3f
+                                                            ),
                                                         shape = CircleShape
                                                     )
                                             )
