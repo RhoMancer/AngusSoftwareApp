@@ -41,6 +41,8 @@ private data class Project(
     val images: List<DrawableResource> = emptyList(),
 )
 
+private const val IMAGE_ASPECT_RATIO = 16f / 9f
+
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen() {
@@ -162,7 +164,7 @@ fun ProjectsScreen() {
             items(projects.size) { idx ->
                 val project = projects[idx]
                 val clickableModifier = if (!project.link.isNullOrBlank()) {
-                    Modifier.clickable { uriHandler.openUri(project.link!!) }
+                    Modifier.clickable { uriHandler.openUri(project.link) }
                 } else {
                     Modifier
                 }
@@ -187,7 +189,7 @@ fun ProjectsScreen() {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .aspectRatio(16f / 9f)
+                                        .aspectRatio(IMAGE_ASPECT_RATIO)
                                         .padding(top = 8.dp)
                                 ) {
                                     HorizontalPager(
