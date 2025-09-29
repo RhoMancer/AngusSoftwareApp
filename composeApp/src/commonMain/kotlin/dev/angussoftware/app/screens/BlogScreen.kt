@@ -25,6 +25,8 @@ import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.utils.rememberCommonScreenState
 import org.jetbrains.compose.resources.stringResource
 
+const val PAGE_SIZE = 20
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlogScreen(navController: NavHostController? = null) {
@@ -32,7 +34,7 @@ fun BlogScreen(navController: NavHostController? = null) {
 
     var isLoading by remember { mutableStateOf(true) }
     var allPosts by remember { mutableStateOf<List<BlogPost>>(emptyList()) }
-    val pageSize = 20
+    val pageSize = PAGE_SIZE
     var visibleCount by remember { mutableStateOf(pageSize) }
 
     println("Fetching initial posts 0")

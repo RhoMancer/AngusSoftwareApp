@@ -50,6 +50,7 @@ fun displayCurrentScreen(navController: NavHostController) {
                     val indexStr = route.substringAfterLast("/")
                     indexStr.toIntOrNull() ?: 0
                 } catch (e: Exception) {
+                    // todo: proper error handling
                     0
                 }
                 val feedUrl = RSS_FEED_URL
@@ -64,6 +65,7 @@ fun displayCurrentScreen(navController: NavHostController) {
                         blogPost = if (postIndex < allPosts.size) allPosts[postIndex] else null
                         isLoading = false
                     } catch (e: Exception) {
+                        // todo: proper error handling
                         isLoading = false
                     }
                 }
