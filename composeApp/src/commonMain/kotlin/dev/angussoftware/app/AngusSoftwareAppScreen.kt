@@ -2,30 +2,28 @@ package dev.angussoftware.app
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import angussoftwareapp.composeapp.generated.resources.Res
+import angussoftwareapp.composeapp.generated.resources.nav_blog
+import angussoftwareapp.composeapp.generated.resources.nav_home
+import angussoftwareapp.composeapp.generated.resources.nav_projects
 import dev.angussoftware.app.navigation.DefaultNavigationBarHeight
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.navigation.displayCurrentScreen
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import angussoftwareapp.composeapp.generated.resources.Res
-import angussoftwareapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 // Define an enum class for different screens
@@ -75,19 +73,28 @@ fun AngusSoftwareAppScreen(navController: NavHostController = rememberNavControl
                             selected = currentRoute == Screen.Home.name,
                             onClick = { navController.navigate(Screen.Home.name) },
                             label = { Text(stringResource(Res.string.nav_home)) },
-                            icon = { Icon(Icons.Default.Home, contentDescription = stringResource(Res.string.nav_home)) }
+                            icon = { Icon(
+                                Icons.Default.Home,
+                                contentDescription = stringResource(Res.string.nav_home)
+                            ) }
                         )
                         NavigationBarItem(
                             selected = currentRoute == Screen.Projects.name,
                             onClick = { navController.navigate(Screen.Projects.name) },
                             label = { Text(stringResource(Res.string.nav_projects)) },
-                            icon = { Icon(Icons.Default.List, contentDescription = stringResource(Res.string.nav_projects)) }
+                            icon = { Icon(
+                                Icons.AutoMirrored.Filled.List,
+                                contentDescription = stringResource(Res.string.nav_projects)
+                            ) }
                         )
                         NavigationBarItem(
                             selected = currentRoute == Screen.Blog.name,
                             onClick = { navController.navigate(Screen.Blog.name) },
                             label = { Text(stringResource(Res.string.nav_blog)) },
-                            icon = { Icon(Icons.Default.Create, contentDescription = stringResource(Res.string.nav_blog)) }
+                            icon = { Icon(
+                                Icons.Default.Create,
+                                contentDescription = stringResource(Res.string.nav_blog)
+                            ) }
                         )
                     }
                 },
@@ -131,21 +138,30 @@ fun AngusSoftwareAppScreen(navController: NavHostController = rememberNavControl
                             selected = currentRoute == Screen.Home.name,
                             onClick = { navController.navigate(Screen.Home.name) },
                             label = { Text(stringResource(Res.string.nav_home)) },
-                            icon = { Icon(Icons.Default.Home, contentDescription = stringResource(Res.string.nav_home)) },
+                            icon = { Icon(
+                                Icons.Default.Home,
+                                contentDescription = stringResource(Res.string.nav_home)
+                            ) },
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
                         NavigationRailItem(
                             selected = currentRoute == Screen.Projects.name,
                             onClick = { navController.navigate(Screen.Projects.name) },
                             label = { Text(stringResource(Res.string.nav_projects)) },
-                            icon = { Icon(Icons.Default.List, contentDescription = stringResource(Res.string.nav_projects)) },
+                            icon = { Icon(
+                                Icons.AutoMirrored.Filled.List,
+                                contentDescription = stringResource(Res.string.nav_projects)
+                            ) },
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
                         NavigationRailItem(
                             selected = currentRoute == Screen.Blog.name,
                             onClick = { navController.navigate(Screen.Blog.name) },
                             label = { Text(stringResource(Res.string.nav_blog)) },
-                            icon = { Icon(Icons.Default.Create, contentDescription = stringResource(Res.string.nav_blog)) },
+                            icon = { Icon(
+                                Icons.Default.Create,
+                                contentDescription = stringResource(Res.string.nav_blog)
+                            ) },
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
                     }

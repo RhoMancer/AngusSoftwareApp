@@ -16,9 +16,9 @@ pluginManagement {
     }
 }
 
-val githubUsername=
+val githubUsername: String? =
     System.getenv("GITHUB_USER")
-val githubPassword =
+val githubPassword: String? =
     System.getenv("GITHUB_TOKEN")
 
 dependencyResolutionManagement {

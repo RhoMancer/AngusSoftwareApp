@@ -1,9 +1,8 @@
 package dev.angussoftware.app.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -13,7 +12,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.Res
 import angussoftwareapp.composeapp.generated.resources.home_name
-import angussoftwareapp.composeapp.generated.resources.home_title
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -64,17 +62,7 @@ fun SkillChip(text: String) {
     }
 }
 
-/**
- * Reusable TopAppBar component used across screens to eliminate duplication.
- * Handles both compact and non-compact screen layouts with appropriate styling.
- *
- * @param title The title text to display in the app bar
- * @param icon Optional icon to display at the start of the title (null = no icon shown)
- * @param isCompactScreen Whether the screen is in compact mode
- * @param titleAlpha Alpha value for the title (used in compact mode)
- * @param bgAlpha Alpha value for the background (used in compact mode)
- * @param showNonCompact Whether to show the non-compact version when not in compact mode (default: true)
- */
+
 @Composable
 private fun TitleWithIcon(
     title: String,
@@ -102,6 +90,17 @@ private fun TitleWithIcon(
     }
 }
 
+/**
+ * Reusable TopAppBar component used across screens to eliminate duplication.
+ * Handles both compact and non-compact screen layouts with appropriate styling.
+ *
+ * @param title The title text to display in the app bar
+ * @param icon Optional icon to display at the start of the title (null = no icon shown)
+ * @param isCompactScreen Whether the screen is in compact mode
+ * @param titleAlpha Alpha value for the title (used in compact mode)
+ * @param bgAlpha Alpha value for the background (used in compact mode)
+ * @param showNonCompact Whether to show the non-compact version when not in compact mode (default: true)
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopAppBar(

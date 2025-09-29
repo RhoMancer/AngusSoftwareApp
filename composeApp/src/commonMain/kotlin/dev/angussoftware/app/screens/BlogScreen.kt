@@ -1,14 +1,9 @@
 package dev.angussoftware.app.screens
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material3.*
@@ -17,17 +12,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import dev.angussoftware.app.Screen
 import angussoftwareapp.composeapp.generated.resources.*
+import dev.angussoftware.app.Screen
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.blog.BlogRepository
-import dev.angussoftware.app.currentWindowAdaptiveInfo
-import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.utils.rememberCommonScreenState
@@ -36,7 +28,6 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlogScreen(navController: NavHostController? = null) {
-    val uriHandler = LocalUriHandler.current
     val feedUrl = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
     var isLoading by remember { mutableStateOf(true) }
