@@ -16,6 +16,12 @@ import dev.angussoftware.app.screens.BlogPostScreen
 import dev.angussoftware.app.screens.HomeScreen
 import dev.angussoftware.app.screens.ProjectsScreen
 import dev.angussoftware.app.blog.BlogRepository
+import angussoftwareapp.composeapp.generated.resources.Res
+import angussoftwareapp.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+internal const val BLOG_POST_LOADING_ID = "loading"
+internal const val BLOG_POST_ERROR_ID = "error"
+internal const val RSS_FEED_URL = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
 @Composable
 fun displayCurrentScreen(navController: NavHostController) {
@@ -46,7 +52,7 @@ fun displayCurrentScreen(navController: NavHostController) {
                 } catch (e: Exception) {
                     0
                 }
-                val feedUrl = "https://rhomancer.github.io/angus-blog-content/rss.xml"
+                val feedUrl = RSS_FEED_URL
                 
                 var blogPost by remember { mutableStateOf<dev.angussoftware.app.blog.BlogPost?>(null) }
                 var isLoading by remember { mutableStateOf(true) }
@@ -65,8 +71,8 @@ fun displayCurrentScreen(navController: NavHostController) {
                 if (isLoading) {
                     BlogPostScreen(
                         blogPost = dev.angussoftware.app.blog.BlogPost(
-                            id = "loading",
-                            title = "Loading...",
+                            id = BLOG_POST_LOADING_ID,
+                            title = stringResource(Res.string.ui_loading),
                             url = "",
                             pubDate = null,
                             summary = null,
@@ -84,8 +90,8 @@ fun displayCurrentScreen(navController: NavHostController) {
                     } ?: run {
                         BlogPostScreen(
                             blogPost = dev.angussoftware.app.blog.BlogPost(
-                                id = "error",
-                                title = "Post not found",
+                                id = BLOG_POST_ERROR_ID,
+                                title = stringResource(Res.string.blog_post_not_found),
                                 url = "",
                                 pubDate = null,
                                 summary = null,

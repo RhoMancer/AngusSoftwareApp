@@ -15,6 +15,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.currentWindowAdaptiveInfo
+import angussoftwareapp.composeapp.generated.resources.Res
+import angussoftwareapp.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +47,7 @@ fun BlogPostScreen(blogPost: BlogPost, onBackClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Back",
+                    text = stringResource(Res.string.ui_back),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable { onBackClick() }
@@ -55,12 +58,12 @@ fun BlogPostScreen(blogPost: BlogPost, onBackClick: () -> Unit) {
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
-                        contentDescription = "Open in browser",
+                        contentDescription = stringResource(Res.string.ui_open_in_browser),
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Open",
+                        text = stringResource(Res.string.ui_open),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -88,7 +91,7 @@ fun BlogPostScreen(blogPost: BlogPost, onBackClick: () -> Unit) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Image placeholder",
+                        text = stringResource(Res.string.ui_image_placeholder),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

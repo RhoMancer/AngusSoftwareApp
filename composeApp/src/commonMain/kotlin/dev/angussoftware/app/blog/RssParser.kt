@@ -1,5 +1,7 @@
 package dev.angussoftware.app.blog
 
+internal const val DEFAULT_UNTITLED_POST = "Untitled"
+
 internal object RssParser {
     fun parse(xml: String, limit: Int = 20): List<BlogPost> {
         val items = ITEM_REGEX.findAll(xml).map { it.value }.take(limit)
@@ -21,13 +23,13 @@ internal object RssParser {
             val descriptionRaw = extractTag(itemXml, "description")
             val summary = (descriptionRaw ?: contentRaw)
                 ?.let { stripHtml(decodeXmlEntities(stripCdata(it))).trim() }
-                ?.take(400)
+                ?.take(n = 400)
 
             val imageUrl = extractEnclosureUrl(itemXml) ?: extractMediaUrl(itemXml)
 
             posts += BlogPost(
                 id = (guid ?: link),
-                title = title.ifBlank { "Untitled" },
+                title = title.ifBlank { DEFAULT_UNTITLED_POST },
                 url = link,
                 pubDate = pubDate,
                 summary = summary,
@@ -46,10 +48,9 @@ internal object RssParser {
 
     private fun extractLink(xml: String): String {
         // 1) Standard RSS link content
-        extractTag(xml, "link")?.let { return stripCdata(it).trim() }
+        return extractTag(xml, "link")?.let { stripCdata(it).trim() } ?:
         // 2) Atom-style link href attribute
-        extractAtomLinkHref(xml)?.let { return it.trim() }
-        return ""
+        extractAtomLinkHref(xml)?.trim() ?: ""
     }
 
     private fun extractAtomLinkHref(xml: String): String? {

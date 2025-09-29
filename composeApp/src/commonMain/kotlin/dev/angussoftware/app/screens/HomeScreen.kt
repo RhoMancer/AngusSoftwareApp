@@ -29,6 +29,7 @@ import dev.angussoftware.app.currentWindowAdaptiveInfo
 import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
+import dev.angussoftware.app.ui.utils.rememberCommonScreenState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -50,7 +51,7 @@ private const val SKILL_CHIPS_PER_ROW = 3
 @Composable
 @Preview
 fun HomeScreen() {
-    val common = dev.angussoftware.app.ui.utils.rememberCommonScreenState()
+    val common = rememberCommonScreenState()
 
     val statusBarHeightDp = common.statusBarHeightDp
     val bottomInset = common.bottomInset
@@ -128,7 +129,7 @@ fun HeroSection(alpha: Float) {
 
         Image(
             painter = painterResource(getAngusLogoSystem()),
-            contentDescription = "Profile Image",
+            contentDescription = stringResource(Res.string.ui_profile_image),
             modifier = Modifier
                 .fillMaxWidth(fraction = 1f/3f)
                 .aspectRatio(1f),
@@ -356,7 +357,7 @@ fun SocialMediaButton(platform: String, url: String) {
             Spacer(modifier = Modifier.width(6.dp))
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
-                contentDescription = "Open",
+                contentDescription = stringResource(Res.string.ui_open),
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }

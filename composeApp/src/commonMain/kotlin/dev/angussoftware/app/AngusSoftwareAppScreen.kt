@@ -23,6 +23,9 @@ import dev.angussoftware.app.navigation.DefaultNavigationBarHeight
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.navigation.displayCurrentScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import angussoftwareapp.composeapp.generated.resources.Res
+import angussoftwareapp.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 
 // Define an enum class for different screens
@@ -71,20 +74,20 @@ fun AngusSoftwareAppScreen(navController: NavHostController = rememberNavControl
                         NavigationBarItem(
                             selected = currentRoute == Screen.Home.name,
                             onClick = { navController.navigate(Screen.Home.name) },
-                            label = { Text("Home") },
-                            icon = { Icon(Icons.Default.Home, contentDescription = "Home") }
+                            label = { Text(stringResource(Res.string.nav_home)) },
+                            icon = { Icon(Icons.Default.Home, contentDescription = stringResource(Res.string.nav_home)) }
                         )
                         NavigationBarItem(
                             selected = currentRoute == Screen.Projects.name,
                             onClick = { navController.navigate(Screen.Projects.name) },
-                            label = { Text("Projects") },
-                            icon = { Icon(Icons.Default.List, contentDescription = "Projects") }
+                            label = { Text(stringResource(Res.string.nav_projects)) },
+                            icon = { Icon(Icons.Default.List, contentDescription = stringResource(Res.string.nav_projects)) }
                         )
                         NavigationBarItem(
                             selected = currentRoute == Screen.Blog.name,
                             onClick = { navController.navigate(Screen.Blog.name) },
-                            label = { Text("Blog") },
-                            icon = { Icon(Icons.Default.Create, contentDescription = "Blog") }
+                            label = { Text(stringResource(Res.string.nav_blog)) },
+                            icon = { Icon(Icons.Default.Create, contentDescription = stringResource(Res.string.nav_blog)) }
                         )
                     }
                 },
@@ -127,22 +130,22 @@ fun AngusSoftwareAppScreen(navController: NavHostController = rememberNavControl
                         NavigationRailItem(
                             selected = currentRoute == Screen.Home.name,
                             onClick = { navController.navigate(Screen.Home.name) },
-                            label = { Text("Home") },
-                            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                            label = { Text(stringResource(Res.string.nav_home)) },
+                            icon = { Icon(Icons.Default.Home, contentDescription = stringResource(Res.string.nav_home)) },
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
                         NavigationRailItem(
                             selected = currentRoute == Screen.Projects.name,
                             onClick = { navController.navigate(Screen.Projects.name) },
-                            label = { Text("Projects") },
-                            icon = { Icon(Icons.Default.List, contentDescription = "Projects") },
+                            label = { Text(stringResource(Res.string.nav_projects)) },
+                            icon = { Icon(Icons.Default.List, contentDescription = stringResource(Res.string.nav_projects)) },
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
                         NavigationRailItem(
                             selected = currentRoute == Screen.Blog.name,
                             onClick = { navController.navigate(Screen.Blog.name) },
-                            label = { Text("Blog") },
-                            icon = { Icon(Icons.Default.Create, contentDescription = "Blog") },
+                            label = { Text(stringResource(Res.string.nav_blog)) },
+                            icon = { Icon(Icons.Default.Create, contentDescription = stringResource(Res.string.nav_blog)) },
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
                     }

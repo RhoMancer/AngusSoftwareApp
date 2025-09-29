@@ -30,6 +30,7 @@ import dev.angussoftware.app.currentWindowAdaptiveInfo
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
+import dev.angussoftware.app.ui.utils.rememberCommonScreenState
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +58,7 @@ fun BlogScreen(navController: NavHostController? = null) {
         isLoading = false
     }
 
-    val common = dev.angussoftware.app.ui.utils.rememberCommonScreenState()
+    val common = rememberCommonScreenState()
 
     val statusBarHeightDp = common.statusBarHeightDp
     val bottomInset = common.bottomInset

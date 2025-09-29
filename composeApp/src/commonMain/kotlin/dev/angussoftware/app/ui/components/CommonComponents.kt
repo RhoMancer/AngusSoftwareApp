@@ -1,5 +1,6 @@
 package dev.angussoftware.app.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,6 +11,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
+import angussoftwareapp.composeapp.generated.resources.Res
+import angussoftwareapp.composeapp.generated.resources.home_name
+import angussoftwareapp.composeapp.generated.resources.home_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * SectionCard is a reusable Card matching the design used throughout the app's sections.
@@ -86,7 +91,8 @@ private fun TitleWithIcon(
                 painter = icon,
                 contentDescription = null,
                 tint = Color.Unspecified,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.fillMaxHeight()
+                    .padding(vertical = 8.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = title)
@@ -99,7 +105,7 @@ private fun TitleWithIcon(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopAppBar(
-    title: String = "Angus Software",
+    title: String = stringResource(Res.string.home_name),
     icon: Painter? = null,
     isCompactScreen: Boolean,
     titleAlpha: Float = 1f,
@@ -126,7 +132,7 @@ fun CommonTopAppBar(
             title = { 
                 TitleWithIcon(
                     title = title,
-                    icon = icon
+                    icon = icon,
                 )
             },
             colors = TopAppBarDefaults.topAppBarColors(
