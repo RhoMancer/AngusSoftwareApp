@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
  * Android implementation of currentWindowAdaptiveInfo using LocalConfiguration
  */
 @Composable
-actual fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo {
+internal actual fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo {
     val widthPx = LocalWindowInfo.current.containerSize.width
     val density = LocalDensity.current.density
 

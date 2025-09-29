@@ -3,10 +3,10 @@ package dev.angussoftware.app
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ComposeAppCommonTest {
+internal class ComposeAppCommonTest {
 
     @Test
-    fun example() {
+    internal fun example() {
         assertEquals(3, 1 + 2)
     }
 }

@@ -45,7 +45,7 @@ private const val IMAGE_ASPECT_RATIO = 16f / 9f
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectsScreen() {
+internal fun ProjectsScreen() {
     val projects = listOf(
         Project(
             title = stringResource(Res.string.project_portfolio_title),

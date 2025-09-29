@@ -10,7 +10,7 @@ import org.w3c.dom.events.Event
  * Now observes browser resize events and converts pixels to dp using LocalDensity
  */
 @Composable
-actual fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo {
+internal actual fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo {
     val density = LocalDensity.current
 
     var widthPx by remember { mutableStateOf(window.innerWidth) }

@@ -21,7 +21,7 @@ import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 /**
  * Common reusable screen state holder for Home, Projects, Blog screens.
  */
-data class CommonScreenState(
+internal data class CommonScreenState(
     val statusBarHeightDp: Dp,
     val bottomInset: Dp,
     val listState: LazyListState,
@@ -35,7 +35,7 @@ data class CommonScreenState(
 )
 
 @Composable
-fun rememberCommonScreenState(
+internal fun rememberCommonScreenState(
     collapseThreshold: Dp = 120.dp,
     tilePadding: Dp = 16.dp,
     appBarHeightDp: Dp = 64.dp,

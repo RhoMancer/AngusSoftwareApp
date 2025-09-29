@@ -27,7 +27,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 // Define an enum class for different screens
-enum class Screen {
+internal enum class Screen {
     Home,
     Projects,
     Blog,
@@ -37,7 +37,7 @@ enum class Screen {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun AngusSoftwareAppScreen(navController: NavHostController = rememberNavController()) {
+internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberNavController()) {
     // Get window size information
     val windowInfo = currentWindowAdaptiveInfo()
 

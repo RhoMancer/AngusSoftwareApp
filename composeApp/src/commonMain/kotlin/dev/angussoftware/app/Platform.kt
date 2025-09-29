@@ -1,3 +1,3 @@
 package dev.angussoftware.app
 
-expect fun isWasm(): Boolean
+internal expect fun isWasm(): Boolean

@@ -43,7 +43,7 @@ private const val SKILL_CHIPS_PER_ROW = 3
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun HomeScreen() {
+internal fun HomeScreen() {
     val common = rememberCommonScreenState()
 
     val statusBarHeightDp = common.statusBarHeightDp
@@ -111,7 +111,7 @@ fun HomeScreen() {
  * @param alpha The opacity value for the fade-in animation
  */
 @Composable
-fun HeroSection(alpha: Float) {
+private fun HeroSection(alpha: Float) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -165,7 +165,7 @@ fun HeroSection(alpha: Float) {
  * @param alpha The opacity value for the fade-in animation
  */
 @Composable
-fun AboutMeSection(alpha: Float) {
+private fun AboutMeSection(alpha: Float) {
 
     val isCompactScreen = currentWindowAdaptiveInfo().isCompact
 
@@ -244,7 +244,7 @@ fun AboutMeSection(alpha: Float) {
  * @param alpha The opacity value for the fade-in animation
  */
 @Composable
-fun ContactSection(alpha: Float) {
+private fun ContactSection(alpha: Float) {
     SectionCard(alpha = alpha) {
         Column(
             modifier = Modifier
@@ -310,7 +310,7 @@ fun ContactSection(alpha: Float) {
  * @param content The actual contact information value
  */
 @Composable
-fun ContactItem(title: String, content: String) {
+private fun ContactItem(title: String, content: String) {
     Column {
         Text(
             text = title,
@@ -330,7 +330,7 @@ fun ContactItem(title: String, content: String) {
  * @param platform The name of the social media platform
  */
 @Composable
-fun SocialMediaButton(platform: String, url: String) {
+private fun SocialMediaButton(platform: String, url: String) {
     val uriHandler = LocalUriHandler.current
     OutlinedCard(
         modifier = Modifier.clickable { uriHandler.openUri(url) },

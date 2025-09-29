@@ -11,7 +11,7 @@ import kotlin.js.JsAny
 
 // External JavaScript function implemented in network.js
 @JsName("fetchUrlTextExternal")
-external fun fetchUrlTextExternal(url: String): Promise<JsAny>
+private external fun fetchUrlTextExternal(url: String): Promise<JsAny>
 internal actual suspend fun fetchUrlText(url: String): String {
     // Call external JavaScript function to avoid type casting issues
     val jsResult: JsAny = fetchUrlTextExternal(url).await()

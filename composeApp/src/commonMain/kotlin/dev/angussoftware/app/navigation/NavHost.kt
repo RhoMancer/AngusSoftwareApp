@@ -24,7 +24,7 @@ internal const val BLOG_POST_ERROR_ID = "error"
 internal const val RSS_FEED_URL = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
 @Composable
-fun displayCurrentScreen(navController: NavHostController) {
+internal fun displayCurrentScreen(navController: NavHostController) {
     Scaffold {
         NavHost(
             navController = navController,

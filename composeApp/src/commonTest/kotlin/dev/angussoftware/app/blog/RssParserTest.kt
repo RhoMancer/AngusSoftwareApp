@@ -4,9 +4,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class RssParserTest {
+internal class RssParserTest {
     @Test
-    fun parsesSingleItemFromRss() {
+    internal fun parsesSingleItemFromRss() {
         val xml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0">
@@ -39,7 +39,7 @@ class RssParserTest {
     }
 
     @Test
-    fun gracefullyHandlesMissingOptionalFields() {
+    internal fun gracefullyHandlesMissingOptionalFields() {
         val xml = """
             <rss version="2.0">
               <channel>

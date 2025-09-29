@@ -3,7 +3,7 @@ package dev.angussoftware.app.blog
 internal const val DEFAULT_UNTITLED_POST = "Untitled"
 
 internal object RssParser {
-    fun parse(xml: String, limit: Int = 20): List<BlogPost> {
+    internal fun parse(xml: String, limit: Int = 20): List<BlogPost> {
         val items = ITEM_REGEX.findAll(xml).map { it.value }.take(limit)
         val posts = mutableListOf<BlogPost>()
         for (itemXml in items) {
@@ -72,7 +72,7 @@ internal object RssParser {
     private fun stripCdata(text: String): String =
         text.removePrefix("<![CDATA[").removeSuffix("]]>")
 
-    internal fun stripHtml(html: String): String =
+    private fun stripHtml(html: String): String =
         html.replace(Regex("<[^>]+>"), " ")
             .replace("&nbsp;", " ")
             .replace("&amp;", "&")

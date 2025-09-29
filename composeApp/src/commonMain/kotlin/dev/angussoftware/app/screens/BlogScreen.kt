@@ -25,11 +25,11 @@ import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.utils.rememberCommonScreenState
 import org.jetbrains.compose.resources.stringResource
 
-const val PAGE_SIZE = 20
+private const val PAGE_SIZE = 20
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BlogScreen(navController: NavHostController? = null) {
+internal fun BlogScreen(navController: NavHostController? = null) {
     val feedUrl = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
     var isLoading by remember { mutableStateOf(true) }
