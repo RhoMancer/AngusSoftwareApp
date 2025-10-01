@@ -23,7 +23,12 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
 import com.angussoftware.theming.compose.resources.AngusResources
+import com.angussoftware.theming.compose.resources.getAngusPaintPalette
 import com.angussoftware.theming.compose.resources.getAngusSimpleLogoSystem
+import com.angussoftware.theming.compose.resources.getAngusSolitareIcon
+import com.angussoftware.theming.compose.resources.getBlinkReaderIcon
+import com.angussoftware.theming.compose.resources.getGooglePlayStoreIcon
+import com.angussoftware.theming.compose.resources.getTapTargetBoosterIcon
 import dev.angussoftware.app.isWasm
 import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
@@ -65,6 +70,7 @@ internal fun ProjectsScreen() {
         Project(
             title = stringResource(Res.string.project_google_play_developer_account),
             link = "https://play.google.com/store/apps/dev?id=7308269362866323199",
+            icon = getGooglePlayStoreIcon()
         ),
         Project(
             title = stringResource(Res.string.project_angus_paint_title),
@@ -83,7 +89,8 @@ internal fun ProjectsScreen() {
                 Res.drawable.angus_paint_6,
                 Res.drawable.angus_paint_7
             ),
-            link = "https://play.google.com/store/apps/details?id=gms.angusgaming.anguspaint"
+            link = "https://play.google.com/store/apps/details?id=gms.angusgaming.anguspaint",
+            icon = getAngusPaintPalette()
         ),
         Project(
             title = stringResource(Res.string.project_angus_solitaire_title),
@@ -98,7 +105,8 @@ internal fun ProjectsScreen() {
                 Res.drawable.angus_solitaire_2,
                 Res.drawable.angus_solitaire_3
             ),
-            link = "https://play.google.com/store/apps/details?id=gms.angus.angussoli"
+            link = "https://play.google.com/store/apps/details?id=gms.angus.angussoli",
+//            icon = getAngusSolitareIcon()
         ),
         Project(
             title = stringResource(Res.string.project_blink_reader_title),
@@ -113,7 +121,8 @@ internal fun ProjectsScreen() {
                 Res.drawable.blink_reader_2,
                 Res.drawable.blink_reader_3
             ),
-            link = "https://play.google.com/store/apps/details?id=com.woods.blinkreader"
+            link = "https://play.google.com/store/apps/details?id=com.woods.blinkreader",
+            icon = getBlinkReaderIcon()
         ),
         Project(
             title = stringResource(Res.string.project_tap_target_booster_title),
@@ -129,7 +138,8 @@ internal fun ProjectsScreen() {
                 Res.drawable.tap_target_3,
                 Res.drawable.tap_target_4
             ),
-            link = "https://play.google.com/store/apps/details?id=angus.gaming.taptargetbooster"
+            link = "https://play.google.com/store/apps/details?id=angus.gaming.taptargetbooster",
+            icon = getTapTargetBoosterIcon()
         )
     )
 
