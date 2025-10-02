@@ -17,19 +17,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
-import com.angussoftware.theming.compose.resources.AngusResources
 import com.angussoftware.theming.compose.resources.getAngusPaintPalette
 import com.angussoftware.theming.compose.resources.getAngusSimpleLogoSystem
 import com.angussoftware.theming.compose.resources.getAngusSolitareIcon
 import com.angussoftware.theming.compose.resources.getBlinkReaderIcon
 import com.angussoftware.theming.compose.resources.getGooglePlayStoreIcon
 import com.angussoftware.theming.compose.resources.getTapTargetBoosterIcon
-import dev.angussoftware.app.isWasm
+import dev.angussoftware.app.ui.utils.isWasm
 import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
@@ -130,7 +128,7 @@ internal fun ProjectsScreen() {
             description = stringResource(Res.string.project_tap_target_booster_desc),
             technologies = listOf(
                 Res.string.tech_kotlin,
-                Res.string.tech_compose
+                Res.string.tech_xml
             ).map { stringResource(it) },
             images = listOf(
                 Res.drawable.tap_target_1,

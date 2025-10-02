@@ -1,4 +1,4 @@
-package dev.angussoftware.app
+package dev.angussoftware.app.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,6 +9,7 @@ import androidx.compose.ui.tooling.preview.Devices.PHONE
 import androidx.compose.ui.tooling.preview.Devices.TABLET
 import androidx.compose.ui.tooling.preview.Preview
 import com.angussoftware.theming.compose.ui.theme.AngusTheme
+import dev.angussoftware.app.screens.AngusSoftwareAppScreen
 
 internal class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

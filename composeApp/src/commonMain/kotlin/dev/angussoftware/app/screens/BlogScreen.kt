@@ -12,12 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import angussoftwareapp.composeapp.generated.resources.*
-import dev.angussoftware.app.Screen
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.blog.BlogRepository
 import dev.angussoftware.app.ui.components.CommonTopAppBar
@@ -76,7 +74,7 @@ internal fun BlogScreen(navController: NavHostController? = null) {
             // Title
             item {
                 Text(
-                    text = stringResource(Res.string.nav_blog),
+                    text = stringResource(Res.string.blog_title),
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier
                         .padding(bottom = 16.dp)

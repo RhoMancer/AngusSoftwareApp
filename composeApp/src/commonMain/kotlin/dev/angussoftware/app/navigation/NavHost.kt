@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import androidx.compose.runtime.*
-import dev.angussoftware.app.Screen
+import dev.angussoftware.app.screens.Screen
 import dev.angussoftware.app.screens.BlogScreen
 import dev.angussoftware.app.screens.BlogPostScreen
 import dev.angussoftware.app.screens.HomeScreen

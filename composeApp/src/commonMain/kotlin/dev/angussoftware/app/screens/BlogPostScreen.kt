@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import dev.angussoftware.app.blog.BlogPost
-import dev.angussoftware.app.currentWindowAdaptiveInfo
+import dev.angussoftware.app.ui.utils.currentWindowAdaptiveInfo
 import angussoftwareapp.composeapp.generated.resources.Res
 import angussoftwareapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource

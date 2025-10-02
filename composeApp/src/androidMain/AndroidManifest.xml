@@ -12,7 +12,7 @@
         android:theme="@style/AngusTheme">
         <activity
             android:exported="true"
-            android:name=".MainActivity">
+            android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
