@@ -23,6 +23,58 @@ internal const val BLOG_POST_LOADING_ID = "loading"
 internal const val BLOG_POST_ERROR_ID = "error"
 internal const val RSS_FEED_URL = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
+/**
+ * Parses the post index from a navigation route string.
+ * Extracts the numeric index from the end of the route path.
+ * 
+ * @param route The navigation route string (e.g., "BlogPost/5")
+ * @return The parsed post index as Int, or 0 if parsing fails or route is invalid
+ */
+internal fun parsePostIndex(route: String?): Int {
+    return try {
+        val indexStr = route?.substringAfterLast("/") ?: ""
+        indexStr.toIntOrNull() ?: 0
+    } catch (e: Exception) {
+        0
+    }
+}
+
+/**
+ * Creates a BlogPost object for loading state display.
+ * 
+ * @param loadingTitle The localized loading title string
+ * @return A BlogPost configured for loading state
+ */
+internal fun createLoadingBlogPost(loadingTitle: String): dev.angussoftware.app.blog.BlogPost {
+    return dev.angussoftware.app.blog.BlogPost(
+        id = BLOG_POST_LOADING_ID,
+        title = loadingTitle,
+        url = "",
+        pubDate = null,
+        summary = null,
+        imageUrl = null,
+        content = null
+    )
+}
+
+/**
+ * Creates a BlogPost object for error state display.
+ * 
+ * @param errorTitle The localized error title string
+ * @return A BlogPost configured for error state
+ */
+internal fun createErrorBlogPost(errorTitle: String): dev.angussoftware.app.blog.BlogPost {
+    return dev.angussoftware.app.blog.BlogPost(
+        id = BLOG_POST_ERROR_ID,
+        title = errorTitle,
+        url = "",
+        pubDate = null,
+        summary = null,
+        imageUrl = null,
+        content = null
+    )
+}
+
 @Composable
 internal fun displayCurrentScreen(navController: NavHostController) {
     Scaffold {
@@ -45,14 +97,7 @@ internal fun displayCurrentScreen(navController: NavHostController) {
                 route = "${Screen.BlogPost.name}/{postIndex}",
                 arguments = listOf(navArgument("postIndex") { type = NavType.StringType })
             ) { backStackEntry ->
-                val postIndex = try {
-                    val route = backStackEntry.destination.route ?: ""
-                    val indexStr = route.substringAfterLast("/")
-                    indexStr.toIntOrNull() ?: 0
-                } catch (e: Exception) {
-                    // todo: proper error handling
-                    0
-                }
+                val postIndex = parsePostIndex(backStackEntry.destination.route)
                 val feedUrl = RSS_FEED_URL
                 
                 var blogPost by remember { mutableStateOf<dev.angussoftware.app.blog.BlogPost?>(null) }
@@ -72,15 +117,7 @@ internal fun displayCurrentScreen(navController: NavHostController) {
                 
                 if (isLoading) {
                     BlogPostScreen(
-                        blogPost = dev.angussoftware.app.blog.BlogPost(
-                            id = BLOG_POST_LOADING_ID,
-                            title = stringResource(Res.string.ui_loading),
-                            url = "",
-                            pubDate = null,
-                            summary = null,
-                            imageUrl = null,
-                            content = null
-                        ),
+                        blogPost = createLoadingBlogPost(stringResource(Res.string.ui_loading)),
                         onBackClick = { navController.popBackStack() }
                     )
                 } else {
@@ -91,15 +128,7 @@ internal fun displayCurrentScreen(navController: NavHostController) {
                         )
                     } ?: run {
                         BlogPostScreen(
-                            blogPost = dev.angussoftware.app.blog.BlogPost(
-                                id = BLOG_POST_ERROR_ID,
-                                title = stringResource(Res.string.blog_post_not_found),
-                                url = "",
-                                pubDate = null,
-                                summary = null,
-                                imageUrl = null,
-                                content = null
-                            ),
+                            blogPost = createErrorBlogPost(stringResource(Res.string.blog_post_not_found)),
                             onBackClick = { navController.popBackStack() }
                         )
                     }
