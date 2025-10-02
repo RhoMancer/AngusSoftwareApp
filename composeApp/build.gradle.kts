@@ -62,9 +62,13 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.angusSoftware.theming.compose)
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
         }
     }
 }
+
+
 
 android {
     namespace = "dev.angussoftware.app"
