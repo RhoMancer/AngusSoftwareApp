@@ -1,4 +1,4 @@
-package dev.angussoftware.app
+package dev.angussoftware.app.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -19,6 +19,7 @@ import angussoftwareapp.composeapp.generated.resources.Res
 import angussoftwareapp.composeapp.generated.resources.nav_blog
 import angussoftwareapp.composeapp.generated.resources.nav_home
 import angussoftwareapp.composeapp.generated.resources.nav_projects
+import dev.angussoftware.app.ui.utils.currentWindowAdaptiveInfo
 import dev.angussoftware.app.navigation.DefaultNavigationBarHeight
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.navigation.displayCurrentScreen

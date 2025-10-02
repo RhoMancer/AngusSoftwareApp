@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
 import com.angussoftware.theming.compose.resources.getAngusLogoSystem
 import com.angussoftware.theming.compose.resources.getAngusSimpleLogoSystem
-import dev.angussoftware.app.currentWindowAdaptiveInfo
+import dev.angussoftware.app.ui.utils.currentWindowAdaptiveInfo
 import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
@@ -84,7 +84,14 @@ internal fun HomeScreen() {
 
             // ABOUT ME
             item {
-                AboutMeSection(alpha)
+                AboutMeProfessionalSection(alpha)
+            }
+
+            item { Spacer(modifier = Modifier.height(tilePadding * 2)) }
+
+            // ABOUT ME
+            item {
+                AboutMePersonalSection(alpha)
             }
 
             item { Spacer(modifier = Modifier.height(tilePadding * 2)) }
@@ -159,13 +166,13 @@ private fun HeroSection(alpha: Float) {
 }
 
 /**
- * AboutMeSection displays professional information about the user,
+ * AboutMeProfessionalSection displays professional information about the user,
  * including a summary of their background and skills.
  *
  * @param alpha The opacity value for the fade-in animation
  */
 @Composable
-private fun AboutMeSection(alpha: Float) {
+private fun AboutMeProfessionalSection(alpha: Float) {
 
     val isCompactScreen = currentWindowAdaptiveInfo().isCompact
 
@@ -176,20 +183,26 @@ private fun AboutMeSection(alpha: Float) {
         ) {
             // Section Title
             Text(
-                text = stringResource(Res.string.home_about_title),
+                text = stringResource(Res.string.home_about_pro_title),
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             // Professional Summary
             Text(
-                text = stringResource(Res.string.home_about_paragraph1),
+                text = stringResource(Res.string.home_about_pro_paragraph1),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             Text(
-                text = stringResource(Res.string.home_about_paragraph2),
+                text = stringResource(Res.string.home_about_pro_paragraph2),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Text(
+                text = stringResource(Res.string.home_about_pro_paragraph3),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -234,6 +247,51 @@ private fun AboutMeSection(alpha: Float) {
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * AboutMePersonalSection displays personal information about the developer,
+ * including a summary of their background and interests.
+ *
+ * @param alpha The opacity value for the fade-in animation
+ */
+@Composable
+private fun AboutMePersonalSection(alpha: Float) {
+
+    val isCompactScreen = currentWindowAdaptiveInfo().isCompact
+
+    SectionCard(alpha = alpha) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            // Section Title
+            Text(
+                text = stringResource(Res.string.home_about_per_title),
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            // Personal Summary
+            Text(
+                text = stringResource(Res.string.home_about_per_paragraph1),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Text(
+                text = stringResource(Res.string.home_about_per_paragraph2),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Text(
+                text = stringResource(Res.string.home_about_per_paragraph3),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
         }
     }
 }

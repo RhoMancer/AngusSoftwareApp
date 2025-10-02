@@ -57,7 +57,7 @@ internal fun SkillChip(text: String) {
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
         )
     }

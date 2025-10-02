@@ -26,10 +26,17 @@
     <string name="home_tagline">Writing software daily, for fun and growth</string>
 
     <!-- Home screen: About -->
-    <string name="home_about_title">About Me</string>
-    <string name="home_about_paragraph1">I am a Software Developer with expertise in modern mobile technologies and writing for JVM. With a strong foundation in front-end development, I create seamless, user-centered applications that drive engagement.</string>
-    <string name="home_about_paragraph2">My approach combines technical excellence with creative problem-solving. I'm dedicated to writing clean, maintainable code and staying current with industry best practices and emerging technologies.</string>
+    <string name="home_about_pro_title">Professional Experience</string>
+    <string name="home_about_pro_paragraph1">For work, I build whatever’s needed at the best value I can provide. I was trained in Android development when the timing was right, but over the years I’ve come to feel confident working in just about any modern language or stack.</string>
+    <string name="home_about_pro_paragraph2">What I do best is taking the abstract ideas people bring me — the picture they have in their heads of how a project should look or feel — and turning that into something concrete. I focus on refining the connections, making sure nothing important is missed, and delivering something complete and functional.</string>
+    <string name="home_about_pro_paragraph3">Professionally, most of my experience is with large-scale retail mobile applications. In my personal time, I work on whatever I’m motivated to finish, almost always in Kotlin. I’m very results-oriented: I’d rather focus on projects that will be completed than sink time into something that won’t reach the finish line.</string>
     <string name="home_skills_title">Key Skills</string>
+
+    <!-- Home screen: About -->
+    <string name="home_about_per_title">Overly Personal</string>
+    <string name="home_about_per_paragraph1">I think a lot about how life is fleeting and how limited our time is, especially in the years when we’re strongest. What keeps me moving are the people I know who are also wearing their own masks but still accomplish the things I wish I could. They remind me that it’s possible.</string>
+    <string name="home_about_per_paragraph2">Most of what I do — in lifting, in projects, in life — comes down to faith that I’m not some special snowflake who can’t grow. If I keep at it, even slowly, the small progress I’ve seen so far will keep adding up. Slowing down or stopping always makes things worse; going at a reasonable speed keeps me steady.</string>
+    <string name="home_about_per_paragraph3">When I finally let go of worry and realize there’s nothing urgent to stress over, I find relief in small things — petting my animals, meditating, or just breathing for a moment. I don’t expect anyone to waste empathy on me; I just want to give a bit of context about the person behind the code. This is me trying, moving forward, one step at a time.</string>
 
     <!-- Home screen: Skills list -->
     <!-- Reuse tech_kotlin and tech_compose where appropriate -->
@@ -85,6 +92,7 @@
     </string>
     
     <!-- Blog screen -->
+    <string name="blog_title">Rhoman₵er's Blog</string>
     <string name="blog_loading">Loading posts...</string>
     <string name="blog_empty">There are no new Posts to display.</string>
     <string name="blog_load_more">Load more posts</string>
@@ -93,7 +101,7 @@
     <string name="nav_home">Home</string>
     <string name="nav_projects">Projects</string>
     <string name="nav_blog">Blog</string>
-    
+
     <!-- Common UI strings -->
     <string name="ui_back">Back</string>
     <string name="ui_open">Open</string>

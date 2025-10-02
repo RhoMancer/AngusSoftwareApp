@@ -1,4 +1,4 @@
-package dev.angussoftware.app
+package dev.angussoftware.app.ui.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
