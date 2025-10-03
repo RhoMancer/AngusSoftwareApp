@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.testTag
 import dev.angussoftware.app.screens.Screen
 import dev.angussoftware.app.screens.BlogScreen
 import dev.angussoftware.app.screens.BlogPostScreen
@@ -75,6 +76,8 @@ internal fun createErrorBlogPost(errorTitle: String): dev.angussoftware.app.blog
     )
 }
 
+internal const val NAV_HOST_TEST_TAG = "NavHost"
+
 @Composable
 internal fun displayCurrentScreen(navController: NavHostController) {
     Scaffold {
@@ -83,6 +86,7 @@ internal fun displayCurrentScreen(navController: NavHostController) {
             startDestination = Screen.Home.name,
             modifier = Modifier
                 .fillMaxSize()
+                .testTag(NAV_HOST_TEST_TAG)
         ) {
             composable(route = Screen.Home.name) {
                 HomeScreen()
