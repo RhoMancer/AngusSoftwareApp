@@ -11,9 +11,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import dev.angussoftware.app.blog.BlogPost
+import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.ui.utils.currentWindowAdaptiveInfo
 import angussoftwareapp.composeapp.generated.resources.Res
 import angussoftwareapp.composeapp.generated.resources.*
@@ -25,10 +27,11 @@ internal fun BlogPostScreen(blogPost: BlogPost, onBackClick: () -> Unit) {
     val uriHandler = LocalUriHandler.current
     val windowInfo = currentWindowAdaptiveInfo()
     val isCompactScreen = windowInfo.isCompact
+    val navigationBarHeight = LocalNavigationBarHeight.current
     
     // Calculate padding for status bar and bottom navigation
     val statusBarHeightDp = if (isCompactScreen) 24.dp else 0.dp
-    val bottomInset = if (isCompactScreen) 80.dp else 16.dp
+    val bottomInset = if (isCompactScreen) navigationBarHeight else 16.dp
     val tilePadding = 16.dp
 
     Surface(
@@ -40,7 +43,9 @@ internal fun BlogPostScreen(blogPost: BlogPost, onBackClick: () -> Unit) {
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
-                .padding(top = statusBarHeightDp + tilePadding, bottom = bottomInset + tilePadding)
+                .padding(
+                    top = statusBarHeightDp + tilePadding, 
+                    bottom = bottomInset + tilePadding)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
