@@ -346,15 +346,19 @@ private fun ContactSection(alpha: Float) {
             ) {
                 SocialMediaButton(
                     platform = stringResource(Res.string.platform_linkedin),
-                    url = "https://www.linkedin.com/in/harry-cliff/"
+                    url = stringResource(Res.string.url_linkedin)
                 )
                 SocialMediaButton(
                     platform = stringResource(Res.string.platform_github),
-                    url = "https://github.com/RhoMancer/"
+                    url = stringResource(Res.string.url_github)
                 )
                 SocialMediaButton(
                     platform = stringResource(Res.string.platform_bluesky),
-                    url = "https://bsky.app/profile/rhomancer.bsky.social"
+                    url = stringResource(Res.string.url_bluesky)
+                )
+                SocialMediaButton(
+                    platform = stringResource(Res.string.platform_protopro),
+                    url = stringResource(Res.string.url_protopro)
                 )
             }
         }
