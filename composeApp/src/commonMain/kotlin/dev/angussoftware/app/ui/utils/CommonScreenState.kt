@@ -55,7 +55,7 @@ internal fun rememberCommonScreenState(
         derivedStateOf {
             val index = listState.firstVisibleItemIndex
             val offset = listState.firstVisibleItemScrollOffset
-            index > 0 || offset > collapseThresholdPx.toInt()
+            isCollapsedFor(index, offset, collapseThresholdPx.toInt())
         }
     }
 
@@ -92,3 +92,19 @@ internal fun rememberCommonScreenState(
         appBarHeightDp = appBarHeightDp,
     )
 }
+
+
+/**
+ * Pure predicate that determines whether the top app bar should be considered collapsed,
+ * based on the current LazyList position and a pixel threshold.
+ *
+ * Contract:
+ * - Collapsed when the first visible item index is greater than 0 (scrolled past first item)
+ * - Or when the first visible item scroll offset is strictly greater than thresholdPx
+ * - Not collapsed when at the first item and offset <= thresholdPx
+ */
+internal fun isCollapsedFor(
+    listIndex: Int,
+    listOffsetPx: Int,
+    thresholdPx: Int,
+): Boolean = listIndex > 0 || listOffsetPx > thresholdPx
