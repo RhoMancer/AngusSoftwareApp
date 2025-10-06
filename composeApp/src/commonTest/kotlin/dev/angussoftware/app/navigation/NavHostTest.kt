@@ -1,14 +1,9 @@
 package dev.angussoftware.app.navigation
 
-import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.runComposeUiTest
-import androidx.navigation.compose.rememberNavController
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import dev.angussoftware.app.blog.BlogPost
 
 internal class NavHostTest {
     
