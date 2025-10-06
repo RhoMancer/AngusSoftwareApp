@@ -7,6 +7,8 @@ import androidx.navigation.compose.rememberNavController
 import kotlin.test.Test
 
 class NavHostComposableTest {
+    // this test will fail unless it is run as
+    // :composeApp:connectedAndroidTest
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun testDisplayCurrentScreenRendersNavHost() = runComposeUiTest {
