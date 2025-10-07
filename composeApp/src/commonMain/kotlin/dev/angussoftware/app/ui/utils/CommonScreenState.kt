@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -32,6 +33,10 @@ internal data class CommonScreenState(
     val tilePadding: Dp,
     val appBarHeightDp: Dp,
 )
+
+// Test-only override hook for window adaptive info to make isCompactScreen deterministic in tests
+// Default is null, meaning production behavior using currentWindowAdaptiveInfo()
+internal val LocalOverrideWindowAdaptiveInfo = compositionLocalOf<WindowAdaptiveInfo?> { null }
 
 @Composable
 internal fun rememberCommonScreenState(
@@ -77,7 +82,8 @@ internal fun rememberCommonScreenState(
         label = "topBarBgAlpha"
     )
 
-    val isCompactScreen = currentWindowAdaptiveInfo().isCompact
+    val adaptiveInfo = LocalOverrideWindowAdaptiveInfo.current ?: currentWindowAdaptiveInfo()
+    val isCompactScreen = adaptiveInfo.isCompact
 
     return CommonScreenState(
         statusBarHeightDp = statusBarHeightDp,
