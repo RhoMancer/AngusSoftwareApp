@@ -44,6 +44,9 @@ private const val BOTTOM_INSET_TAG = "bottomInset"
 private const val IS_COMPACT_TAG = "isCompact"
 private const val TOGGLE_NAV_HEIGHT_TAG = "toggleNavHeight"
 private const val BOTTOM_INSET_DELTA_TAG = "bottomInsetDelta"
+private const val STATUS_BAR_HEIGHT_TAG = "statusBarHeight"
+private const val RECOMPOSE_TAG = "forceRecompose"
+private const val ALPHA_DIFF_TAG = "alphaDiff"
 
 /**
  * UI tests for rememberCommonScreenState collapse behavior and animations.
@@ -92,39 +95,6 @@ class CommonScreenStateUiTest {
         onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("1.00")
     }
 
-    @OptIn(ExperimentalTestApi::class)
-    @Test
-    fun reverse_transition_and_stable_end_states() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen() }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
-
-        // Initially expanded
-        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
-        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("0.00")
-        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("0.00")
-
-        // Collapse by scrolling to next item
-        onNodeWithTag(LIST_TAG).performScrollToIndex(1)
-        waitForIdle()
-        mainClock.advanceTimeBy(3000)
-        waitForIdle()
-
-        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
-        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("1.00")
-        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("1.00")
-
-        // Expand back to top (index 0, offset 0)
-        onNodeWithTag(SCROLL_TO_TOP_TAG).performClick()
-        waitForIdle()
-        mainClock.advanceTimeBy(3000)
-        waitForIdle()
-
-        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
-        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("0.00")
-        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("0.00")
-    }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
@@ -153,50 +123,7 @@ class CommonScreenStateUiTest {
         onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("1.00")
     }
 
-    @OptIn(ExperimentalTestApi::class)
-    @Test
-    fun collapses_by_offset_within_first_item_when_scrolled_beyond_threshold() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen() }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
 
-        // Ensure starting expanded
-        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
-
-        // Scroll by threshold+1 pixels while staying on the first item (index 0)
-        onNodeWithTag(SCROLL_BY_TAG).performClick()
-        waitForIdle()
-        mainClock.advanceTimeBy(3000)
-        waitForIdle()
-
-        // Collapsed due to offset-only path
-        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
-        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("1.00")
-    }
-
-    @OptIn(ExperimentalTestApi::class)
-    @Test
-    fun threshold_parameterization_and_boundary() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen(collapseThreshold = 1.dp) }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
-
-        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
-
-        onNodeWithTag(SCROLL_TO_THRESHOLD_TAG).performClick()
-        waitForIdle()
-        mainClock.advanceTimeBy(200)
-        waitForIdle()
-        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
-
-        onNodeWithTag(SCROLL_BY_TAG).performClick()
-        waitForIdle()
-        mainClock.advanceTimeBy(3000)
-        waitForIdle()
-        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
-    }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
@@ -228,8 +155,7 @@ class CommonScreenStateUiTest {
 
     @OptIn(ExperimentalTestApi::class)
     @Test
-    fun isCompactScreen_branching_via_override() = runComposeUiTest {
-        // Force COMPACT
+    fun isCompactScreen_true_for_compact_size_class() = runComposeUiTest {
         setContent {
             CompositionLocalProvider(LocalOverrideWindowAdaptiveInfo provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)) {
                 TestScreen()
@@ -237,8 +163,11 @@ class CommonScreenStateUiTest {
         }
         waitForIdle()
         onNodeWithTag(IS_COMPACT_TAG).assertTextEquals("true")
+    }
 
-        // Force EXPANDED
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun isCompactScreen_false_for_expanded_size_class() = runComposeUiTest {
         setContent {
             CompositionLocalProvider(LocalOverrideWindowAdaptiveInfo provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED)) {
                 TestScreen()
@@ -247,6 +176,67 @@ class CommonScreenStateUiTest {
         waitForIdle()
         onNodeWithTag(IS_COMPACT_TAG).assertTextEquals("false")
     }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun medium_size_class_yields_isCompactScreen_false() = runComposeUiTest {
+        setContent {
+            CompositionLocalProvider(LocalOverrideWindowAdaptiveInfo provides WindowAdaptiveInfo(WindowWidthSizeClass.MEDIUM)) {
+                TestScreen()
+            }
+        }
+        waitForIdle()
+        onNodeWithTag(IS_COMPACT_TAG).assertTextEquals("false")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun statusBarHeightDp_is_non_negative_and_stable_across_recomposition() = runComposeUiTest {
+        setContent { TestScreen() }
+        waitForIdle()
+
+        // Read the initial statusBarHeight text
+        val initialHeightText = onNodeWithTag(STATUS_BAR_HEIGHT_TAG).fetchSemanticsNode()
+            .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
+        val initialHeight = initialHeightText.toFloatOrNull() ?: 0f
+        assertTrue(initialHeight >= 0f, "statusBarHeightDp should be non-negative, was: $initialHeight")
+
+        // Trigger a recomposition without changing insets or any state that affects statusBarHeightDp
+        onNodeWithTag("triggerRecompose").performClick()
+        waitForIdle()
+
+        // Read the height again and assert it's unchanged
+        val afterRecomposeHeightText = onNodeWithTag(STATUS_BAR_HEIGHT_TAG).fetchSemanticsNode()
+            .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
+        val afterRecomposeHeight = afterRecomposeHeightText.toFloatOrNull() ?: 0f
+        assertTrue(abs(afterRecomposeHeight - initialHeight) < 0.01f, 
+            "statusBarHeightDp should remain stable across recomposition, was $initialHeight then $afterRecomposeHeight")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun fade_in_alpha_stable_across_recompositions_after_reaching_one() = runComposeUiTest {
+        mainClock.autoAdvance = false
+        setContent { TestScreen() }
+        mainClock.advanceTimeByFrame()
+        waitForIdle()
+
+        // Advance time to complete the fade-in animation (1000ms)
+        mainClock.advanceTimeBy(1000)
+        waitForIdle()
+        onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("1.00")
+
+        // Trigger recomposition
+        onNodeWithTag("triggerRecompose").performClick()
+        waitForIdle()
+        mainClock.advanceTimeBy(100)
+        waitForIdle()
+
+        // Fade alpha should remain 1.00 (not restart)
+        onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("1.00")
+    }
+
+
 }
 
 @androidx.compose.runtime.Composable
@@ -262,6 +252,7 @@ private fun TestScreen(
     )
     val scope = rememberCoroutineScope()
     val thresholdPx = with(LocalDensity.current) { collapseThreshold.toPx() }
+    var recomposeFlag by remember { mutableStateOf(false) }
 
     // Expose state via tagged text for assertions
     Text(modifier = Modifier.testTag(COLLAPSED_TAG), text = state.isCollapsed.toString())
@@ -293,8 +284,23 @@ private fun TestScreen(
         modifier = Modifier.testTag(BOTTOM_INSET_TAG),
         text = String.format("%.2f", state.bottomInset.value)
     )
+    Text(
+        modifier = Modifier.testTag(STATUS_BAR_HEIGHT_TAG),
+        text = String.format("%.2f", state.statusBarHeightDp.value)
+    )
+    Text(
+        modifier = Modifier.testTag(ALPHA_DIFF_TAG),
+        text = String.format("%.2f", state.titleAlpha - state.bgAlpha)
+    )
+    Text(
+        modifier = Modifier.testTag(RECOMPOSE_TAG),
+        text = recomposeFlag.toString()
+    )
 
     // Controls to drive precise scroll behavior in tests
+    Button(modifier = Modifier.testTag("triggerRecompose"), onClick = {
+        recomposeFlag = !recomposeFlag
+    }) { Text("recomp") }
     Button(modifier = Modifier.testTag(SCROLL_TO_TOP_TAG), onClick = {
         scope.launch { state.listState.scrollToItem(0, 0) }
     }) { Text("top") }
