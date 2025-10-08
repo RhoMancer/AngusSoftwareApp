@@ -49,6 +49,43 @@ private const val RECOMPOSE_TAG = "forceRecompose"
 private const val ALPHA_DIFF_TAG = "alphaDiff"
 
 /**
+ * Helper extension functions to reduce code duplication in tests.
+ */
+
+/**
+ * Advances the test clock by the specified duration and waits for idle state.
+ * This is a common pattern used throughout animation tests.
+ */
+@OptIn(ExperimentalTestApi::class)
+private fun androidx.compose.ui.test.ComposeUiTest.advanceClockAndWait(millis: Long) {
+    mainClock.advanceTimeBy(millis)
+    waitForIdle()
+}
+
+/**
+ * Sets up manual clock control for animation testing.
+ * This performs the common setup: disable auto-advance, set content, advance one frame, and wait.
+ */
+@OptIn(ExperimentalTestApi::class)
+private fun androidx.compose.ui.test.ComposeUiTest.setupManualClock(
+    content: @androidx.compose.runtime.Composable () -> Unit
+) {
+    mainClock.autoAdvance = false
+    setContent(content)
+    mainClock.advanceTimeByFrame()
+    waitForIdle()
+}
+
+/**
+ * Asserts that the alpha value displayed at the given tag equals the expected value.
+ * The expected value should be formatted as a two-decimal string (e.g., "1.00").
+ */
+@OptIn(ExperimentalTestApi::class)
+private fun androidx.compose.ui.test.ComposeUiTest.assertAlphaEquals(tag: String, expected: String) {
+    onNodeWithTag(tag).assertTextEquals(expected)
+}
+
+/**
  * UI tests for rememberCommonScreenState collapse behavior and animations.
  */
 class CommonScreenStateUiTest {
@@ -74,13 +111,7 @@ class CommonScreenStateUiTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun titleAlpha_reaches_one_after_collapse_when_advancing_clock() = runComposeUiTest {
-        // Manually control the test clock
-        mainClock.autoAdvance = false
-
-        setContent { TestScreen() }
-        // Ensure composition is ready before interacting with nodes when autoAdvance is false
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
+        setupManualClock { TestScreen() }
 
         // Trigger collapse
         onNodeWithTag(LIST_TAG).performScrollToIndex(1)
@@ -88,39 +119,32 @@ class CommonScreenStateUiTest {
 
         // Advance the clock enough for animations to reach end state
         // titleAlpha uses default animationSpec (spring), so give ample time
-        mainClock.advanceTimeBy(5000L)
-        waitForIdle()
+        advanceClockAndWait(5000L)
 
         // Expect titleAlpha to have reached 1.00 (formatted with 2 decimals)
-        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("1.00")
+        assertAlphaEquals(TITLE_ALPHA_TAG, "1.00")
     }
 
 
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun cover_bgAlpha_and_top_level_fade_alpha() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen() }
-        // First frame to ensure composition, alpha animation target is set to 1 but progress is 0
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
+        setupManualClock { TestScreen() }
 
         // Fade alpha should start at 0.00
-        onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("0.00")
+        assertAlphaEquals(FADE_ALPHA_TAG, "0.00")
         // Not collapsed yet, so bgAlpha remains 0.00
-        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("0.00")
+        assertAlphaEquals(BG_ALPHA_TAG, "0.00")
 
         // Advance time to complete the 1000ms fade-in tween
-        mainClock.advanceTimeBy(1000)
-        waitForIdle()
-        onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("1.00")
+        advanceClockAndWait(1000)
+        assertAlphaEquals(FADE_ALPHA_TAG, "1.00")
 
         // Now collapse and ensure bgAlpha reaches 1.00
         onNodeWithTag(LIST_TAG).performScrollToIndex(1)
         waitForIdle()
-        mainClock.advanceTimeBy(3000)
-        waitForIdle()
-        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("1.00")
+        advanceClockAndWait(3000)
+        assertAlphaEquals(BG_ALPHA_TAG, "1.00")
     }
 
 
@@ -266,38 +290,31 @@ class CommonScreenStateUiTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun titleAlpha_and_bgAlpha_return_to_zero_when_uncollapsing() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen() }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
+        setupManualClock { TestScreen() }
 
         // Scroll down to collapse
         onNodeWithTag(LIST_TAG).performScrollToIndex(5)
-        mainClock.advanceTimeBy(500)
-        waitForIdle()
+        advanceClockAndWait(500)
         
         // Advance time to complete animations
-        mainClock.advanceTimeBy(5000L)
-        waitForIdle()
+        advanceClockAndWait(5000L)
 
         // Verify collapsed state with alpha values at 1.00
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
-        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("1.00")
-        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("1.00")
+        assertAlphaEquals(TITLE_ALPHA_TAG, "1.00")
+        assertAlphaEquals(BG_ALPHA_TAG, "1.00")
 
         // Scroll back to top
         onNodeWithTag(LIST_TAG).performScrollToIndex(0)
-        mainClock.advanceTimeBy(500)
-        waitForIdle()
+        advanceClockAndWait(500)
 
         // Advance time to complete uncollapse animations
-        mainClock.advanceTimeBy(5000L)
-        waitForIdle()
+        advanceClockAndWait(5000L)
 
         // Verify uncollapsed state with alpha values back to 0.00
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
-        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("0.00")
-        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("0.00")
+        assertAlphaEquals(TITLE_ALPHA_TAG, "0.00")
+        assertAlphaEquals(BG_ALPHA_TAG, "0.00")
     }
 
     /**
@@ -309,36 +326,29 @@ class CommonScreenStateUiTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun multiple_rapid_scroll_operations_maintain_state_consistency() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen() }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
+        setupManualClock { TestScreen() }
 
         // Initial state: not collapsed
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
 
         // First scroll down: should collapse
         onNodeWithTag(LIST_TAG).performScrollToIndex(3)
-        mainClock.advanceTimeBy(500)
-        waitForIdle()
+        advanceClockAndWait(500)
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
 
         // Scroll back to top: should uncollapse
         onNodeWithTag(LIST_TAG).performScrollToIndex(0)
-        mainClock.advanceTimeBy(500)
-        waitForIdle()
+        advanceClockAndWait(500)
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
 
         // Scroll down again: should collapse again
         onNodeWithTag(LIST_TAG).performScrollToIndex(2)
-        mainClock.advanceTimeBy(500)
-        waitForIdle()
+        advanceClockAndWait(500)
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
 
         // Final scroll to top: should uncollapse
         onNodeWithTag(LIST_TAG).performScrollToIndex(0)
-        mainClock.advanceTimeBy(500)
-        waitForIdle()
+        advanceClockAndWait(500)
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
     }
 
@@ -406,10 +416,7 @@ class CommonScreenStateUiTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun titleAlpha_and_bgAlpha_animate_in_sync() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen() }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
+        setupManualClock { TestScreen() }
 
         // Trigger collapse
         onNodeWithTag(LIST_TAG).performScrollToIndex(1)
@@ -418,8 +425,7 @@ class CommonScreenStateUiTest {
         // Check alpha difference at various points during animation
         // They should animate together, so difference should remain close to 0
         for (i in 0..10) {
-            mainClock.advanceTimeBy(100)
-            waitForIdle()
+            advanceClockAndWait(100)
             val alphaDiffText = onNodeWithTag(ALPHA_DIFF_TAG).fetchSemanticsNode()
                 .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
             val alphaDiff = alphaDiffText.toFloatOrNull() ?: Float.MAX_VALUE
@@ -631,6 +637,37 @@ class CommonScreenStateUiTest {
 
         // Should be collapsed (index > 0)
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+    }
+
+    /**
+     * Tests behavior with an extremely large collapse threshold value.
+     * With a threshold of 99999.dp, normal scrolling offsets will never exceed it,
+     * but collapse should still occur when scrolling past the first item (index > 0).
+     * This verifies that the index-based collapse logic works independently of threshold.
+     */
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun extremely_large_collapseThreshold_still_collapses_on_index_change() = runComposeUiTest {
+        setContent { TestScreen(collapseThreshold = 99999.dp) }
+        waitForIdle()
+
+        // Initially at top: not collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+
+        // Scroll to item 1 - should trigger collapse due to index > 0,
+        // not due to offset exceeding the huge threshold
+        onNodeWithTag(LIST_TAG).performScrollToIndex(1)
+        waitForIdle()
+
+        // Should be collapsed (index > 0 triggers collapse regardless of threshold)
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+
+        // Scroll back to top
+        onNodeWithTag(LIST_TAG).performScrollToIndex(0)
+        waitForIdle()
+
+        // Should be uncollapsed (index = 0, and offset won't exceed 99999.dp)
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
     }
 
     @OptIn(ExperimentalTestApi::class)
@@ -849,12 +886,6 @@ private fun TestScreen(
     Button(modifier = Modifier.testTag("triggerRecompose"), onClick = {
         recomposeFlag = !recomposeFlag
     }) { Text("recomp") }
-    Button(modifier = Modifier.testTag(SCROLL_TO_TOP_TAG), onClick = {
-        scope.launch { state.listState.scrollToItem(0, 0) }
-    }) { Text("top") }
-    Button(modifier = Modifier.testTag(SCROLL_BY_TAG), onClick = {
-        scope.launch { state.listState.scrollToItem(0, (thresholdPx + 1f).toInt()) }
-    }) { Text("by") }
     Button(modifier = Modifier.testTag(SCROLL_TO_THRESHOLD_TAG), onClick = {
         scope.launch { state.listState.scrollToItem(0, thresholdPx.toInt()) }
     }) { Text("thr") }
