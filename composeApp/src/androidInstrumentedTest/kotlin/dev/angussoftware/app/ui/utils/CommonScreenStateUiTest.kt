@@ -258,6 +258,11 @@ class CommonScreenStateUiTest {
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
     }
 
+    /**
+     * Tests the bi-directional animation behavior: verifies that titleAlpha and bgAlpha
+     * animate from 0 → 1 when collapsing, and from 1 → 0 when uncollapsing (scrolling back to top).
+     * This ensures the animations work correctly in both directions.
+     */
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun titleAlpha_and_bgAlpha_return_to_zero_when_uncollapsing() = runComposeUiTest {
@@ -295,6 +300,12 @@ class CommonScreenStateUiTest {
         onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("0.00")
     }
 
+    /**
+     * Tests state consistency during rapid scroll operations.
+     * Performs the sequence: scroll down → scroll up → scroll down → scroll up,
+     * verifying that isCollapsed state correctly reflects the scroll position at each step.
+     * This ensures no state corruption occurs during frequent transitions.
+     */
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun multiple_rapid_scroll_operations_maintain_state_consistency() = runComposeUiTest {
@@ -345,6 +356,12 @@ class CommonScreenStateUiTest {
         assertTrue(bottomInset >= 0f, "bottomInset should be non-negative, was: $bottomInset")
     }
 
+    /**
+     * Tests the boundary condition for collapse threshold.
+     * According to the contract in isCollapsedFor(), collapse only occurs when offset > threshold.
+     * This test verifies that when offset == threshold (not greater), the bar remains uncollapsed.
+     * Uses the SCROLL_TO_THRESHOLD_TAG button to scroll to exactly the threshold value.
+     */
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun scrolling_exactly_to_threshold_does_not_collapse() = runComposeUiTest {
@@ -379,6 +396,13 @@ class CommonScreenStateUiTest {
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
     }
 
+    /**
+     * Tests that titleAlpha and bgAlpha animate in perfect synchronization.
+     * Both animations should progress at the same rate since they have the same target
+     * and animation spec. This test samples the alpha difference at multiple points
+     * during the animation and verifies it remains near zero (< 0.01).
+     * Uses the ALPHA_DIFF_TAG to monitor synchronization.
+     */
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun titleAlpha_and_bgAlpha_animate_in_sync() = runComposeUiTest {
@@ -536,6 +560,228 @@ class CommonScreenStateUiTest {
         assertTrue(state!!.isCompactScreen != null, "isCompactScreen should not be null")
         assertTrue(state!!.tilePadding == 20.dp, "tilePadding should match input")
         assertTrue(state!!.appBarHeightDp == 80.dp, "appBarHeightDp should match input")
+    }
+
+    /**
+     * Tests that animations recover gracefully when interrupted mid-flight.
+     * This verifies that rapid state changes (collapse → uncollapse) during
+     * an animation don't cause visual glitches or incorrect final states.
+     */
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun animation_interrupted_midway_recovers_gracefully() = runComposeUiTest {
+        mainClock.autoAdvance = false
+        setContent { TestScreen() }
+        mainClock.advanceTimeByFrame()
+        waitForIdle()
+
+        // Start collapse animation
+        onNodeWithTag(LIST_TAG).performScrollToIndex(5)
+        waitForIdle()
+        // Only advance 50ms into the animation (not complete)
+        mainClock.advanceTimeBy(50)
+        waitForIdle()
+
+        // Immediately reverse direction while animation is in progress
+        onNodeWithTag(LIST_TAG).performScrollToIndex(0)
+        waitForIdle()
+        // Complete the reverse animation
+        mainClock.advanceTimeBy(5000)
+        waitForIdle()
+
+        // Should smoothly reach 0.00 without issues
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("0.00")
+        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("0.00")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun negative_collapseThreshold_causes_immediate_collapse() = runComposeUiTest {
+        setContent { TestScreen(collapseThreshold = (-10).dp) }
+        waitForIdle()
+
+        // With negative threshold like -10, even at index=0 offset=0,
+        // the condition (offset > threshold) becomes (0 > -10) which is TRUE.
+        // Therefore, negative thresholds cause immediate collapse behavior.
+        // This test verifies that behavior is consistent.
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+
+        // Scrolling further should maintain collapsed state
+        onNodeWithTag(LIST_TAG).performScrollToIndex(1)
+        waitForIdle()
+
+        // Should remain collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun zero_collapseThreshold_makes_any_scroll_trigger_collapse() = runComposeUiTest {
+        setContent { TestScreen(collapseThreshold = 0.dp) }
+        waitForIdle()
+
+        // Initially at top with no offset: not collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+
+        // Scroll to item 1 (index > 0), which should trigger collapse
+        // even with threshold = 0, since the collapse logic is: index > 0 OR offset > threshold
+        onNodeWithTag(LIST_TAG).performScrollToIndex(1)
+        waitForIdle()
+
+        // Should be collapsed (index > 0)
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun isCollapsed_remains_stable_across_recomposition_when_at_top() = runComposeUiTest {
+        setContent { TestScreen() }
+        waitForIdle()
+
+        // Initially not collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+
+        // Trigger recomposition without scrolling
+        onNodeWithTag("triggerRecompose").performClick()
+        waitForIdle()
+
+        // Should remain not collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun titleAlpha_and_bgAlpha_stable_when_collapse_state_unchanged() = runComposeUiTest {
+        mainClock.autoAdvance = false
+        setContent { TestScreen() }
+        mainClock.advanceTimeByFrame()
+        waitForIdle()
+
+        // Scroll to collapse
+        onNodeWithTag(LIST_TAG).performScrollToIndex(3)
+        mainClock.advanceTimeBy(5000)
+        waitForIdle()
+
+        // Both should be at 1.00
+        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("1.00")
+        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("1.00")
+
+        // Trigger recomposition while remaining collapsed
+        onNodeWithTag("triggerRecompose").performClick()
+        mainClock.advanceTimeBy(100)
+        waitForIdle()
+
+        // Should remain at 1.00 (no animation restart)
+        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("1.00")
+        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("1.00")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun isCompactScreen_stable_across_recomposition() = runComposeUiTest {
+        setContent {
+            CompositionLocalProvider(LocalOverrideWindowAdaptiveInfo provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)) {
+                TestScreen()
+            }
+        }
+        waitForIdle()
+
+        // Initially compact
+        onNodeWithTag(IS_COMPACT_TAG).assertTextEquals("true")
+
+        // Trigger recomposition
+        onNodeWithTag("triggerRecompose").performClick()
+        waitForIdle()
+
+        // Should remain compact
+        onNodeWithTag(IS_COMPACT_TAG).assertTextEquals("true")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun parameter_values_stable_across_recomposition() = runComposeUiTest {
+        setContent { TestScreen(tilePadding = 25.dp, appBarHeightDp = 100.dp) }
+        waitForIdle()
+
+        // Check initial values
+        onNodeWithTag(TILE_PADDING_TAG).assertTextEquals("25")
+        onNodeWithTag(APP_BAR_HEIGHT_TAG).assertTextEquals("100")
+
+        // Trigger recomposition
+        onNodeWithTag("triggerRecompose").performClick()
+        waitForIdle()
+
+        // Should remain unchanged
+        onNodeWithTag(TILE_PADDING_TAG).assertTextEquals("25")
+        onNodeWithTag(APP_BAR_HEIGHT_TAG).assertTextEquals("100")
+    }
+
+    /**
+     * Tests that LaunchedEffect(Unit) executes exactly once on initial composition
+     * and doesn't restart on subsequent recompositions.
+     */
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun fade_animation_triggered_exactly_once_on_initial_composition() = runComposeUiTest {
+        mainClock.autoAdvance = false
+        setContent { TestScreen() }
+        mainClock.advanceTimeByFrame()
+        waitForIdle()
+
+        // Alpha should start at 0
+        onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("0.00")
+
+        // Complete fade animation
+        mainClock.advanceTimeBy(1000)
+        waitForIdle()
+        onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("1.00")
+
+        // Trigger multiple recompositions
+        onNodeWithTag("triggerRecompose").performClick()
+        waitForIdle()
+        mainClock.advanceTimeBy(100)
+        waitForIdle()
+        onNodeWithTag("triggerRecompose").performClick()
+        waitForIdle()
+        mainClock.advanceTimeBy(100)
+        waitForIdle()
+
+        // Alpha should remain 1.00 (LaunchedEffect didn't restart)
+        onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("1.00")
+    }
+
+    /**
+     * Verifies that the listState returned by rememberCommonScreenState is actually
+     * the same instance driving the LazyColumn, by confirming scroll actions update
+     * the state's firstVisibleItemIndex property.
+     */
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun listState_instance_is_used_by_lazyColumn() = runComposeUiTest {
+        var capturedState: CommonScreenState? = null
+        setContent {
+            capturedState = rememberCommonScreenState()
+            val state = capturedState!!
+            LazyColumn(state = state.listState, modifier = Modifier.testTag(LIST_TAG)) {
+                items((0 until 50).toList()) { _ ->
+                    Box(Modifier.fillMaxWidth().height(200.dp))
+                }
+            }
+        }
+        waitForIdle()
+
+        // Verify initial state
+        val initialIndex = capturedState!!.listState.firstVisibleItemIndex
+        assertTrue(initialIndex == 0, "Initial index should be 0, was $initialIndex")
+
+        // Scroll to item 5
+        onNodeWithTag(LIST_TAG).performScrollToIndex(5)
+        waitForIdle()
+
+        // Verify listState was updated
+        val afterScrollIndex = capturedState!!.listState.firstVisibleItemIndex
+        assertTrue(afterScrollIndex >= 5, "After scroll index should be >= 5, was $afterScrollIndex")
     }
 
 
