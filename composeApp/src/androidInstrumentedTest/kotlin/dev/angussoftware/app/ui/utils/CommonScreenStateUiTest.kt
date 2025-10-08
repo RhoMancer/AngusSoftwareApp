@@ -236,6 +236,308 @@ class CommonScreenStateUiTest {
         onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("1.00")
     }
 
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun collapse_to_uncollapse_transition_when_scrolling_back_to_top() = runComposeUiTest {
+        setContent { TestScreen() }
+        waitForIdle()
+
+        // Initially at top: not collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+
+        // Scroll down to trigger collapse
+        onNodeWithTag(LIST_TAG).performScrollToIndex(5)
+        waitForIdle()
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+
+        // Scroll back to top
+        onNodeWithTag(LIST_TAG).performScrollToIndex(0)
+        waitForIdle()
+
+        // Should be uncollapsed now
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun titleAlpha_and_bgAlpha_return_to_zero_when_uncollapsing() = runComposeUiTest {
+        mainClock.autoAdvance = false
+        setContent { TestScreen() }
+        mainClock.advanceTimeByFrame()
+        waitForIdle()
+
+        // Scroll down to collapse
+        onNodeWithTag(LIST_TAG).performScrollToIndex(5)
+        mainClock.advanceTimeBy(500)
+        waitForIdle()
+        
+        // Advance time to complete animations
+        mainClock.advanceTimeBy(5000L)
+        waitForIdle()
+
+        // Verify collapsed state with alpha values at 1.00
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("1.00")
+        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("1.00")
+
+        // Scroll back to top
+        onNodeWithTag(LIST_TAG).performScrollToIndex(0)
+        mainClock.advanceTimeBy(500)
+        waitForIdle()
+
+        // Advance time to complete uncollapse animations
+        mainClock.advanceTimeBy(5000L)
+        waitForIdle()
+
+        // Verify uncollapsed state with alpha values back to 0.00
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+        onNodeWithTag(TITLE_ALPHA_TAG).assertTextEquals("0.00")
+        onNodeWithTag(BG_ALPHA_TAG).assertTextEquals("0.00")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun multiple_rapid_scroll_operations_maintain_state_consistency() = runComposeUiTest {
+        mainClock.autoAdvance = false
+        setContent { TestScreen() }
+        mainClock.advanceTimeByFrame()
+        waitForIdle()
+
+        // Initial state: not collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+
+        // First scroll down: should collapse
+        onNodeWithTag(LIST_TAG).performScrollToIndex(3)
+        mainClock.advanceTimeBy(500)
+        waitForIdle()
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+
+        // Scroll back to top: should uncollapse
+        onNodeWithTag(LIST_TAG).performScrollToIndex(0)
+        mainClock.advanceTimeBy(500)
+        waitForIdle()
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+
+        // Scroll down again: should collapse again
+        onNodeWithTag(LIST_TAG).performScrollToIndex(2)
+        mainClock.advanceTimeBy(500)
+        waitForIdle()
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+
+        // Final scroll to top: should uncollapse
+        onNodeWithTag(LIST_TAG).performScrollToIndex(0)
+        mainClock.advanceTimeBy(500)
+        waitForIdle()
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun initial_bottomInset_value_is_non_negative() = runComposeUiTest {
+        setContent { TestScreen() }
+        waitForIdle()
+
+        // Read the initial bottomInset text
+        val bottomInsetText = onNodeWithTag(BOTTOM_INSET_TAG).fetchSemanticsNode()
+            .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
+        val bottomInset = bottomInsetText.toFloatOrNull() ?: -1f
+        
+        assertTrue(bottomInset >= 0f, "bottomInset should be non-negative, was: $bottomInset")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun scrolling_exactly_to_threshold_does_not_collapse() = runComposeUiTest {
+        setContent { TestScreen() }
+        waitForIdle()
+
+        // Initially not collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+
+        // Click button to scroll exactly to threshold (offset = threshold, not > threshold)
+        onNodeWithTag(SCROLL_TO_THRESHOLD_TAG).performClick()
+        waitForIdle()
+
+        // Should remain not collapsed (contract: only collapse when offset > threshold)
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun scrolling_past_first_item_by_one_index_triggers_collapse() = runComposeUiTest {
+        setContent { TestScreen() }
+        waitForIdle()
+
+        // Initially not collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+
+        // Scroll to item index 1 (past first item)
+        onNodeWithTag(LIST_TAG).performScrollToIndex(1)
+        waitForIdle()
+
+        // Should now be collapsed (index > 0 triggers collapse)
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun titleAlpha_and_bgAlpha_animate_in_sync() = runComposeUiTest {
+        mainClock.autoAdvance = false
+        setContent { TestScreen() }
+        mainClock.advanceTimeByFrame()
+        waitForIdle()
+
+        // Trigger collapse
+        onNodeWithTag(LIST_TAG).performScrollToIndex(1)
+        waitForIdle()
+
+        // Check alpha difference at various points during animation
+        // They should animate together, so difference should remain close to 0
+        for (i in 0..10) {
+            mainClock.advanceTimeBy(100)
+            waitForIdle()
+            val alphaDiffText = onNodeWithTag(ALPHA_DIFF_TAG).fetchSemanticsNode()
+                .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
+            val alphaDiff = alphaDiffText.toFloatOrNull() ?: Float.MAX_VALUE
+            assertTrue(abs(alphaDiff) < 0.01f, "titleAlpha and bgAlpha should animate in sync, difference was $alphaDiff at step $i")
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun custom_collapse_threshold_50dp_works_correctly() = runComposeUiTest {
+        setContent { TestScreen(collapseThreshold = 50.dp) }
+        waitForIdle()
+
+        // Initially not collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+
+        // Scroll to trigger collapse with custom threshold
+        onNodeWithTag(LIST_TAG).performScrollToIndex(1)
+        waitForIdle()
+
+        // Should be collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun custom_collapse_threshold_200dp_works_correctly() = runComposeUiTest {
+        setContent { TestScreen(collapseThreshold = 200.dp) }
+        waitForIdle()
+
+        // Initially not collapsed
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+
+        // Scroll to trigger collapse with larger threshold
+        onNodeWithTag(LIST_TAG).performScrollToIndex(1)
+        waitForIdle()
+
+        // Should be collapsed (scrolling to item 1 moves past index 0)
+        onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun negative_tilePadding_parameter_is_passed_through() = runComposeUiTest {
+        setContent { TestScreen(tilePadding = (-5).dp) }
+        waitForIdle()
+
+        // Should pass through the negative value as-is
+        onNodeWithTag(TILE_PADDING_TAG).assertTextEquals("-5")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun zero_appBarHeight_parameter_is_passed_through() = runComposeUiTest {
+        setContent { TestScreen(appBarHeightDp = 0.dp) }
+        waitForIdle()
+
+        // Should pass through zero value
+        onNodeWithTag(APP_BAR_HEIGHT_TAG).assertTextEquals("0")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun very_large_parameters_are_handled() = runComposeUiTest {
+        setContent { TestScreen(tilePadding = 9999.dp, appBarHeightDp = 8888.dp) }
+        waitForIdle()
+
+        // Should pass through large values
+        onNodeWithTag(TILE_PADDING_TAG).assertTextEquals("9999")
+        onNodeWithTag(APP_BAR_HEIGHT_TAG).assertTextEquals("8888")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun commonScreenState_data_class_equality_works() = runComposeUiTest {
+        var state1: CommonScreenState? = null
+        var state2: CommonScreenState? = null
+        
+        setContent {
+            state1 = rememberCommonScreenState(
+                collapseThreshold = 120.dp,
+                tilePadding = 16.dp,
+                appBarHeightDp = 64.dp
+            )
+            state2 = rememberCommonScreenState(
+                collapseThreshold = 120.dp,
+                tilePadding = 16.dp,
+                appBarHeightDp = 64.dp
+            )
+        }
+        waitForIdle()
+
+        // Two states created with same parameters should have equal property values
+        assertTrue(state1 != null && state2 != null, "Both states should be initialized")
+        assertTrue(state1!!.tilePadding == state2!!.tilePadding, "tilePadding should match")
+        assertTrue(state1.appBarHeightDp == state2.appBarHeightDp, "appBarHeightDp should match")
+        assertTrue(state1.isCollapsed == state2.isCollapsed, "isCollapsed should match initially")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun commonScreenState_data_class_copy_works() = runComposeUiTest {
+        var originalState: CommonScreenState? = null
+        
+        setContent {
+            originalState = rememberCommonScreenState(tilePadding = 16.dp, appBarHeightDp = 64.dp)
+        }
+        waitForIdle()
+
+        // Test copy functionality
+        val copiedState = originalState!!.copy(tilePadding = 32.dp)
+        
+        // Copied state should have new tilePadding but same other immutable properties
+        assertTrue(copiedState.tilePadding == 32.dp, "Copied state should have new tilePadding value")
+        assertTrue(copiedState.appBarHeightDp == originalState!!.appBarHeightDp, "appBarHeightDp should remain the same")
+        assertTrue(copiedState.statusBarHeightDp == originalState!!.statusBarHeightDp, "statusBarHeightDp should remain the same")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun commonScreenState_all_properties_are_accessible() = runComposeUiTest {
+        var state: CommonScreenState? = null
+        
+        setContent {
+            state = rememberCommonScreenState(tilePadding = 20.dp, appBarHeightDp = 80.dp)
+        }
+        waitForIdle()
+
+        // Verify all 10 properties are accessible and have reasonable values
+        assertTrue(state != null, "State should be initialized")
+        assertTrue(state!!.statusBarHeightDp.value >= 0f, "statusBarHeightDp should be non-negative")
+        assertTrue(state!!.bottomInset.value >= 0f, "bottomInset should be non-negative")
+        assertTrue(state!!.listState != null, "listState should not be null")
+        assertTrue(state!!.isCollapsed == false, "isCollapsed should be false initially")
+        assertTrue(state!!.alpha >= 0f && state!!.alpha <= 1f, "alpha should be between 0 and 1")
+        assertTrue(state!!.titleAlpha >= 0f && state!!.titleAlpha <= 1f, "titleAlpha should be between 0 and 1")
+        assertTrue(state!!.bgAlpha >= 0f && state!!.bgAlpha <= 1f, "bgAlpha should be between 0 and 1")
+        assertTrue(state!!.isCompactScreen != null, "isCompactScreen should not be null")
+        assertTrue(state!!.tilePadding == 20.dp, "tilePadding should match input")
+        assertTrue(state!!.appBarHeightDp == 80.dp, "appBarHeightDp should match input")
+    }
+
 
 }
 
