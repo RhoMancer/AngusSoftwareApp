@@ -19,12 +19,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
+import dev.angussoftware.app.ui.utils.ScreenshotTestHelper.captureDeviceScreenshot
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.test.Test
@@ -99,6 +101,11 @@ class CommonScreenStateUiTest {
 
         // Initially at top: not collapsed
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+        
+        // 📸 Screenshot 1: Initial state (not collapsed)
+        println("[DEBUG_LOG] About to capture first screenshot: 01_collapse_initial_not_collapsed")
+        captureDeviceScreenshot("01_collapse_initial_not_collapsed")
+        println("[DEBUG_LOG] First screenshot capture call completed")
 
         // Scroll so that first visible item index > 0
         onNodeWithTag(LIST_TAG).performScrollToIndex(1)
@@ -106,16 +113,27 @@ class CommonScreenStateUiTest {
 
         // Should be collapsed now
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+        
+        // 📸 Screenshot 2: After scroll (collapsed)
+        println("[DEBUG_LOG] About to capture second screenshot: 01_collapse_after_scroll_collapsed")
+        captureDeviceScreenshot("01_collapse_after_scroll_collapsed")
+        println("[DEBUG_LOG] Second screenshot capture call completed")
     }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun titleAlpha_reaches_one_after_collapse_when_advancing_clock() = runComposeUiTest {
         setupManualClock { TestScreen() }
+        
+        // 📸 Screenshot 1: Initial state before collapse
+        captureDeviceScreenshot("02_titleAlpha_initial")
 
         // Trigger collapse
         onNodeWithTag(LIST_TAG).performScrollToIndex(1)
         waitForIdle()
+        
+        // 📸 Screenshot 2: Just after scroll, animation starting
+        captureDeviceScreenshot("02_titleAlpha_animation_start")
 
         // Advance the clock enough for animations to reach end state
         // titleAlpha uses default animationSpec (spring), so give ample time
@@ -123,6 +141,9 @@ class CommonScreenStateUiTest {
 
         // Expect titleAlpha to have reached 1.00 (formatted with 2 decimals)
         assertAlphaEquals(TITLE_ALPHA_TAG, "1.00")
+        
+        // 📸 Screenshot 3: After animation completes
+        captureDeviceScreenshot("02_titleAlpha_animation_complete")
     }
 
 
@@ -268,11 +289,17 @@ class CommonScreenStateUiTest {
 
         // Initially at top: not collapsed
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+        
+        // 📸 Screenshot 1: Initial state (not collapsed)
+        captureDeviceScreenshot("03_bidirectional_initial")
 
         // Scroll down to trigger collapse
         onNodeWithTag(LIST_TAG).performScrollToIndex(5)
         waitForIdle()
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+        
+        // 📸 Screenshot 2: After scrolling down (collapsed)
+        captureDeviceScreenshot("03_bidirectional_collapsed")
 
         // Scroll back to top
         onNodeWithTag(LIST_TAG).performScrollToIndex(0)
@@ -280,6 +307,9 @@ class CommonScreenStateUiTest {
 
         // Should be uncollapsed now
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+        
+        // 📸 Screenshot 3: After scrolling back to top (uncollapsed again)
+        captureDeviceScreenshot("03_bidirectional_uncollapsed")
     }
 
     /**
@@ -441,6 +471,9 @@ class CommonScreenStateUiTest {
 
         // Initially not collapsed
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+        
+        // 📸 Screenshot 1: Initial state with custom 50dp threshold (organized in subdirectory)
+        captureDeviceScreenshot("initial_50dp", subdirectory = "custom_threshold_tests")
 
         // Scroll to trigger collapse with custom threshold
         onNodeWithTag(LIST_TAG).performScrollToIndex(1)
@@ -448,6 +481,9 @@ class CommonScreenStateUiTest {
 
         // Should be collapsed
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("true")
+        
+        // 📸 Screenshot 2: After scroll with 50dp threshold (organized in subdirectory)
+        captureDeviceScreenshot("collapsed_50dp", subdirectory = "custom_threshold_tests")
     }
 
     @OptIn(ExperimentalTestApi::class)
