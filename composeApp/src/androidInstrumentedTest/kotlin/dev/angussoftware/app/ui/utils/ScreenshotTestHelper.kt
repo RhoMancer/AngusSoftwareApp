@@ -3,25 +3,93 @@ package dev.angussoftware.app.ui.utils
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.UiDevice
 import java.io.File
 import java.io.FileOutputStream
 
 /**
  * Helper object for capturing DEVICE-LEVEL screenshots during instrumented tests.
  * 
- * Uses UiAutomation.takeScreenshot() to capture the entire screen at the system level,
- * which doesn't require Compose hierarchies.
+ * ## Why Device-Level Screenshots?
  * 
- * Screenshots are saved to public Download directory:
- * /sdcard/Download/dev.angussoftware.app/debug/screenshots/
+ * This implementation uses Android's UiAutomation.takeScreenshot() API instead of Compose's
+ * captureToImage() for several critical reasons:
  * 
- * This directory:
- * - Persists after the test app uninstalls (which happens automatically after tests)
- * - Doesn't require WRITE_EXTERNAL_STORAGE permission on any Android version
- * - Allows the fetchScreenshots Gradle task to retrieve screenshots
+ * 1. **No Compose Dependencies**: Works at the Android system level, independent of Compose
+ *    hierarchies, semantics trees, or UI framework state
+ * 2. **Complete Screen Capture**: Captures everything visible including status bar, navigation
+ *    bar, system overlays, and app content - exactly what users see
+ * 3. **Reliability**: No timing issues with Compose initialization or "No compose hierarchies
+ *    found" errors that plague Compose-level screenshot approaches
+ * 4. **Cross-Framework Compatibility**: Works with any Android UI framework, not just Compose
  * 
- * Screenshots are automatically copied to: composeApp/screenshots/
+ * ## Storage Strategy
+ * 
+ * Screenshots are saved to: `/sdcard/Download/dev.angussoftware.app/debug/screenshots/`
+ * 
+ * This location is strategically chosen because:
+ * - **Public Directory**: No WRITE_EXTERNAL_STORAGE permission required on Android 10+
+ * - **Persistence**: Survives app uninstallation (critical since tests auto-uninstall apps)
+ * - **ADB Access**: Easily accessible via `adb pull` commands from Gradle tasks
+ * - **Namespaced**: App ID prevents conflicts with other projects
+ * - **Build-Type Organized**: Separates debug/release screenshots
+ * 
+ * ## Integration with Gradle Tasks
+ * 
+ * This helper works in conjunction with three Gradle tasks defined in build.gradle.kts:
+ * 1. `createScreenshotDirectory` - Creates device directory before tests
+ * 2. `fetchScreenshots` - Pulls screenshots to local project after tests
+ * 3. `clearScreenshots` - Cleans up device storage after fetching
+ * 
+ * The complete automated workflow:
+ * ```
+ * connectedDebugAndroidTest
+ * ├── dependsOn: createScreenshotDirectory
+ * ├── during tests: captureDeviceScreenshot() calls save to device
+ * ├── finalizedBy: fetchScreenshots (copies to composeApp/screenshots/)
+ * └── finalizedBy: clearScreenshots (cleans device storage)
+ * ```
+ * 
+ * ## Usage in Tests
+ * 
+ * ```kotlin
+ * import dev.angussoftware.app.ui.utils.ScreenshotTestHelper.captureDeviceScreenshot
+ * 
+ * @Test
+ * fun myUiTest() = runComposeUiTest {
+ *     setContent { MyScreen() }
+ *     waitForIdle()
+ *     
+ *     // Capture initial state
+ *     captureDeviceScreenshot("01_initial_state")
+ *     
+ *     // Perform UI action
+ *     onNodeWithTag("button").performClick()
+ *     waitForIdle()
+ *     
+ *     // Capture result state  
+ *     captureDeviceScreenshot("02_after_click")
+ *     
+ *     // Organize related screenshots
+ *     captureDeviceScreenshot("error_case", subdirectory = "error_scenarios")
+ * }
+ * ```
+ * 
+ * ## Developer Guidelines
+ * 
+ * - **Naming**: Use descriptive sequential names (01_initial, 02_action, 03_result)
+ * - **Organization**: Group related screenshots using subdirectory parameter
+ * - **Timing**: Call after waitForIdle() to ensure UI has finished rendering
+ * - **Error Handling**: Screenshots failures won't fail tests - they're supplementary
+ * - **Review**: Screenshots appear in composeApp/screenshots/ after test completion
+ * 
+ * ## For AI Agents
+ * 
+ * Key integration points to understand:
+ * - Screenshots captured during test execution are automatically retrieved
+ * - No manual intervention required - fully automated workflow
+ * - Storage paths must match between this helper and Gradle task configuration
+ * - Device-level approach is more reliable than Compose-level for integration testing
+ * - Error handling is graceful - screenshot failures don't break test execution
  */
 object ScreenshotTestHelper {
     
