@@ -173,10 +173,13 @@ tasks.register<Exec>("createScreenshotDirectory") {
     group = "verification"
     description = "Creates screenshot directory on connected Android device"
     
-    commandLine("adb", "shell", "mkdir", "-p", screenshotsDeviceDir)
+    // Capture script variables as task-local values for configuration cache compatibility
+    val deviceDir = screenshotsDeviceDir
+    
+    commandLine("adb", "shell", "mkdir", "-p", deviceDir)
     
     doFirst {
-        println("Creating screenshot directory on device: $screenshotsDeviceDir")
+        println("Creating screenshot directory on device: $deviceDir")
     }
     
     doLast {
@@ -206,22 +209,26 @@ tasks.register<Exec>("fetchScreenshots") {
     group = "verification"
     description = "Fetches screenshots from device to local project directory"
     
-    commandLine("adb", "pull", screenshotsDeviceDir, screenshotsLocalDir.absolutePath)
+    // Capture script variables as task-local values for configuration cache compatibility
+    val deviceDir = screenshotsDeviceDir
+    val localDir = screenshotsLocalDir
+    
+    commandLine("adb", "pull", deviceDir, localDir.absolutePath)
     
     doFirst {
         println("Fetching screenshots from device...")
-        println("Device path: $screenshotsDeviceDir")
-        println("Local path: ${screenshotsLocalDir.absolutePath}")
+        println("Device path: $deviceDir")
+        println("Local path: ${localDir.absolutePath}")
         
         // Create local directory if it doesn't exist
-        if (!screenshotsLocalDir.exists()) {
-            screenshotsLocalDir.mkdirs()
+        if (!localDir.exists()) {
+            localDir.mkdirs()
             println("Created local screenshots directory")
         }
     }
     
     doLast {
-        println("Screenshots fetched successfully to: ${screenshotsLocalDir.absolutePath}")
+        println("Screenshots fetched successfully to: ${localDir.absolutePath}")
     }
     
     // Don't fail if no screenshots exist - some tests might not capture screenshots
@@ -246,10 +253,13 @@ tasks.register<Exec>("clearScreenshots") {
     group = "verification"
     description = "Removes screenshots from device storage"
     
-    commandLine("adb", "shell", "rm", "-rf", screenshotsDeviceDir)
+    // Capture script variables as task-local values for configuration cache compatibility
+    val deviceDir = screenshotsDeviceDir
+    
+    commandLine("adb", "shell", "rm", "-rf", deviceDir)
     
     doFirst {
-        println("Clearing screenshots from device: $screenshotsDeviceDir")
+        println("Clearing screenshots from device: $deviceDir")
     }
     
     doLast {
