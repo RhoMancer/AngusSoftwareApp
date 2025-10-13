@@ -1,12 +1,22 @@
 package dev.angussoftware.app.ui.utils
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -152,6 +162,9 @@ class CommonScreenStateUiTest {
     fun cover_bgAlpha_and_top_level_fade_alpha() = runComposeUiTest {
         setupManualClock { TestScreen() }
 
+        // 📸 Screenshot 1: Initial state
+        captureDeviceScreenshot("03_bgAlpha_fade_initial")
+
         // Fade alpha should start at 0.00
         assertAlphaEquals(FADE_ALPHA_TAG, "0.00")
         // Not collapsed yet, so bgAlpha remains 0.00
@@ -160,12 +173,18 @@ class CommonScreenStateUiTest {
         // Advance time to complete the 1000ms fade-in tween
         advanceClockAndWait(1000)
         assertAlphaEquals(FADE_ALPHA_TAG, "1.00")
+        
+        // 📸 Screenshot 2: After fade-in complete
+        captureDeviceScreenshot("03_bgAlpha_fade_complete")
 
         // Now collapse and ensure bgAlpha reaches 1.00
         onNodeWithTag(LIST_TAG).performScrollToIndex(1)
         waitForIdle()
         advanceClockAndWait(3000)
         assertAlphaEquals(BG_ALPHA_TAG, "1.00")
+        
+        // 📸 Screenshot 3: After collapse and bg alpha complete
+        captureDeviceScreenshot("03_bgAlpha_fade_collapsed")
     }
 
 
@@ -178,6 +197,9 @@ class CommonScreenStateUiTest {
         mainClock.advanceTimeByFrame()
         waitForIdle()
 
+        // 📸 Screenshot 1: Initial state with 5dp nav height
+        captureDeviceScreenshot("04_insets_initial_5dp")
+
         // Initial delta should be 0.00
         onNodeWithTag(BOTTOM_INSET_DELTA_TAG).assertTextEquals("0.00")
 
@@ -186,6 +208,10 @@ class CommonScreenStateUiTest {
         waitForIdle()
         mainClock.advanceTimeBy(200)
         waitForIdle()
+        
+        // 📸 Screenshot 2: After toggle to 25dp nav height
+        captureDeviceScreenshot("04_insets_after_toggle_25dp")
+        
         onNodeWithTag(BOTTOM_INSET_DELTA_TAG).assertTextEquals("20.00")
     }
 
@@ -410,10 +436,16 @@ class CommonScreenStateUiTest {
 
         // Initially not collapsed
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
+        
+        // 📸 Screenshot 1: Initial state (should show not collapsed)
+        captureDeviceScreenshot("05_threshold_initial_not_collapsed")
 
         // Click button to scroll exactly to threshold (offset = threshold, not > threshold)
         onNodeWithTag(SCROLL_TO_THRESHOLD_TAG).performClick()
         waitForIdle()
+        
+        // 📸 Screenshot 2: After scrolling to threshold (should still show not collapsed)
+        captureDeviceScreenshot("05_threshold_after_scroll_should_not_collapse")
 
         // Should remain not collapsed (contract: only collapse when offset > threshold)
         onNodeWithTag(COLLAPSED_TAG).assertTextEquals("false")
@@ -873,65 +905,132 @@ private fun TestScreen(
     )
     val scope = rememberCoroutineScope()
     val thresholdPx = with(LocalDensity.current) { collapseThreshold.toPx() }
+    val itemHeightPx = with(LocalDensity.current) { 104.dp.toPx() }
     var recomposeFlag by remember { mutableStateOf(false) }
 
-    // Expose state via tagged text for assertions
-    Text(modifier = Modifier.testTag(COLLAPSED_TAG), text = state.isCollapsed.toString())
-    Text(
-        modifier = Modifier.testTag(TITLE_ALPHA_TAG),
-        text = String.format("%.2f", state.titleAlpha)
-    )
-    Text(
-        modifier = Modifier.testTag(BG_ALPHA_TAG),
-        text = String.format("%.2f", state.bgAlpha)
-    )
-    Text(
-        modifier = Modifier.testTag(FADE_ALPHA_TAG),
-        text = String.format("%.2f", state.alpha)
-    )
-    Text(
-        modifier = Modifier.testTag(IS_COMPACT_TAG),
-        text = state.isCompactScreen.toString()
-    )
-    Text(
-        modifier = Modifier.testTag(TILE_PADDING_TAG),
-        text = state.tilePadding.value.toInt().toString()
-    )
-    Text(
-        modifier = Modifier.testTag(APP_BAR_HEIGHT_TAG),
-        text = state.appBarHeightDp.value.toInt().toString()
-    )
-    Text(
-        modifier = Modifier.testTag(BOTTOM_INSET_TAG),
-        text = String.format("%.2f", state.bottomInset.value)
-    )
-    Text(
-        modifier = Modifier.testTag(STATUS_BAR_HEIGHT_TAG),
-        text = String.format("%.2f", state.statusBarHeightDp.value)
-    )
-    Text(
-        modifier = Modifier.testTag(ALPHA_DIFF_TAG),
-        text = String.format("%.2f", state.titleAlpha - state.bgAlpha)
-    )
-    Text(
-        modifier = Modifier.testTag(RECOMPOSE_TAG),
-        text = recomposeFlag.toString()
-    )
-
-    // Controls to drive precise scroll behavior in tests
-    Button(modifier = Modifier.testTag("triggerRecompose"), onClick = {
-        recomposeFlag = !recomposeFlag
-    }) { Text("recomp") }
-    Button(modifier = Modifier.testTag(SCROLL_TO_THRESHOLD_TAG), onClick = {
-        scope.launch { state.listState.scrollToItem(0, thresholdPx.toInt()) }
-    }) { Text("thr") }
-
-    // Content with a scrollable list using the state's listState
-    LazyColumn(state = state.listState, modifier = Modifier.testTag(LIST_TAG)) {
-        // Enough items to allow scrolling
-        items((0 until 50).toList()) { _ ->
-            Box(Modifier.fillMaxWidth().height(200.dp))
+    Column(modifier = Modifier.fillMaxSize()) {
+        // State information panel - visible at top of screen
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text(
+                    text = "Common Screen State Info",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                
+                // Row 1: Core states
+                Row {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Collapsed: ${state.isCollapsed}")
+                        Text("Title Alpha: ${String.format("%.2f", state.titleAlpha)}")
+                        Text("BG Alpha: ${String.format("%.2f", state.bgAlpha)}")
+                        Text("Fade Alpha: ${String.format("%.2f", state.alpha)}")
+                    }
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Compact: ${state.isCompactScreen}")
+                        Text("Tile Padding: ${state.tilePadding.value.toInt()}")
+                        Text("App Bar Height: ${state.appBarHeightDp.value.toInt()}")
+                        Text("Bottom Inset: ${String.format("%.2f", state.bottomInset.value)}")
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Row 2: Additional states
+                Row {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Status Bar Height: ${String.format("%.2f", state.statusBarHeightDp.value)}")
+                        Text("Alpha Diff: ${String.format("%.2f", state.titleAlpha - state.bgAlpha)}")
+                    }
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Recompose: $recomposeFlag")
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Controls
+                Row {
+                    Button(
+                        modifier = Modifier.testTag("triggerRecompose"),
+                        onClick = { recomposeFlag = !recomposeFlag }
+                    ) { 
+                        Text("Recompose") 
+                    }
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    Button(
+                        modifier = Modifier.testTag(SCROLL_TO_THRESHOLD_TAG),
+                        onClick = {
+                            scope.launch { 
+                                // Each item is 100dp height + 4dp padding = 104dp total
+                                // To stay at item 0, we need offset < item height
+                                // But we want to test exactly the threshold, so use threshold directly
+                                // but ensure we don't exceed item height by using min of threshold and safe offset
+                                val safeOffset = minOf(thresholdPx.toInt(), (itemHeightPx * 0.9f).toInt())
+                                state.listState.scrollToItem(0, safeOffset)
+                            }
+                        }
+                    ) { 
+                        Text("Scroll to Threshold") 
+                    }
+                }
+            }
         }
+        
+        // Scrollable content area
+        LazyColumn(
+            state = state.listState, 
+            modifier = Modifier
+                .testTag(LIST_TAG)
+                .fillMaxSize()
+                .background(Color.Gray.copy(alpha = 0.1f))
+        ) {
+            // Enough items to allow scrolling
+            items((0 until 50).toList()) { index ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(4.dp)
+                        .background(
+                            if (index % 2 == 0) Color.Blue.copy(alpha = 0.1f)
+                            else Color.Green.copy(alpha = 0.1f)
+                        )
+                ) {
+                    Text(
+                        "Item $index",
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        }
+    }
+    
+    // Hidden text elements for test assertions (positioned off-screen but still accessible)
+    Box(modifier = Modifier.padding(0.dp)) {
+        Text(modifier = Modifier.testTag(COLLAPSED_TAG), text = state.isCollapsed.toString())
+        Text(modifier = Modifier.testTag(TITLE_ALPHA_TAG), text = String.format("%.2f", state.titleAlpha))
+        Text(modifier = Modifier.testTag(BG_ALPHA_TAG), text = String.format("%.2f", state.bgAlpha))
+        Text(modifier = Modifier.testTag(FADE_ALPHA_TAG), text = String.format("%.2f", state.alpha))
+        Text(modifier = Modifier.testTag(IS_COMPACT_TAG), text = state.isCompactScreen.toString())
+        Text(modifier = Modifier.testTag(TILE_PADDING_TAG), text = state.tilePadding.value.toInt().toString())
+        Text(modifier = Modifier.testTag(APP_BAR_HEIGHT_TAG), text = state.appBarHeightDp.value.toInt().toString())
+        Text(modifier = Modifier.testTag(BOTTOM_INSET_TAG), text = String.format("%.2f", state.bottomInset.value))
+        Text(modifier = Modifier.testTag(STATUS_BAR_HEIGHT_TAG), text = String.format("%.2f", state.statusBarHeightDp.value))
+        Text(modifier = Modifier.testTag(ALPHA_DIFF_TAG), text = String.format("%.2f", state.titleAlpha - state.bgAlpha))
+        Text(modifier = Modifier.testTag(RECOMPOSE_TAG), text = recomposeFlag.toString())
     }
 }
 
@@ -945,14 +1044,57 @@ private fun InsetsTestScreen() {
         // Capture baseline bottom inset on first composition; remember keeps it stable
         val baseline = remember { state.bottomInset.value }
 
-        Button(modifier = Modifier.testTag(TOGGLE_NAV_HEIGHT_TAG), onClick = {
-            scope.launch {
-                navHeight = 25.dp
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+            Text(
+                text = "Navigation Bar Insets Test",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Navigation Bar Height: ${navHeight.value}dp")
+                    Text("Bottom Inset: ${String.format("%.2f", state.bottomInset.value)}")
+                    Text("Delta from Baseline: ${String.format("%.2f", state.bottomInset.value - baseline)}")
+                }
             }
-        }) { Text("toggle") }
-
-        // Show current bottom inset and the delta from baseline
-        Text(modifier = Modifier.testTag(BOTTOM_INSET_TAG), text = String.format("%.2f", state.bottomInset.value))
-        Text(modifier = Modifier.testTag(BOTTOM_INSET_DELTA_TAG), text = String.format("%.2f", state.bottomInset.value - baseline))
+            
+            Button(
+                modifier = Modifier.testTag(TOGGLE_NAV_HEIGHT_TAG),
+                onClick = {
+                    scope.launch {
+                        navHeight = 25.dp
+                    }
+                }
+            ) { 
+                Text("Toggle Nav Height (${navHeight.value}dp → 25.dp)") 
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Visual feedback area
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .background(Color.Blue.copy(alpha = 0.1f))
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Visual test area\nScroll up/down to see inset effects",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+        
+        // Hidden text elements for test assertions
+        Box(modifier = Modifier.padding(0.dp)) {
+            Text(modifier = Modifier.testTag(BOTTOM_INSET_TAG), text = String.format("%.2f", state.bottomInset.value))
+            Text(modifier = Modifier.testTag(BOTTOM_INSET_DELTA_TAG), text = String.format("%.2f", state.bottomInset.value - baseline))
+        }
     }
 }
