@@ -29,14 +29,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
-import dev.angussoftware.app.ui.utils.ScreenshotTestHelper.captureDeviceScreenshot
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.test.Test
@@ -47,8 +45,6 @@ private const val COLLAPSED_TAG = "collapsed"
 private const val TITLE_ALPHA_TAG = "titleAlpha"
 private const val BG_ALPHA_TAG = "bgAlpha"
 private const val FADE_ALPHA_TAG = "fadeAlpha"
-private const val SCROLL_BY_TAG = "scrollBy"
-private const val SCROLL_TO_TOP_TAG = "scrollToTop"
 private const val SCROLL_TO_THRESHOLD_TAG = "scrollToThreshold"
 private const val TILE_PADDING_TAG = "tilePadding"
 private const val APP_BAR_HEIGHT_TAG = "appBarHeight"
@@ -57,7 +53,6 @@ private const val IS_COMPACT_TAG = "isCompact"
 private const val TOGGLE_NAV_HEIGHT_TAG = "toggleNavHeight"
 private const val BOTTOM_INSET_DELTA_TAG = "bottomInsetDelta"
 private const val STATUS_BAR_HEIGHT_TAG = "statusBarHeight"
-private const val RECOMPOSE_TAG = "forceRecompose"
 private const val ALPHA_DIFF_TAG = "alphaDiff"
 
 /**
@@ -147,7 +142,6 @@ class CommonScreenStateUiTest {
         assertAlphaEquals(TITLE_ALPHA_TAG, "1.00")
     }
 
-
     /**
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed correct fade alpha and bgAlpha animation behavior.
@@ -174,8 +168,6 @@ class CommonScreenStateUiTest {
         assertAlphaEquals(BG_ALPHA_TAG, "1.00")
     }
 
-
-
     /**
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed correct navigation bar inset calculation and delta changes.
@@ -184,10 +176,7 @@ class CommonScreenStateUiTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun insets_and_LocalNavigationBarHeight_affect_bottomInset_delta() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { InsetsTestScreen() }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
+        setupManualClock { InsetsTestScreen() }
 
         // Initial delta should be 0.00
         onNodeWithTag(BOTTOM_INSET_DELTA_TAG).assertTextEquals("0.00")
@@ -197,7 +186,7 @@ class CommonScreenStateUiTest {
         waitForIdle()
         mainClock.advanceTimeBy(200)
         waitForIdle()
-        
+
         onNodeWithTag(BOTTOM_INSET_DELTA_TAG).assertTextEquals("20.00")
     }
 
@@ -211,7 +200,7 @@ class CommonScreenStateUiTest {
     fun pass_through_parameters_are_reflected() = runComposeUiTest {
         setContent { TestScreen(tilePadding = 7.dp, appBarHeightDp = 123.dp) }
         waitForIdle()
-        
+
         onNodeWithTag(TILE_PADDING_TAG).assertTextEquals("7")
         onNodeWithTag(APP_BAR_HEIGHT_TAG).assertTextEquals("123")
     }
@@ -230,7 +219,7 @@ class CommonScreenStateUiTest {
             }
         }
         waitForIdle()
-        
+
         onNodeWithTag(IS_COMPACT_TAG).assertTextEquals("true")
     }
 
@@ -248,7 +237,7 @@ class CommonScreenStateUiTest {
             }
         }
         waitForIdle()
-        
+
         onNodeWithTag(IS_COMPACT_TAG).assertTextEquals("false")
     }
 
@@ -266,7 +255,7 @@ class CommonScreenStateUiTest {
             }
         }
         waitForIdle()
-        
+
         onNodeWithTag(IS_COMPACT_TAG).assertTextEquals("false")
     }
 
@@ -295,7 +284,7 @@ class CommonScreenStateUiTest {
         val afterRecomposeHeightText = onNodeWithTag(STATUS_BAR_HEIGHT_TAG).fetchSemanticsNode()
             .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
         val afterRecomposeHeight = afterRecomposeHeightText.toFloatOrNull() ?: 0f
-        assertTrue(abs(afterRecomposeHeight - initialHeight) < 0.01f, 
+        assertTrue(abs(afterRecomposeHeight - initialHeight) < 0.01f,
             "statusBarHeightDp should remain stable across recomposition, was $initialHeight then $afterRecomposeHeight")
     }
 
@@ -307,15 +296,12 @@ class CommonScreenStateUiTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun fade_in_alpha_stable_across_recompositions_after_reaching_one() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen() }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
+        setupManualClock { TestScreen() }
 
         // Advance time to complete the fade-in animation (1000ms)
         mainClock.advanceTimeBy(1000)
         waitForIdle()
-        
+
         onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("1.00")
 
         // Trigger recomposition
@@ -323,7 +309,7 @@ class CommonScreenStateUiTest {
         waitForIdle()
         mainClock.advanceTimeBy(100)
         waitForIdle()
-        
+
         // Fade alpha should remain 1.00 (not restart)
         onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("1.00")
     }
@@ -359,7 +345,7 @@ class CommonScreenStateUiTest {
      * Tests the bi-directional animation behavior: verifies that titleAlpha and bgAlpha
      * animate from 0 → 1 when collapsing, and from 1 → 0 when uncollapsing (scrolling back to top).
      * This ensures the animations work correctly in both directions.
-     * 
+     *
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed correct bidirectional animation behavior.
      * Screenshot code removed to improve test performance.
@@ -372,7 +358,7 @@ class CommonScreenStateUiTest {
         // Scroll down to collapse
         onNodeWithTag(LIST_TAG).performScrollToIndex(5)
         advanceClockAndWait(500)
-        
+
         // Advance time to complete animations
         advanceClockAndWait(5000L)
 
@@ -399,7 +385,7 @@ class CommonScreenStateUiTest {
      * Performs the sequence: scroll down → scroll up → scroll down → scroll up,
      * verifying that isCollapsed state correctly reflects the scroll position at each step.
      * This ensures no state corruption occurs during frequent transitions.
-     * 
+     *
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed correct state consistency during rapid scroll operations.
      * Screenshot code removed to improve test performance.
@@ -443,12 +429,12 @@ class CommonScreenStateUiTest {
     fun initial_bottomInset_value_is_non_negative() = runComposeUiTest {
         setContent { TestScreen() }
         waitForIdle()
-        
+
         // Read the initial bottomInset text
         val bottomInsetText = onNodeWithTag(BOTTOM_INSET_TAG).fetchSemanticsNode()
             .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
         val bottomInset = bottomInsetText.toFloatOrNull() ?: -1f
-        
+
         assertTrue(bottomInset >= 0f, "bottomInset should be non-negative, was: $bottomInset")
     }
 
@@ -457,7 +443,7 @@ class CommonScreenStateUiTest {
      * According to the contract in isCollapsedFor(), collapse only occurs when offset > threshold.
      * This test verifies that when offset == threshold (not greater), the bar remains uncollapsed.
      * Uses the SCROLL_TO_THRESHOLD_TAG button to scroll to exactly the threshold value.
-     * 
+     *
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed correct threshold boundary behavior (offset == threshold does not collapse).
      * Screenshot code removed to improve test performance.
@@ -507,7 +493,7 @@ class CommonScreenStateUiTest {
      * and animation spec. This test samples the alpha difference at multiple points
      * during the animation and verifies it remains near zero (< 0.01).
      * Uses the ALPHA_DIFF_TAG to monitor synchronization.
-     * 
+     *
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed correct alpha synchronization during animation.
      * Screenshot code removed to improve test performance.
@@ -525,7 +511,7 @@ class CommonScreenStateUiTest {
         // They should animate together, so difference should remain close to 0
         for (i in 0..10) {
             advanceClockAndWait(100)
-            
+
             val alphaDiffText = onNodeWithTag(ALPHA_DIFF_TAG).fetchSemanticsNode()
                 .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
             val alphaDiff = alphaDiffText.toFloatOrNull() ?: Float.MAX_VALUE
@@ -633,7 +619,7 @@ class CommonScreenStateUiTest {
     fun commonScreenState_data_class_equality_works() = runComposeUiTest {
         var state1: CommonScreenState? = null
         var state2: CommonScreenState? = null
-        
+
         setContent {
             state1 = rememberCommonScreenState(
                 collapseThreshold = 120.dp,
@@ -645,7 +631,7 @@ class CommonScreenStateUiTest {
                 tilePadding = 16.dp,
                 appBarHeightDp = 64.dp
             )
-            
+
             // Add a basic UI to show state values for the screenshot
             Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                 Text("Data Class Equality Test", style = MaterialTheme.typography.headlineSmall)
@@ -679,10 +665,10 @@ class CommonScreenStateUiTest {
         var originalState: CommonScreenState? = null
         var showCopiedState by mutableStateOf(false)
         var copiedStateRef: CommonScreenState? = null
-        
+
         setContent {
             originalState = rememberCommonScreenState(tilePadding = 16.dp, appBarHeightDp = 64.dp)
-            
+
             // Create a UI that can show both original and copied state
             Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                 if (!showCopiedState) {
@@ -712,11 +698,11 @@ class CommonScreenStateUiTest {
         // Test copy functionality
         val copiedState = originalState!!.copy(tilePadding = 32.dp)
         copiedStateRef = copiedState  // Save for UI
-        
+
         // Switch to showing the copied state (will trigger recomposition)
         showCopiedState = true
         waitForIdle()
-        
+
         // Copied state should have new tilePadding but same other immutable properties
         assertTrue(copiedState.tilePadding == 32.dp, "Copied state should have new tilePadding value")
         assertTrue(copiedState.appBarHeightDp == originalState!!.appBarHeightDp, "appBarHeightDp should remain the same")
@@ -732,15 +718,15 @@ class CommonScreenStateUiTest {
     @Test
     fun commonScreenState_all_properties_are_accessible() = runComposeUiTest {
         var state: CommonScreenState? = null
-        
+
         setContent {
             state = rememberCommonScreenState(tilePadding = 20.dp, appBarHeightDp = 80.dp)
-            
+
             // Create a UI to display all properties for the screenshot
             Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                 Text("All CommonScreenState Properties", style = MaterialTheme.typography.headlineSmall)
                 Spacer(Modifier.height(8.dp))
-                
+
                 Text("statusBarHeightDp: ${state!!.statusBarHeightDp.value}")
                 Text("bottomInset: ${state!!.bottomInset.value}")
                 Text("listState: ${if (state!!.listState != null) "initialized" else "null"}")
@@ -773,7 +759,7 @@ class CommonScreenStateUiTest {
      * Tests that animations recover gracefully when interrupted mid-flight.
      * This verifies that rapid state changes (collapse → uncollapse) during
      * an animation don't cause visual glitches or incorrect final states.
-     * 
+     *
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed correct animation recovery behavior when interrupted.
      * Screenshot code removed to improve test performance.
@@ -781,10 +767,7 @@ class CommonScreenStateUiTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun animation_interrupted_midway_recovers_gracefully() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen() }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
+        setupManualClock { TestScreen() }
 
         // Start collapse animation
         onNodeWithTag(LIST_TAG).performScrollToIndex(5)
@@ -796,7 +779,7 @@ class CommonScreenStateUiTest {
         // Immediately reverse direction while animation is in progress
         onNodeWithTag(LIST_TAG).performScrollToIndex(0)
         waitForIdle()
-        
+
         // Complete the reverse animation
         mainClock.advanceTimeBy(5000)
         waitForIdle()
@@ -860,7 +843,7 @@ class CommonScreenStateUiTest {
      * With a threshold of 99999.dp, normal scrolling offsets will never exceed it,
      * but collapse should still occur when scrolling past the first item (index > 0).
      * This verifies that the index-based collapse logic works independently of threshold.
-     * 
+     *
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed correct index-based collapse with extremely large threshold.
      * Screenshot code removed to improve test performance.
@@ -920,10 +903,7 @@ class CommonScreenStateUiTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun titleAlpha_and_bgAlpha_stable_when_collapse_state_unchanged() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen() }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
+        setupManualClock { TestScreen() }
 
         // Scroll to collapse
         onNodeWithTag(LIST_TAG).performScrollToIndex(3)
@@ -997,7 +977,7 @@ class CommonScreenStateUiTest {
     /**
      * Tests that LaunchedEffect(Unit) executes exactly once on initial composition
      * and doesn't restart on subsequent recompositions.
-     * 
+     *
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed fade animation starts at 0.00, reaches 1.00, and remains at 1.00 after multiple recompositions.
      * Screenshot code removed to improve test performance.
@@ -1005,10 +985,7 @@ class CommonScreenStateUiTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun fade_animation_triggered_exactly_once_on_initial_composition() = runComposeUiTest {
-        mainClock.autoAdvance = false
-        setContent { TestScreen() }
-        mainClock.advanceTimeByFrame()
-        waitForIdle()
+        setupManualClock { TestScreen() }
 
         // Alpha should start at 0
         onNodeWithTag(FADE_ALPHA_TAG).assertTextEquals("0.00")
@@ -1036,7 +1013,7 @@ class CommonScreenStateUiTest {
      * Verifies that the listState returned by rememberCommonScreenState is actually
      * the same instance driving the LazyColumn, by confirming scroll actions update
      * the state's firstVisibleItemIndex property.
-     * 
+     *
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed listState instance is properly tracking scroll position (index 0 → index 5).
      * Custom UI added to display list state information clearly in screenshots.
@@ -1049,7 +1026,7 @@ class CommonScreenStateUiTest {
         setContent {
             capturedState = rememberCommonScreenState()
             val state = capturedState!!
-            
+
             Column(modifier = Modifier.fillMaxSize()) {
                 // Info card showing list state
                 Card(
@@ -1067,7 +1044,7 @@ class CommonScreenStateUiTest {
                         Text("First Visible Item Offset: ${state.listState.firstVisibleItemScrollOffset}")
                     }
                 }
-                
+
                 // LazyColumn
                 LazyColumn(state = state.listState, modifier = Modifier.testTag(LIST_TAG).fillMaxSize()) {
                     items((0 until 50).toList()) { index ->
@@ -1137,7 +1114,7 @@ private fun TestScreen(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                
+
                 // Row 1: Core states
                 Row {
                     Column(modifier = Modifier.weight(1f)) {
@@ -1146,9 +1123,9 @@ private fun TestScreen(
                         Text("BG Alpha: ${String.format("%.2f", state.bgAlpha)}")
                         Text("Fade Alpha: ${String.format("%.2f", state.alpha)}")
                     }
-                    
+
                     Spacer(modifier = Modifier.width(8.dp))
-                    
+
                     Column(modifier = Modifier.weight(1f)) {
                         Text("Compact: ${state.isCompactScreen}")
                         Text("Tile Padding: ${state.tilePadding.value.toInt()}")
@@ -1156,40 +1133,40 @@ private fun TestScreen(
                         Text("Bottom Inset: ${String.format("%.2f", state.bottomInset.value)}")
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 // Row 2: Additional states
                 Row {
                     Column(modifier = Modifier.weight(1f)) {
                         Text("Status Bar Height: ${String.format("%.2f", state.statusBarHeightDp.value)}")
                         Text("Alpha Diff: ${String.format("%.2f", state.titleAlpha - state.bgAlpha)}")
                     }
-                    
+
                     Spacer(modifier = Modifier.width(8.dp))
-                    
+
                     Column(modifier = Modifier.weight(1f)) {
                         Text("Recompose: $recomposeFlag")
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 // Controls
                 Row {
                     Button(
                         modifier = Modifier.testTag("triggerRecompose"),
                         onClick = { recomposeFlag = !recomposeFlag }
-                    ) { 
-                        Text("Recompose") 
+                    ) {
+                        Text("Recompose")
                     }
-                    
+
                     Spacer(modifier = Modifier.width(8.dp))
-                    
+
                     Button(
                         modifier = Modifier.testTag(SCROLL_TO_THRESHOLD_TAG),
                         onClick = {
-                            scope.launch { 
+                            scope.launch {
                                 // Each item is 100dp height + 4dp padding = 104dp total
                                 // To stay at item 0, we need offset < item height
                                 // But we want to test exactly the threshold, so use threshold directly
@@ -1198,16 +1175,16 @@ private fun TestScreen(
                                 state.listState.scrollToItem(0, safeOffset)
                             }
                         }
-                    ) { 
-                        Text("Scroll to Threshold") 
+                    ) {
+                        Text("Scroll to Threshold")
                     }
                 }
             }
         }
-        
+
         // Scrollable content area
         LazyColumn(
-            state = state.listState, 
+            state = state.listState,
             modifier = Modifier
                 .testTag(LIST_TAG)
                 .fillMaxSize()
@@ -1233,7 +1210,7 @@ private fun TestScreen(
             }
         }
     }
-    
+
     // Hidden text elements for test assertions (positioned off-screen but still accessible)
     Box(modifier = Modifier.padding(0.dp)) {
         Text(modifier = Modifier.testTag(COLLAPSED_TAG), text = state.isCollapsed.toString())
@@ -1246,7 +1223,6 @@ private fun TestScreen(
         Text(modifier = Modifier.testTag(BOTTOM_INSET_TAG), text = String.format("%.2f", state.bottomInset.value))
         Text(modifier = Modifier.testTag(STATUS_BAR_HEIGHT_TAG), text = String.format("%.2f", state.statusBarHeightDp.value))
         Text(modifier = Modifier.testTag(ALPHA_DIFF_TAG), text = String.format("%.2f", state.titleAlpha - state.bgAlpha))
-        Text(modifier = Modifier.testTag(RECOMPOSE_TAG), text = recomposeFlag.toString())
     }
 }
 
@@ -1266,7 +1242,7 @@ private fun InsetsTestScreen() {
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1278,7 +1254,7 @@ private fun InsetsTestScreen() {
                     Text("Delta from Baseline: ${String.format("%.2f", state.bottomInset.value - baseline)}")
                 }
             }
-            
+
             Button(
                 modifier = Modifier.testTag(TOGGLE_NAV_HEIGHT_TAG),
                 onClick = {
@@ -1286,12 +1262,12 @@ private fun InsetsTestScreen() {
                         navHeight = 25.dp
                     }
                 }
-            ) { 
-                Text("Toggle Nav Height (${navHeight.value}dp → 25.dp)") 
+            ) {
+                Text("Toggle Nav Height (${navHeight.value}dp → 25.dp)")
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             // Visual feedback area
             Box(
                 modifier = Modifier
@@ -1306,7 +1282,7 @@ private fun InsetsTestScreen() {
                 )
             }
         }
-        
+
         // Hidden text elements for test assertions
         Box(modifier = Modifier.padding(0.dp)) {
             Text(modifier = Modifier.testTag(BOTTOM_INSET_TAG), text = String.format("%.2f", state.bottomInset.value))
