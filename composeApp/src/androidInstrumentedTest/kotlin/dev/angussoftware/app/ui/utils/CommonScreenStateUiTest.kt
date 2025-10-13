@@ -38,6 +38,7 @@ import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 private const val LIST_TAG = "list"
@@ -157,7 +158,7 @@ class CommonScreenStateUiTest {
         // Not collapsed yet, so bgAlpha remains 0.00
         assertAlphaEquals(BG_ALPHA_TAG, "0.00")
 
-        // Advance time to complete the 1000ms fade-in tween
+        // Advance time to complete the 1000 ms fade-in tween
         advanceClockAndWait(1000)
         assertAlphaEquals(FADE_ALPHA_TAG, "1.00")
 
@@ -298,7 +299,7 @@ class CommonScreenStateUiTest {
     fun fade_in_alpha_stable_across_recompositions_after_reaching_one() = runComposeUiTest {
         setupManualClock { TestScreen() }
 
-        // Advance time to complete the fade-in animation (1000ms)
+        // Advance time to complete the fade-in animation (1000 ms)
         mainClock.advanceTimeBy(1000)
         waitForIdle()
 
@@ -342,7 +343,7 @@ class CommonScreenStateUiTest {
     }
 
     /**
-     * Tests the bi-directional animation behavior: verifies that titleAlpha and bgAlpha
+     * Tests the bidirectional animation behavior: verifies that titleAlpha and bgAlpha
      * animate from 0 → 1 when collapsing, and from 1 → 0 when uncollapsing (scrolling back to top).
      * This ensures the animations work correctly in both directions.
      *
@@ -649,9 +650,9 @@ class CommonScreenStateUiTest {
 
         // Two states created with same parameters should have equal property values
         assertTrue(state1 != null && state2 != null, "Both states should be initialized")
-        assertTrue(state1!!.tilePadding == state2!!.tilePadding, "tilePadding should match")
-        assertTrue(state1.appBarHeightDp == state2.appBarHeightDp, "appBarHeightDp should match")
-        assertTrue(state1.isCollapsed == state2.isCollapsed, "isCollapsed should match initially")
+        assertEquals(state1.tilePadding, state2.tilePadding, "tilePadding should match")
+        assertEquals(state1.appBarHeightDp, state2.appBarHeightDp, "appBarHeightDp should match")
+        assertEquals(state1.isCollapsed, state2.isCollapsed, "isCollapsed should match initially")
     }
 
     /**
@@ -675,20 +676,20 @@ class CommonScreenStateUiTest {
                     // Show original state only
                     Text("Data Class Copy Test", style = MaterialTheme.typography.headlineSmall)
                     Spacer(Modifier.height(8.dp))
-                    Text("Original tilePadding: ${originalState!!.tilePadding}")
-                    Text("Original appBarHeight: ${originalState!!.appBarHeightDp}")
-                    Text("Original statusBarHeight: ${originalState!!.statusBarHeightDp}")
+                    Text("Original tilePadding: ${originalState.tilePadding}")
+                    Text("Original appBarHeight: ${originalState.appBarHeightDp}")
+                    Text("Original statusBarHeight: ${originalState.statusBarHeightDp}")
                 } else {
                     // Show both original and copied state
                     Text("Data Class Copy Test - After Copy", style = MaterialTheme.typography.headlineSmall)
                     Spacer(Modifier.height(8.dp))
-                    Text("Original tilePadding: ${originalState!!.tilePadding}")
+                    Text("Original tilePadding: ${originalState.tilePadding}")
                     Text("Copied tilePadding: ${copiedStateRef!!.tilePadding} (modified)")
                     Spacer(Modifier.height(8.dp))
-                    Text("Original appBarHeight: ${originalState!!.appBarHeightDp}")
+                    Text("Original appBarHeight: ${originalState.appBarHeightDp}")
                     Text("Copied appBarHeight: ${copiedStateRef!!.appBarHeightDp} (unchanged)")
                     Spacer(Modifier.height(8.dp))
-                    Text("Original statusBarHeight: ${originalState!!.statusBarHeightDp}")
+                    Text("Original statusBarHeight: ${originalState.statusBarHeightDp}")
                     Text("Copied statusBarHeight: ${copiedStateRef!!.statusBarHeightDp} (unchanged)")
                 }
             }
@@ -704,14 +705,18 @@ class CommonScreenStateUiTest {
         waitForIdle()
 
         // Copied state should have new tilePadding but same other immutable properties
-        assertTrue(copiedState.tilePadding == 32.dp, "Copied state should have new tilePadding value")
-        assertTrue(copiedState.appBarHeightDp == originalState!!.appBarHeightDp, "appBarHeightDp should remain the same")
-        assertTrue(copiedState.statusBarHeightDp == originalState!!.statusBarHeightDp, "statusBarHeightDp should remain the same")
+        assertEquals(copiedState.tilePadding, 32.dp, "Copied state should have new tilePadding value")
+        assertEquals(copiedState.appBarHeightDp, originalState.appBarHeightDp, "appBarHeightDp should remain the same")
+        assertEquals(
+            copiedState.statusBarHeightDp,
+            originalState.statusBarHeightDp,
+            "statusBarHeightDp should remain the same"
+        )
     }
 
     /**
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
-     * Screenshots confirmed all properties are accessible and display correctly.
+     * Screenshots confirmed all properties are accessible and displayed correctly.
      * Screenshot code removed to improve test performance.
      */
     @OptIn(ExperimentalTestApi::class)
@@ -727,32 +732,32 @@ class CommonScreenStateUiTest {
                 Text("All CommonScreenState Properties", style = MaterialTheme.typography.headlineSmall)
                 Spacer(Modifier.height(8.dp))
 
-                Text("statusBarHeightDp: ${state!!.statusBarHeightDp.value}")
-                Text("bottomInset: ${state!!.bottomInset.value}")
-                Text("listState: ${if (state!!.listState != null) "initialized" else "null"}")
-                Text("isCollapsed: ${state!!.isCollapsed}")
-                Text("alpha: ${state!!.alpha}")
-                Text("titleAlpha: ${state!!.titleAlpha}")
-                Text("bgAlpha: ${state!!.bgAlpha}")
-                Text("isCompactScreen: ${state!!.isCompactScreen}")
-                Text("tilePadding: ${state!!.tilePadding.value}")
-                Text("appBarHeightDp: ${state!!.appBarHeightDp.value}")
+                Text("statusBarHeightDp: ${state.statusBarHeightDp.value}")
+                Text("bottomInset: ${state.bottomInset.value}")
+                Text("listState: ${"initialized"}")
+                Text("isCollapsed: ${state.isCollapsed}")
+                Text("alpha: ${state.alpha}")
+                Text("titleAlpha: ${state.titleAlpha}")
+                Text("bgAlpha: ${state.bgAlpha}")
+                Text("isCompactScreen: ${state.isCompactScreen}")
+                Text("tilePadding: ${state.tilePadding.value}")
+                Text("appBarHeightDp: ${state.appBarHeightDp.value}")
             }
         }
         waitForIdle()
 
         // Verify all 10 properties are accessible and have reasonable values
         assertTrue(state != null, "State should be initialized")
-        assertTrue(state!!.statusBarHeightDp.value >= 0f, "statusBarHeightDp should be non-negative")
-        assertTrue(state!!.bottomInset.value >= 0f, "bottomInset should be non-negative")
-        assertTrue(state!!.listState != null, "listState should not be null")
-        assertTrue(state!!.isCollapsed == false, "isCollapsed should be false initially")
-        assertTrue(state!!.alpha >= 0f && state!!.alpha <= 1f, "alpha should be between 0 and 1")
-        assertTrue(state!!.titleAlpha >= 0f && state!!.titleAlpha <= 1f, "titleAlpha should be between 0 and 1")
-        assertTrue(state!!.bgAlpha >= 0f && state!!.bgAlpha <= 1f, "bgAlpha should be between 0 and 1")
-        assertTrue(state!!.isCompactScreen != null, "isCompactScreen should not be null")
-        assertTrue(state!!.tilePadding == 20.dp, "tilePadding should match input")
-        assertTrue(state!!.appBarHeightDp == 80.dp, "appBarHeightDp should match input")
+        assertTrue(state.statusBarHeightDp.value >= 0f, "statusBarHeightDp should be non-negative")
+        assertTrue(state.bottomInset.value >= 0f, "bottomInset should be non-negative")
+        assertTrue(true, "listState should not be null")
+        assertEquals(state.isCollapsed, false, "isCollapsed should be false initially")
+        assertTrue(state.alpha in 0f..1f, "alpha should be between 0 and 1")
+        assertTrue(state.titleAlpha in 0f..1f, "titleAlpha should be between 0 and 1")
+        assertTrue(state.bgAlpha in 0f..1f, "bgAlpha should be between 0 and 1")
+        assertTrue(true, "isCompactScreen should not be null")
+        assertEquals(state.tilePadding, 20.dp, "tilePadding should match input")
+        assertEquals(state.appBarHeightDp, 80.dp, "appBarHeightDp should match input")
     }
 
     /**
@@ -772,11 +777,11 @@ class CommonScreenStateUiTest {
         // Start collapse animation
         onNodeWithTag(LIST_TAG).performScrollToIndex(5)
         waitForIdle()
-        // Only advance 50ms into the animation (not complete)
+        // Only advance 50 ms into the animation (not complete)
         mainClock.advanceTimeBy(50)
         waitForIdle()
 
-        // Immediately reverse direction while animation is in progress
+        // Immediately reverse the direction while animation is in progress
         onNodeWithTag(LIST_TAG).performScrollToIndex(0)
         waitForIdle()
 
@@ -875,7 +880,7 @@ class CommonScreenStateUiTest {
 
     /**
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
-     * Screenshots confirmed isCollapsed remains false across recomposition when at top.
+     * Screenshots confirmed isCollapsed remain false across recomposition when at top.
      * Screenshot code removed to improve test performance.
      */
     @OptIn(ExperimentalTestApi::class)
@@ -926,7 +931,7 @@ class CommonScreenStateUiTest {
 
     /**
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
-     * Screenshots confirmed isCompactScreen remains true across recomposition.
+     * Screenshots confirmed isCompactScreen remain true across recomposition.
      * Screenshot code removed to improve test performance.
      */
     @OptIn(ExperimentalTestApi::class)
@@ -976,7 +981,7 @@ class CommonScreenStateUiTest {
 
     /**
      * Tests that LaunchedEffect(Unit) executes exactly once on initial composition
-     * and doesn't restart on subsequent recompositions.
+     * and doesn't restart on later recompositions.
      *
      * ✅ SCREENSHOT TESTED: This test has been verified with screenshot testing.
      * Screenshots confirmed fade animation starts at 0.00, reaches 1.00, and remains at 1.00 after multiple recompositions.
@@ -1025,7 +1030,7 @@ class CommonScreenStateUiTest {
         var capturedState: CommonScreenState? = null
         setContent {
             capturedState = rememberCommonScreenState()
-            val state = capturedState!!
+            val state : CommonScreenState = capturedState
 
             Column(modifier = Modifier.fillMaxSize()) {
                 // Info card showing list state
@@ -1071,14 +1076,14 @@ class CommonScreenStateUiTest {
 
         // Verify initial state
         val initialIndex = capturedState!!.listState.firstVisibleItemIndex
-        assertTrue(initialIndex == 0, "Initial index should be 0, was $initialIndex")
+        assertEquals(initialIndex, 0, "Initial index should be 0, was $initialIndex")
 
         // Scroll to item 5
         onNodeWithTag(LIST_TAG).performScrollToIndex(5)
         waitForIdle()
 
         // Verify listState was updated
-        val afterScrollIndex = capturedState!!.listState.firstVisibleItemIndex
+        val afterScrollIndex = capturedState.listState.firstVisibleItemIndex
         assertTrue(afterScrollIndex >= 5, "After scroll index should be >= 5, was $afterScrollIndex")
     }
 
