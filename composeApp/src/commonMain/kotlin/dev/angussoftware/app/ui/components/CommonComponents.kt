@@ -20,7 +20,9 @@ import org.jetbrains.compose.resources.stringResource
 
 // Test/Debug semantics keys and tags for UI testing
 internal val TitleAlphaKey: SemanticsPropertyKey<Float> = SemanticsPropertyKey("CommonTopAppBarTitleAlpha")
+internal val BgAlphaKey: SemanticsPropertyKey<Float> = SemanticsPropertyKey("CommonTopAppBarBgAlpha")
 internal const val COMMON_TOP_APP_BAR_TITLE_TAG: String = "CommonTopAppBarTitle"
+internal const val COMMON_TOP_APP_BAR_ICON_TAG: String = "CommonTopAppBarIcon"
 
 /**
  * SectionCard is a reusable Card matching the design used throughout the app's sections.
@@ -78,7 +80,8 @@ internal fun SkillChip(
 private fun TitleWithIcon(
     title: String,
     icon: Painter?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    debugSemantics: Boolean = false
 ) {
     if (icon != null) {
         Row(
@@ -89,8 +92,10 @@ private fun TitleWithIcon(
             Image(
                 painter = icon,
                 contentDescription = null,
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .fillMaxHeight()
                     .padding(vertical = 8.dp)
+                    .let { base -> if (debugSemantics) base.testTag(COMMON_TOP_APP_BAR_ICON_TAG) else base }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = title)
@@ -135,12 +140,13 @@ internal fun CommonTopAppBar(
             Modifier.alpha(titleAlpha)
         }
         TopAppBar(
-            modifier = modifier,
+            modifier = if (debugSemantics) modifier.semantics { this.set(BgAlphaKey, bgAlpha) } else modifier,
             title = {
                 TitleWithIcon(
                     title = title,
                     icon = icon,
-                    modifier = titleModifier
+                    modifier = titleModifier,
+                    debugSemantics = debugSemantics
                 )
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -160,7 +166,8 @@ internal fun CommonTopAppBar(
                 TitleWithIcon(
                     title = title,
                     icon = icon,
-                    modifier = titleModifier
+                    modifier = titleModifier,
+                    debugSemantics = debugSemantics
                 )
             },
             colors = TopAppBarDefaults.topAppBarColors(
