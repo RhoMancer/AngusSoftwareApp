@@ -1,6 +1,7 @@
 package dev.angussoftware.app.ui.utils
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 
 /**
  * Enum class representing window width size classes
@@ -40,3 +41,18 @@ internal data class WindowAdaptiveInfo(
 @Composable
 internal expect fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo
 
+
+
+/**
+ * Optional CompositionLocal to override window adaptive info, useful for tests.
+ * When null (default), platform-specific currentWindowAdaptiveInfo() will be used.
+ */
+internal val LocalWindowAdaptiveInfoOverride = compositionLocalOf<WindowAdaptiveInfo?> { null }
+
+/**
+ * Resolve the current WindowAdaptiveInfo, honoring any CompositionLocal override.
+ */
+@Composable
+internal fun rememberedCurrentWindowAdaptiveInfo(): WindowAdaptiveInfo {
+    return LocalWindowAdaptiveInfoOverride.current ?: currentWindowAdaptiveInfo()
+}
