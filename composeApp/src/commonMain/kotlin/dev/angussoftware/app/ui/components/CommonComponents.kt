@@ -10,10 +10,17 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.Res
 import angussoftwareapp.composeapp.generated.resources.home_name
 import org.jetbrains.compose.resources.stringResource
+
+// Test/Debug semantics keys and tags for UI testing
+internal val TitleAlphaKey: SemanticsPropertyKey<Float> = SemanticsPropertyKey("CommonTopAppBarTitleAlpha")
+internal const val COMMON_TOP_APP_BAR_TITLE_TAG: String = "CommonTopAppBarTitle"
 
 /**
  * SectionCard is a reusable Card matching the design used throughout the app's sections.
@@ -48,9 +55,12 @@ internal fun SectionCard(
  * Shared SkillChip used across screens for displaying tags/skills.
  */
 @Composable
-internal fun SkillChip(text: String) {
+internal fun SkillChip(
+    text: String,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = modifier.padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         )
@@ -100,6 +110,8 @@ private fun TitleWithIcon(
  * @param titleAlpha Alpha value for the title (used in compact mode)
  * @param bgAlpha Alpha value for the background (used in compact mode)
  * @param showNonCompact Whether to show the non-compact version when not in compact mode (default: true)
+ * @param modifier Modifier for the TopAppBar container
+ * @param debugSemantics When true, attaches testTag and a semantics property to the title exposing titleAlpha for tests
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,15 +121,26 @@ internal fun CommonTopAppBar(
     isCompactScreen: Boolean,
     titleAlpha: Float = 1f,
     bgAlpha: Float = 1f,
-    showNonCompact: Boolean = true
+    showNonCompact: Boolean = true,
+    modifier: Modifier = Modifier,
+    debugSemantics: Boolean = false
 ) {
     if (isCompactScreen) {
+        val titleModifier = if (debugSemantics) {
+            Modifier
+                .alpha(titleAlpha)
+                .testTag(COMMON_TOP_APP_BAR_TITLE_TAG)
+                .semantics { this.set(TitleAlphaKey, titleAlpha) }
+        } else {
+            Modifier.alpha(titleAlpha)
+        }
         TopAppBar(
-            title = { 
+            modifier = modifier,
+            title = {
                 TitleWithIcon(
                     title = title,
                     icon = icon,
-                    modifier = Modifier.alpha(titleAlpha)
+                    modifier = titleModifier
                 )
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -126,12 +149,18 @@ internal fun CommonTopAppBar(
             )
         )
     } else if (showNonCompact) {
+        val titleModifier = if (debugSemantics) {
+            Modifier.testTag(COMMON_TOP_APP_BAR_TITLE_TAG)
+        } else {
+            Modifier
+        }
         TopAppBar(
-            modifier = Modifier.shadow(4.dp),
-            title = { 
+            modifier = modifier.shadow(4.dp),
+            title = {
                 TitleWithIcon(
                     title = title,
                     icon = icon,
+                    modifier = titleModifier
                 )
             },
             colors = TopAppBarDefaults.topAppBarColors(
