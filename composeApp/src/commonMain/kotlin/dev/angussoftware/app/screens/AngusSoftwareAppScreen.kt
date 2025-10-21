@@ -19,12 +19,13 @@ import angussoftwareapp.composeapp.generated.resources.Res
 import angussoftwareapp.composeapp.generated.resources.nav_blog
 import angussoftwareapp.composeapp.generated.resources.nav_home
 import angussoftwareapp.composeapp.generated.resources.nav_projects
-import dev.angussoftware.app.ui.utils.currentWindowAdaptiveInfo
+import dev.angussoftware.app.ui.utils.rememberedCurrentWindowAdaptiveInfo
 import dev.angussoftware.app.navigation.DefaultNavigationBarHeight
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.navigation.displayCurrentScreen
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.testTag
 
 
 // Define an enum class for different screens
@@ -35,12 +36,19 @@ internal enum class Screen {
     BlogPost
 }
 
+// Test tags for UI testing
+internal const val NAV_BAR_TEST_TAG = "BottomNavigationBar"
+internal const val NAV_RAIL_TEST_TAG = "NavigationRail"
+internal const val NAV_ITEM_HOME_TAG = "NavItem_Home"
+internal const val NAV_ITEM_PROJECTS_TAG = "NavItem_Projects"
+internal const val NAV_ITEM_BLOG_TAG = "NavItem_Blog"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberNavController()) {
     // Get window size information
-    val windowInfo = currentWindowAdaptiveInfo()
+    val windowInfo = rememberedCurrentWindowAdaptiveInfo()
 
     // Remember the navigation bar height state
     val navigationBarHeightState = remember { mutableStateOf(DefaultNavigationBarHeight) }
@@ -69,6 +77,7 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                                     navigationBarHeightState.value = heightInDp
                                 }
                             }
+                            .testTag(NAV_BAR_TEST_TAG)
                     ) {
                         NavigationBarItem(
                             selected = currentRoute == Screen.Home.name,
@@ -77,7 +86,8 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                             icon = { Icon(
                                 Icons.Default.Home,
                                 contentDescription = stringResource(Res.string.nav_home)
-                            ) }
+                            ) },
+                            modifier = Modifier.testTag(NAV_ITEM_HOME_TAG)
                         )
                         NavigationBarItem(
                             selected = currentRoute == Screen.Projects.name,
@@ -86,7 +96,8 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                             icon = { Icon(
                                 Icons.AutoMirrored.Filled.List,
                                 contentDescription = stringResource(Res.string.nav_projects)
-                            ) }
+                            ) },
+                            modifier = Modifier.testTag(NAV_ITEM_PROJECTS_TAG)
                         )
                         NavigationBarItem(
                             selected = currentRoute == Screen.Blog.name,
@@ -95,7 +106,8 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                             icon = { Icon(
                                 Icons.Default.Create,
                                 contentDescription = stringResource(Res.string.nav_blog)
-                            ) }
+                            ) },
+                            modifier = Modifier.testTag(NAV_ITEM_BLOG_TAG)
                         )
                     }
                 },
@@ -132,7 +144,8 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                             .wrapContentHeight(
                                 Alignment.CenterVertically,
                                 true
-                            ),
+                            )
+                            .testTag(NAV_RAIL_TEST_TAG),
                         containerColor = MaterialTheme.colorScheme.primaryContainer
                     ) {
                         NavigationRailItem(
@@ -143,7 +156,7 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                                 Icons.Default.Home,
                                 contentDescription = stringResource(Res.string.nav_home)
                             ) },
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp).testTag(NAV_ITEM_HOME_TAG)
                         )
                         NavigationRailItem(
                             selected = currentRoute == Screen.Projects.name,
@@ -153,7 +166,7 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                                 Icons.AutoMirrored.Filled.List,
                                 contentDescription = stringResource(Res.string.nav_projects)
                             ) },
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp).testTag(NAV_ITEM_PROJECTS_TAG)
                         )
                         NavigationRailItem(
                             selected = currentRoute == Screen.Blog.name,
@@ -163,7 +176,7 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                                 Icons.Default.Create,
                                 contentDescription = stringResource(Res.string.nav_blog)
                             ) },
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp).testTag(NAV_ITEM_BLOG_TAG)
                         )
                     }
                 }
