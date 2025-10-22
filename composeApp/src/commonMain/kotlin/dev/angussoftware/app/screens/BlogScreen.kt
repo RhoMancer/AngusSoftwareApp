@@ -22,6 +22,7 @@ import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.utils.rememberCommonScreenState
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.platform.testTag
 
 private const val PAGE_SIZE = 20
 
@@ -60,7 +61,9 @@ internal fun BlogScreen(navController: NavHostController? = null) {
     val isCompactScreen = common.isCompactScreen
     val tilePadding = common.tilePadding
 
-    Box {
+    Box(
+        modifier = Modifier.testTag(BLOG_SCREEN_TEST_TAG)
+    ) {
         LazyColumn(
             state = listState,
             modifier = Modifier

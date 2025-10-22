@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.platform.testTag
 
 private data class Project(
     val title: String,
@@ -160,6 +161,7 @@ internal fun ProjectsScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .testTag(PROJECTS_SCREEN_TEST_TAG)
     ) {
         LazyColumn(
             state = listState,
