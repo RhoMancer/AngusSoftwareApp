@@ -26,6 +26,7 @@ import dev.angussoftware.app.ui.utils.rememberCommonScreenState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.testTag
 
 private const val SKILL_CHIPS_PER_ROW = 3
 
@@ -62,6 +63,7 @@ internal fun HomeScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .testTag(HOME_SCREEN_TEST_TAG)
     ) {
         LazyColumn(
             state = listState,

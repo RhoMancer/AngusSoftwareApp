@@ -43,6 +43,11 @@ internal const val NAV_ITEM_HOME_TAG = "NavItem_Home"
 internal const val NAV_ITEM_PROJECTS_TAG = "NavItem_Projects"
 internal const val NAV_ITEM_BLOG_TAG = "NavItem_Blog"
 
+// Screen content tags for destination verification in tests
+internal const val HOME_SCREEN_TEST_TAG = "HomeScreen"
+internal const val PROJECTS_SCREEN_TEST_TAG = "ProjectsScreen"
+internal const val BLOG_SCREEN_TEST_TAG = "BlogScreen"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
