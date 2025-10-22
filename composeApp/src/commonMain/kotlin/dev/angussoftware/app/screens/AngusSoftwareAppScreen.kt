@@ -86,7 +86,11 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                     ) {
                         NavigationBarItem(
                             selected = currentRoute == Screen.Home.name,
-                            onClick = { navController.navigate(Screen.Home.name) },
+                            onClick = {
+                                navController.navigate(Screen.Home.name) {
+                                    launchSingleTop = true
+                                }
+                            },
                             label = { Text(stringResource(Res.string.nav_home)) },
                             icon = { Icon(
                                 Icons.Default.Home,
@@ -96,7 +100,11 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                         )
                         NavigationBarItem(
                             selected = currentRoute == Screen.Projects.name,
-                            onClick = { navController.navigate(Screen.Projects.name) },
+                            onClick = {
+                                navController.navigate(Screen.Projects.name) {
+                                    launchSingleTop = true
+                                }
+                            },
                             label = { Text(stringResource(Res.string.nav_projects)) },
                             icon = { Icon(
                                 Icons.AutoMirrored.Filled.List,
@@ -106,7 +114,11 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                         )
                         NavigationBarItem(
                             selected = currentRoute == Screen.Blog.name,
-                            onClick = { navController.navigate(Screen.Blog.name) },
+                            onClick = {
+                                navController.navigate(Screen.Blog.name) {
+                                    launchSingleTop = true
+                                }
+                            },
                             label = { Text(stringResource(Res.string.nav_blog)) },
                             icon = { Icon(
                                 Icons.Default.Create,
@@ -155,7 +167,11 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                     ) {
                         NavigationRailItem(
                             selected = currentRoute == Screen.Home.name,
-                            onClick = { navController.navigate(Screen.Home.name) },
+                            onClick = {
+                                navController.navigate(Screen.Home.name) {
+                                    launchSingleTop = true
+                                }
+                            },
                             label = { Text(stringResource(Res.string.nav_home)) },
                             icon = { Icon(
                                 Icons.Default.Home,
@@ -165,7 +181,11 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                         )
                         NavigationRailItem(
                             selected = currentRoute == Screen.Projects.name,
-                            onClick = { navController.navigate(Screen.Projects.name) },
+                            onClick = {
+                                navController.navigate(Screen.Projects.name) {
+                                    launchSingleTop = true
+                                }
+                            },
                             label = { Text(stringResource(Res.string.nav_projects)) },
                             icon = { Icon(
                                 Icons.AutoMirrored.Filled.List,
@@ -175,7 +195,11 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                         )
                         NavigationRailItem(
                             selected = currentRoute == Screen.Blog.name,
-                            onClick = { navController.navigate(Screen.Blog.name) },
+                            onClick = {
+                                navController.navigate(Screen.Blog.name) {
+                                    launchSingleTop = true
+                                }
+                            },
                             label = { Text(stringResource(Res.string.nav_blog)) },
                             icon = { Icon(
                                 Icons.Default.Create,
