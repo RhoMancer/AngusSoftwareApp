@@ -20,6 +20,7 @@ import dev.angussoftware.app.ui.utils.currentWindowAdaptiveInfo
 import angussoftwareapp.composeapp.generated.resources.Res
 import angussoftwareapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.platform.testTag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,6 +117,15 @@ internal fun BlogPostScreen(blogPost: BlogPost, onBackClick: () -> Unit) {
                         modifier = Modifier.padding(top = 12.dp)
                     )
                 }
+            }
+
+            // Test-only readout: expose the current LocalNavigationBarHeight for UI tests via a hidden tag
+            // This has negligible UX impact and helps verify inset propagation in instrumentation tests.
+            Box(modifier = Modifier.padding(0.dp)) {
+                Text(
+                    text = "${navigationBarHeight.value}",
+                    modifier = Modifier.testTag("LOCAL_NAV_BAR_HEIGHT_DP")
+                )
             }
         }
     }
