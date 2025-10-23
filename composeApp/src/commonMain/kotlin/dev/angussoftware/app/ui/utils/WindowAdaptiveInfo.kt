@@ -9,18 +9,20 @@ import androidx.compose.runtime.compositionLocalOf
 internal enum class WindowWidthSizeClass {
     COMPACT,
     MEDIUM,
-    EXPANDED;
-    
+    EXPANDED,
+    ;
+
     companion object {
         // Width breakpoints
         const val MEDIUM_WIDTH_THRESHOLD_DP = 600
         const val EXPANDED_WIDTH_THRESHOLD_DP = 840
-        
-        fun fromWidth(widthDp: Int): WindowWidthSizeClass = when {
-            widthDp < MEDIUM_WIDTH_THRESHOLD_DP -> COMPACT
-            widthDp < EXPANDED_WIDTH_THRESHOLD_DP -> MEDIUM
-            else -> EXPANDED
-        }
+
+        fun fromWidth(widthDp: Int): WindowWidthSizeClass =
+            when {
+                widthDp < MEDIUM_WIDTH_THRESHOLD_DP -> COMPACT
+                widthDp < EXPANDED_WIDTH_THRESHOLD_DP -> MEDIUM
+                else -> EXPANDED
+            }
     }
 }
 
@@ -28,7 +30,7 @@ internal enum class WindowWidthSizeClass {
  * Class containing window size information
  */
 internal data class WindowAdaptiveInfo(
-    val widthSizeClass: WindowWidthSizeClass
+    val widthSizeClass: WindowWidthSizeClass,
 ) {
     val isCompact: Boolean get() = widthSizeClass == WindowWidthSizeClass.COMPACT
     val isMedium: Boolean get() = widthSizeClass == WindowWidthSizeClass.MEDIUM
@@ -41,8 +43,6 @@ internal data class WindowAdaptiveInfo(
 @Composable
 internal expect fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo
 
-
-
 /**
  * Optional CompositionLocal to override window adaptive info, useful for tests.
  * When null (default), platform-specific currentWindowAdaptiveInfo() will be used.
@@ -53,6 +53,5 @@ internal val LocalWindowAdaptiveInfoOverride = compositionLocalOf<WindowAdaptive
  * Resolve the current WindowAdaptiveInfo, honoring any CompositionLocal override.
  */
 @Composable
-internal fun rememberedCurrentWindowAdaptiveInfo(): WindowAdaptiveInfo {
-    return LocalWindowAdaptiveInfoOverride.current ?: currentWindowAdaptiveInfo()
-}
+internal fun rememberedCurrentWindowAdaptiveInfo(): WindowAdaptiveInfo =
+    LocalWindowAdaptiveInfoOverride.current ?: currentWindowAdaptiveInfo()

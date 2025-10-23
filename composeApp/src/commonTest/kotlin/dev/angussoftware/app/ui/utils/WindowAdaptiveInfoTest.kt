@@ -6,14 +6,13 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class WindowAdaptiveInfoTest {
-
     @Test
     fun fromWidth_compact_below600() {
         assertEquals(WindowWidthSizeClass.COMPACT, WindowWidthSizeClass.fromWidth(0))
         assertEquals(WindowWidthSizeClass.COMPACT, WindowWidthSizeClass.fromWidth(200))
         assertEquals(
             WindowWidthSizeClass.COMPACT,
-            WindowWidthSizeClass.fromWidth(WindowWidthSizeClass.MEDIUM_WIDTH_THRESHOLD_DP - 1)
+            WindowWidthSizeClass.fromWidth(WindowWidthSizeClass.MEDIUM_WIDTH_THRESHOLD_DP - 1),
         )
     }
 
@@ -21,12 +20,12 @@ class WindowAdaptiveInfoTest {
     fun fromWidth_medium_600_to_839() {
         assertEquals(
             WindowWidthSizeClass.MEDIUM,
-            WindowWidthSizeClass.fromWidth(WindowWidthSizeClass.MEDIUM_WIDTH_THRESHOLD_DP)
+            WindowWidthSizeClass.fromWidth(WindowWidthSizeClass.MEDIUM_WIDTH_THRESHOLD_DP),
         )
         assertEquals(WindowWidthSizeClass.MEDIUM, WindowWidthSizeClass.fromWidth(700))
         assertEquals(
             WindowWidthSizeClass.MEDIUM,
-            WindowWidthSizeClass.fromWidth(WindowWidthSizeClass.EXPANDED_WIDTH_THRESHOLD_DP - 1)
+            WindowWidthSizeClass.fromWidth(WindowWidthSizeClass.EXPANDED_WIDTH_THRESHOLD_DP - 1),
         )
     }
 
@@ -34,7 +33,7 @@ class WindowAdaptiveInfoTest {
     fun fromWidth_expanded_840_and_above() {
         assertEquals(
             WindowWidthSizeClass.EXPANDED,
-            WindowWidthSizeClass.fromWidth(WindowWidthSizeClass.EXPANDED_WIDTH_THRESHOLD_DP)
+            WindowWidthSizeClass.fromWidth(WindowWidthSizeClass.EXPANDED_WIDTH_THRESHOLD_DP),
         )
         assertEquals(WindowWidthSizeClass.EXPANDED, WindowWidthSizeClass.fromWidth(1200))
         assertEquals(WindowWidthSizeClass.EXPANDED, WindowWidthSizeClass.fromWidth(Int.MAX_VALUE))

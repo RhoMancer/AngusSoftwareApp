@@ -2,17 +2,12 @@ package dev.angussoftware.app.ui.utils
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -69,17 +64,17 @@ internal fun rememberCommonScreenState(
     val alpha by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0f,
         animationSpec = tween(durationMillis = 1000),
-        label = "fadeIn"
+        label = "fadeIn",
     )
     LaunchedEffect(Unit) { isVisible = true }
 
     val titleAlpha by animateFloatAsState(
         targetValue = if (isCollapsed) 1f else 0f,
-        label = "topBarTitleAlpha"
+        label = "topBarTitleAlpha",
     )
     val bgAlpha by animateFloatAsState(
         targetValue = if (isCollapsed) 1f else 0f,
-        label = "topBarBgAlpha"
+        label = "topBarBgAlpha",
     )
 
     val adaptiveInfo = LocalOverrideWindowAdaptiveInfo.current ?: currentWindowAdaptiveInfo()
@@ -98,7 +93,6 @@ internal fun rememberCommonScreenState(
         appBarHeightDp = appBarHeightDp,
     )
 }
-
 
 /**
  * Pure predicate that determines whether the top app bar should be considered collapsed,

@@ -6,7 +6,9 @@
     <string name="project_api_gateway_title">API Gateway</string>
 
     <!-- Project descriptions -->
-    <string name="project_portfolio_desc">A responsive personal portfolio built with Compose Multiplatform, featuring dynamic content and smooth animations.</string>
+    <string name="project_portfolio_desc">A responsive personal portfolio built with Compose Multiplatform, featuring
+        dynamic content and smooth animations.
+    </string>
     <string name="project_task_tracker_desc">Cross-platform task management app with offline support and sync.</string>
     <string name="project_api_gateway_desc">Lightweight API gateway with authentication and rate limiting.</string>
 
@@ -27,17 +29,43 @@
 
     <!-- Home screen: About -->
     <string name="home_about_pro_title">Professional Experience</string>
-    <string name="home_about_pro_paragraph1">For work, I build what’s needed and aim to deliver the best value I can. I was trained in Android development when the timing was right, and over the years I’ve grown comfortable working across modern languages and frameworks. My strength lies in taking abstract ideas — the vision others have for their projects — and translating them into something real. I focus on refining the connections, making sure nothing is missed, and producing results that are solid and maintainable.</string>
-    <string name="home_about_pro_paragraph2">I’ve spent my career at JPMorgan Chase, starting on the Chase Pay application and later moving to their primary retail banking app. My work centers on front-end architecture: service layers, view models, MVI interfaces, use cases, Composables, fragments, and dependency management. While I don’t handle backend services or deployment, I take pride in building the pieces that make complex systems work smoothly on the client side.</string>
-    <string name="home_about_pro_paragraph3">As lead Android developer for my scrum team, I guide two to three junior developers while managing a full workload of my own. I’m known for being process-driven and detail-oriented, making sure every stage of development — from planning through testing — runs cleanly and efficiently.</string>
-    <string name="home_about_pro_paragraph4">My career has been a steady progression marked by consistent learning and refinement. I’m focused on continuing to grow, improving both the quality of what I build and the way I lead others in building it.</string>
+    <string name="home_about_pro_paragraph1">For work, I build what’s needed and aim to deliver the best value I can. I
+        was trained in Android development when the timing was right, and over the years I’ve grown comfortable working
+        across modern languages and frameworks. My strength lies in taking abstract ideas — the vision others have for
+        their projects — and translating them into something real. I focus on refining the connections, making sure
+        nothing is missed, and producing results that are solid and maintainable.
+    </string>
+    <string name="home_about_pro_paragraph2">I’ve spent my career at JPMorgan Chase, starting on the Chase Pay
+        application and later moving to their primary retail banking app. My work centers on front-end architecture:
+        service layers, view models, MVI interfaces, use cases, Composables, fragments, and dependency management. While
+        I don’t handle backend services or deployment, I take pride in building the pieces that make complex systems
+        work smoothly on the client side.
+    </string>
+    <string name="home_about_pro_paragraph3">As lead Android developer for my scrum team, I guide two to three junior
+        developers while managing a full workload of my own. I’m known for being process-driven and detail-oriented,
+        making sure every stage of development — from planning through testing — runs cleanly and efficiently.
+    </string>
+    <string name="home_about_pro_paragraph4">My career has been a steady progression marked by consistent learning and
+        refinement. I’m focused on continuing to grow, improving both the quality of what I build and the way I lead
+        others in building it.
+    </string>
     <string name="home_skills_title">Key Skills</string>
 
     <!-- Home screen: About -->
     <string name="home_about_per_title">Overly Personal</string>
-    <string name="home_about_per_paragraph1">I think a lot about how fleeting life is and how limited our time can feel, especially in the years when we’re strongest. What keeps me moving are the people I know who are also carrying their own weight but still manage to accomplish what they set out to do. They remind me that it’s possible.</string>
-    <string name="home_about_per_paragraph2">Most of what I do — whether in lifting, personal projects, or life — comes down to faith that progress is possible if I keep at it. I don’t expect huge leaps, just steady improvement over time. Slowing down or stopping tends to make things worse, but going at a reasonable pace keeps me grounded.</string>
-    <string name="home_about_per_paragraph3">When I let go of worry and realize there’s nothing urgent pressing down, I find peace in small moments — petting my animals, meditating, or just being still for a bit. I don’t expect empathy or admiration; I just want to offer a small window into who I am beyond the work. I try to keep moving forward with what I have, one step at a time.</string>
+    <string name="home_about_per_paragraph1">I think a lot about how fleeting life is and how limited our time can feel,
+        especially in the years when we’re strongest. What keeps me moving are the people I know who are also carrying
+        their own weight but still manage to accomplish what they set out to do. They remind me that it’s possible.
+    </string>
+    <string name="home_about_per_paragraph2">Most of what I do — whether in lifting, personal projects, or life — comes
+        down to faith that progress is possible if I keep at it. I don’t expect huge leaps, just steady improvement over
+        time. Slowing down or stopping tends to make things worse, but going at a reasonable pace keeps me grounded.
+    </string>
+    <string name="home_about_per_paragraph3">When I let go of worry and realize there’s nothing urgent pressing down, I
+        find peace in small moments — petting my animals, meditating, or just being still for a bit. I don’t expect
+        empathy or admiration; I just want to offer a small window into who I am beyond the work. I try to keep moving
+        forward with what I have, one step at a time.
+    </string>
 
     <!-- Home screen: Skills list -->
     <!-- Reuse tech_kotlin and tech_compose where appropriate -->
@@ -73,33 +101,42 @@
     <!-- Projects: Angus Paint -->
     <string name="project_angus_paint_title">Angus Paint</string>
     <string name="project_angus_paint_subtitle">Paint your own masterpiece with Angus Paint</string>
-    <string name="project_angus_paint_desc">Use your finger as your painting tool. Paint with any color of the rainbow. Paint with different brush sizes. Save your paintings to your device. Paint upon a picture from your device. Paint in portrait or landscape mode. Have fun, and please rate on Google Play!
+    <string name="project_angus_paint_desc">Use your finger as your painting tool. Paint with any color of the rainbow.
+        Paint with different brush sizes. Save your paintings to your device. Paint upon a picture from your device.
+        Paint in portrait or landscape mode. Have fun, and please rate on Google Play!
     </string>
 
     <!-- Projects: Angus Solitaire -->
     <string name="project_angus_solitaire_title">Angus Solitaire</string>
     <string name="project_angus_solitaire_subtitle">A new version of Solitaire invented by Angus Software</string>
-    <string name="project_angus_solitaire_desc">The objective of the game is to score as many points as possible before the deck runs out of cards.
+    <string name="project_angus_solitaire_desc">The objective of the game is to score as many points as possible before
+        the deck runs out of cards.
     </string>
 
     <!-- Projects: Blink Reader -->
     <string name="project_blink_reader_title">Blink Reader</string>
     <string name="project_blink_reader_subtitle">Read at an enhanced speed with Blink Reader</string>
-    <string name="project_blink_reader_desc">Blink Reader is an Application for the Android mobile Operating System. The purpose of the Blink Reader app is to provide its users with an Application for reading text at an enhanced speed. This enhanced reading speed is achieved by displaying one word of the text which the user is reading at a time. By displaying one word at a time, the user doesn't have to move their eyes, and can manually control the words per minute at which the text displays.
+    <string name="project_blink_reader_desc">Blink Reader is an Application for the Android mobile Operating System. The
+        purpose of the Blink Reader app is to provide its users with an Application for reading text at an enhanced
+        speed. This enhanced reading speed is achieved by displaying one word of the text which the user is reading at a
+        time. By displaying one word at a time, the user doesn't have to move their eyes, and can manually control the
+        words per minute at which the text displays.
     </string>
 
     <!-- Projects: Tap Target Booster -->
     <string name="project_tap_target_booster_title">Tap Target Booster</string>
-    <string name="project_tap_target_booster_subtitle">Improve your touching and pressing aim with this targeting game</string>
-    <string name="project_tap_target_booster_desc">With four different modes to help improve you accuracy and speed, Tap Target Booster is fun way to measure and hone your touch screen skills!
+    <string name="project_tap_target_booster_subtitle">Improve your touching and pressing aim with this targeting game
     </string>
-    
+    <string name="project_tap_target_booster_desc">With four different modes to help improve you accuracy and speed, Tap
+        Target Booster is fun way to measure and hone your touch screen skills!
+    </string>
+
     <!-- Blog screen -->
     <string name="blog_title">Rhoman₵er's Blog</string>
     <string name="blog_loading">Loading posts...</string>
     <string name="blog_empty">There are no new Posts to display.</string>
     <string name="blog_load_more">Load more posts</string>
-    
+
     <!-- Navigation labels -->
     <string name="nav_home">Home</string>
     <string name="nav_projects">Projects</string>
@@ -114,7 +151,7 @@
     <string name="ui_loading">Loading...</string>
     <string name="ui_image_placeholder">Image placeholder</string>
     <string name="ui_profile_image">Profile Image</string>
-    
+
     <!-- Blog post states -->
     <string name="blog_post_not_found">Post not found</string>
 </resources>

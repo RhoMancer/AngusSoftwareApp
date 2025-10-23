@@ -5,7 +5,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class CommonScreenStateCollapseTest {
-
     @Test
     fun collapse_when_index_gt_zero() {
         assertTrue(isCollapsedFor(listIndex = 1, listOffsetPx = 0, thresholdPx = 100))

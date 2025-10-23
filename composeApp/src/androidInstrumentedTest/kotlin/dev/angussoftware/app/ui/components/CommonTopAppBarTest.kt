@@ -5,17 +5,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.Assert.assertEquals
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.compose.ui.platform.testTag
 
 /**
  * ✅ SCREENSHOT TESTED: This test suite has been verified with screenshot testing.
@@ -24,15 +24,14 @@ import androidx.compose.ui.platform.testTag
  */
 @RunWith(AndroidJUnit4::class)
 class CommonTopAppBarTest {
-
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Confirmed compact TopAppBar renders with visible "Home" title.
      * Screenshot capture code was used during development and removed for performance.
      */
+    @Test
     fun compactMode_showsTitle() {
         setContent {
             CommonTopAppBar(
@@ -40,77 +39,77 @@ class CommonTopAppBarTest {
                 icon = null,
                 isCompactScreen = true,
                 titleAlpha = 1f,
-                bgAlpha = 1f
+                bgAlpha = 1f,
             )
         }
 
         rule.onNodeWithText("Home").assertIsDisplayed()
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Confirmed non-compact TopAppBar is shown when showNonCompact=true with visible title.
      * Screenshot capture code was used during development and removed for performance.
      */
+    @Test
     fun nonCompact_shown_whenFlagTrue() {
         setContent {
             CommonTopAppBar(
                 title = "Home",
                 icon = null,
                 isCompactScreen = false,
-                showNonCompact = true
+                showNonCompact = true,
             )
         }
 
         rule.onNodeWithText("Home").assertIsDisplayed()
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Confirmed non-compact branch is hidden when showNonCompact=false; title is absent.
      * Screenshot capture code was used during development and removed for performance.
      */
+    @Test
     fun nonCompact_hidden_whenFlagFalse() {
         setContent {
             CommonTopAppBar(
                 title = "Home",
                 icon = null,
                 isCompactScreen = false,
-                showNonCompact = false
+                showNonCompact = false,
             )
         }
 
         rule.onNodeWithText("Home").assertDoesNotExist()
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Confirmed title renders correctly without an icon (text-only).
      * Screenshot capture code was used during development and removed for performance.
      */
+    @Test
     fun titleRenders_withoutIcon() {
         setContent {
             CommonTopAppBar(
                 title = "Home",
                 icon = null,
-                isCompactScreen = true
+                isCompactScreen = true,
             )
         }
         rule.onNodeWithText("Home").assertIsDisplayed()
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Confirmed title renders with an icon (red ColorPainter) displayed next to the title.
      * Uses assertExists() to avoid emulator flakiness; screenshot capture code removed after verification.
      */
+    @Test
     fun titleRenders_withIcon() {
         val dummyPainter = ColorPainter(Color.Red)
         setContent {
             CommonTopAppBar(
                 title = "Home",
                 icon = dummyPainter,
-                isCompactScreen = true
+                isCompactScreen = true,
             )
         }
         rule.waitForIdle()
@@ -119,11 +118,11 @@ class CommonTopAppBarTest {
         rule.onNodeWithText("Home").assertExists()
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Confirmed compact mode title appears visually dimmed (alpha ≈ 0.42),
      * and the semantics property exposes the same value; screenshot capture code removed after verification.
      */
+    @Test
     fun compactMode_debugSemantics_exposes_titleAlpha() {
         val expectedAlpha = 0.42f
         setContent {
@@ -132,7 +131,7 @@ class CommonTopAppBarTest {
                 icon = null,
                 isCompactScreen = true,
                 titleAlpha = expectedAlpha,
-                debugSemantics = true
+                debugSemantics = true,
             )
         }
         rule.waitForIdle()
@@ -154,11 +153,11 @@ class CommonTopAppBarTest {
         // ScreenshotTestHelper.captureDeviceScreenshot("01_initial_state", subdirectory = "common_top_app_bar")
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Confirmed debugSemantics exposes the title tag in non-compact mode.
      * Screenshot captured during development; code removed after verification.
      */
+    @Test
     fun nonCompact_debugSemantics_exposes_titleTag() {
         setContent {
             CommonTopAppBar(
@@ -166,36 +165,38 @@ class CommonTopAppBarTest {
                 icon = null,
                 isCompactScreen = false,
                 showNonCompact = true,
-                debugSemantics = true
+                debugSemantics = true,
             )
         }
         rule.waitForIdle()
         rule.onNodeWithTag(COMMON_TOP_APP_BAR_TITLE_TAG).assertExists()
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Confirmed container modifier is applied (testTag on TopAppBar container).
      * Screenshot captured during development; code removed after verification.
      */
+    @Test
     fun container_modifier_is_applied() {
         setContent {
             CommonTopAppBar(
                 title = "Home",
                 icon = null,
                 isCompactScreen = true,
-                modifier = androidx.compose.ui.Modifier.testTag("AppBarContainer")
+                modifier =
+                    androidx.compose.ui.Modifier
+                        .testTag("AppBarContainer"),
             )
         }
         rule.waitForIdle()
         rule.onNodeWithTag("AppBarContainer").assertExists()
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Confirmed bgAlpha semantics is exposed on the container in compact mode.
      * The screenshot visually shows a dimmed primaryContainer background; semantics matches expected value.
      */
+    @Test
     fun compactMode_debugSemantics_exposes_bgAlpha() {
         val expectedBgAlpha = 0.35f
         setContent {
@@ -205,7 +206,9 @@ class CommonTopAppBarTest {
                 isCompactScreen = true,
                 bgAlpha = expectedBgAlpha,
                 debugSemantics = true,
-                modifier = androidx.compose.ui.Modifier.testTag("AppBarContainer")
+                modifier =
+                    androidx.compose.ui.Modifier
+                        .testTag("AppBarContainer"),
             )
         }
         rule.waitForIdle()
@@ -214,12 +217,12 @@ class CommonTopAppBarTest {
         assertEquals(expectedBgAlpha, actual ?: error("bgAlpha semantics missing"), 0.001f)
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Verified that when icon is provided and debugSemantics=true,
      * an explicit icon node is exposed with COMMON_TOP_APP_BAR_ICON_TAG. Screenshot code was
      * used during development and removed for performance.
      */
+    @Test
     fun iconNode_is_exposed_withDebugSemantics() {
         val dummyPainter = ColorPainter(Color.Blue)
         setContent {
@@ -227,7 +230,7 @@ class CommonTopAppBarTest {
                 title = "Home",
                 icon = dummyPainter,
                 isCompactScreen = true,
-                debugSemantics = true
+                debugSemantics = true,
             )
         }
         rule.waitForIdle()

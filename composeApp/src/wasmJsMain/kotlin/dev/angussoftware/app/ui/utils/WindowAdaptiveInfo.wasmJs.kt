@@ -26,7 +26,14 @@ internal actual fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo {
         }
     }
 
-    val widthDp = with(density) { widthPx.toFloat().toDp().value.toInt() }
+    val widthDp =
+        with(density) {
+            widthPx
+                .toFloat()
+                .toDp()
+                .value
+                .toInt()
+        }
     val widthSizeClass = WindowWidthSizeClass.fromWidth(widthDp)
     return WindowAdaptiveInfo(widthSizeClass)
 }

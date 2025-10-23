@@ -5,9 +5,9 @@ internal interface NetworkClient {
 }
 
 internal class DefaultNetworkClient(
-    private val fetcher: suspend (String) -> String = { url -> dev.angussoftware.app.blog.fetchUrlText(url) }
+    private val fetcher: suspend (String) -> String = { url ->
+        fetchUrlText(url)
+    },
 ) : NetworkClient {
-    override suspend fun fetchUrlText(url: String): String {
-        return fetcher(url)
-    }
+    override suspend fun fetchUrlText(url: String): String = fetcher(url)
 }

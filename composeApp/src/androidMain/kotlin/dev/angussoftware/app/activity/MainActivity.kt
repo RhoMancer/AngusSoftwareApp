@@ -14,7 +14,7 @@ import dev.angussoftware.app.screens.AngusSoftwareAppScreen
 internal class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         // Enable edge-to-edge display
         enableEdgeToEdge()
         setContent {
@@ -29,7 +29,7 @@ internal class MainActivity : ComponentActivity() {
     name = "ZFlip7 Front Screen",
     showBackground = true,
     widthDp = 422,
-    heightDp = 332
+    heightDp = 332,
 )
 @Composable
 private fun SmallAndroidPreview() {
@@ -39,7 +39,7 @@ private fun SmallAndroidPreview() {
 @Preview(
     name = "Phone",
     showBackground = true,
-    device = PHONE
+    device = PHONE,
 )
 @Composable
 private fun AppAndroidPreview() {
@@ -49,7 +49,7 @@ private fun AppAndroidPreview() {
 @Preview(
     name = "Pixel Tablet",
     showBackground = true,
-    device = TABLET
+    device = TABLET,
 )
 @Composable
 private fun TabletAndroidPreview() {
