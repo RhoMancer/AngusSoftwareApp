@@ -233,7 +233,7 @@ private fun AboutMeProfessionalSection(alpha: Float) {
                     Res.string.home_skill_cicd,
                 ).map { stringResource(it) }
             if (isCompactScreen && SKILL_CHIPS_PER_ROW > 0) {
-                for (i in 0..skillChipList.size - 1 step SKILL_CHIPS_PER_ROW) {
+                for (i in 0..<skillChipList.size step SKILL_CHIPS_PER_ROW) {
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
