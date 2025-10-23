@@ -96,7 +96,7 @@ object ScreenshotTestHelper {
     private const val APP_ID = "dev.angussoftware.app"
     private const val BUILD_TYPE = "debug"
     private const val BASE_DIR = "/sdcard/Download"
-    private val SCREENSHOTS_DIR = "$BASE_DIR/$APP_ID/$BUILD_TYPE/screenshots"
+    private const val SCREENSHOTS_DIR = "$BASE_DIR/$APP_ID/$BUILD_TYPE/screenshots"
 
     /**
      * Captures a device-level screenshot (entire screen).

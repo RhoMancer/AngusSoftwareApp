@@ -138,12 +138,12 @@ internal fun CommonTopAppBar(
                 Modifier
                     .alpha(titleAlpha)
                     .testTag(COMMON_TOP_APP_BAR_TITLE_TAG)
-                    .semantics { this.set(TitleAlphaKey, titleAlpha) }
+                    .semantics { this[TitleAlphaKey] = titleAlpha }
             } else {
                 Modifier.alpha(titleAlpha)
             }
         TopAppBar(
-            modifier = if (debugSemantics) modifier.semantics { this.set(BgAlphaKey, bgAlpha) } else modifier,
+            modifier = if (debugSemantics) modifier.semantics { this[BgAlphaKey] = bgAlpha } else modifier,
             title = {
                 TitleWithIcon(
                     title = title,

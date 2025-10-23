@@ -5,14 +5,16 @@ android-minSdk = "26"
 android-targetSdk = "36"
 androidx-activity = "1.11.0"
 androidx-lifecycle = "2.9.5"
+#noinspection NewerVersionAvailable
 composeMultiplatform = "1.9.0"
+#noinspection NewerVersionAvailable
 kotlin = "2.2.10"
 kover = "0.9.3"
 angusSoftware-theming = "0.0.2.30"
 nav_version = "2.9.1"
 uiautomator = "2.3.0"
-uiTestJunit4Android = "1.8.2"
-uiTestManifest = "1.8.2"
+uiTestJunit4Android = "1.9.4"
+uiTestManifest = "1.9.4"
 
 [libraries]
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestManifest" }
