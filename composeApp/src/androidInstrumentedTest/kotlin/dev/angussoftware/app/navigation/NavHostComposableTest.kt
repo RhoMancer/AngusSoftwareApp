@@ -11,13 +11,14 @@ class NavHostComposableTest {
     // :composeApp:connectedAndroidTest
     @OptIn(ExperimentalTestApi::class)
     @Test
-    fun testDisplayCurrentScreenRendersNavHost() = runComposeUiTest {
-        setContent {
-            val navController = rememberNavController()
-            displayCurrentScreen(navController)
+    fun testDisplayCurrentScreenRendersNavHost() =
+        runComposeUiTest {
+            setContent {
+                val navController = rememberNavController()
+                displayCurrentScreen(navController)
+            }
+            onNode(hasTestTag("NavHost"), useUnmergedTree = true).assertExists(
+                "NavHost should be displayed",
+            )
         }
-        onNode(hasTestTag("NavHost"), useUnmergedTree = true).assertExists(
-            "NavHost should be displayed"
-        )
-    }
 }

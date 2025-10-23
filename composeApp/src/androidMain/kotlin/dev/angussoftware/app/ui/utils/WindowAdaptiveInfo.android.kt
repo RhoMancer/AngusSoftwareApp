@@ -18,4 +18,3 @@ internal actual fun currentWindowAdaptiveInfo(): WindowAdaptiveInfo {
 
     return WindowAdaptiveInfo(widthSizeClass)
 }
-

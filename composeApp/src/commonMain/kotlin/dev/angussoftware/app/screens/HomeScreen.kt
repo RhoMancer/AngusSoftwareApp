@@ -13,20 +13,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
 import com.angussoftware.theming.compose.resources.getAngusLogoSystem
 import com.angussoftware.theming.compose.resources.getAngusSimpleLogoSystem
-import dev.angussoftware.app.ui.utils.currentWindowAdaptiveInfo
 import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
+import dev.angussoftware.app.ui.utils.currentWindowAdaptiveInfo
 import dev.angussoftware.app.ui.utils.rememberCommonScreenState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.platform.testTag
 
 private const val SKILL_CHIPS_PER_ROW = 3
 
@@ -61,20 +61,23 @@ internal fun HomeScreen() {
         if (!isCompactScreen) statusBarHeightDp + appBarHeightDp + tilePadding else statusBarHeightDp + tilePadding
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .testTag(HOME_SCREEN_TEST_TAG)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .testTag(HOME_SCREEN_TEST_TAG),
     ) {
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(
-                top = topContentPadding,
-                bottom = bottomInset + tilePadding
-            )
+            contentPadding =
+                PaddingValues(
+                    top = topContentPadding,
+                    bottom = bottomInset + tilePadding,
+                ),
         ) {
             // HERO (no card)
             item {
@@ -108,7 +111,7 @@ internal fun HomeScreen() {
             isCompactScreen = isCompactScreen,
             titleAlpha = titleAlpha,
             bgAlpha = bgAlpha,
-            icon = painterResource(getAngusSimpleLogoSystem())
+            icon = painterResource(getAngusSimpleLogoSystem()),
         )
     }
 }
@@ -122,20 +125,21 @@ internal fun HomeScreen() {
 @Composable
 private fun HeroSection(alpha: Float) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .alpha(alpha)
-            .padding(vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .alpha(alpha)
+                .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         Image(
             painter = painterResource(getAngusLogoSystem()),
             contentDescription = stringResource(Res.string.ui_profile_image),
-            modifier = Modifier
-                .fillMaxWidth(fraction = 1f/3f)
-                .aspectRatio(1f),
-            contentScale = ContentScale.Crop
+            modifier =
+                Modifier
+                    .fillMaxWidth(fraction = 1f / 3f)
+                    .aspectRatio(1f),
+            contentScale = ContentScale.Crop,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -143,7 +147,7 @@ private fun HeroSection(alpha: Float) {
         // Name
         Text(
             text = stringResource(Res.string.home_name),
-            style = MaterialTheme.typography.headlineLarge
+            style = MaterialTheme.typography.headlineLarge,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -152,7 +156,7 @@ private fun HeroSection(alpha: Float) {
         Text(
             text = stringResource(Res.string.home_title),
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.secondary
+            color = MaterialTheme.colorScheme.secondary,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -162,7 +166,7 @@ private fun HeroSection(alpha: Float) {
             text = stringResource(Res.string.home_tagline),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp),
         )
     }
 }
@@ -175,65 +179,67 @@ private fun HeroSection(alpha: Float) {
  */
 @Composable
 private fun AboutMeProfessionalSection(alpha: Float) {
-
     val isCompactScreen = currentWindowAdaptiveInfo().isCompact
 
     SectionCard(alpha = alpha) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
         ) {
             // Section Title
             Text(
                 text = stringResource(Res.string.home_about_pro_title),
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             // Professional Summary
             Text(
                 text = stringResource(Res.string.home_about_pro_paragraph1),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             Text(
                 text = stringResource(Res.string.home_about_pro_paragraph2),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             Text(
                 text = stringResource(Res.string.home_about_pro_paragraph3),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             // Skills Section
             Text(
                 text = stringResource(Res.string.home_skills_title),
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 8.dp),
             )
 
-            val skillChipList = listOf(
-                Res.string.tech_kotlin,
-                Res.string.tech_compose,
-                Res.string.home_skill_android,
-                Res.string.home_skill_javascript,
-                Res.string.home_skill_react,
-                Res.string.home_skill_nodejs,
-                Res.string.home_skill_uiux,
-                Res.string.home_skill_git,
-                Res.string.home_skill_cicd,
-            ).map { stringResource(it) }
+            val skillChipList =
+                listOf(
+                    Res.string.tech_kotlin,
+                    Res.string.tech_compose,
+                    Res.string.home_skill_android,
+                    Res.string.home_skill_javascript,
+                    Res.string.home_skill_react,
+                    Res.string.home_skill_nodejs,
+                    Res.string.home_skill_uiux,
+                    Res.string.home_skill_git,
+                    Res.string.home_skill_cicd,
+                ).map { stringResource(it) }
             if (isCompactScreen && SKILL_CHIPS_PER_ROW > 0) {
                 for (i in 0..skillChipList.size - 1 step SKILL_CHIPS_PER_ROW) {
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        skillChipList.subList(i, minOf(i + SKILL_CHIPS_PER_ROW, skillChipList.size))
+                        skillChipList
+                            .subList(i, minOf(i + SKILL_CHIPS_PER_ROW, skillChipList.size))
                             .forEach {
                                 SkillChip(it)
                             }
@@ -242,7 +248,7 @@ private fun AboutMeProfessionalSection(alpha: Float) {
             } else {
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     skillChipList.forEach {
                         SkillChip(it)
@@ -261,38 +267,38 @@ private fun AboutMeProfessionalSection(alpha: Float) {
  */
 @Composable
 private fun AboutMePersonalSection(alpha: Float) {
-
-    val isCompactScreen = currentWindowAdaptiveInfo().isCompact
+    currentWindowAdaptiveInfo().isCompact
 
     SectionCard(alpha = alpha) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
         ) {
             // Section Title
             Text(
                 text = stringResource(Res.string.home_about_per_title),
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             // Personal Summary
             Text(
                 text = stringResource(Res.string.home_about_per_paragraph1),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             Text(
                 text = stringResource(Res.string.home_about_per_paragraph2),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             Text(
                 text = stringResource(Res.string.home_about_per_paragraph3),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
         }
     }
@@ -307,20 +313,21 @@ private fun AboutMePersonalSection(alpha: Float) {
 private fun ContactSection(alpha: Float) {
     SectionCard(alpha = alpha) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
         ) {
             // Section Title
             Text(
                 text = stringResource(Res.string.home_contact_title),
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             // Email
             ContactItem(
                 title = stringResource(Res.string.home_contact_email_label),
-                content = stringResource(Res.string.home_contact_email_value)
+                content = stringResource(Res.string.home_contact_email_value),
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -328,7 +335,7 @@ private fun ContactSection(alpha: Float) {
             // Location
             ContactItem(
                 title = stringResource(Res.string.home_contact_location_label),
-                content = stringResource(Res.string.home_contact_location_value)
+                content = stringResource(Res.string.home_contact_location_value),
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -337,30 +344,30 @@ private fun ContactSection(alpha: Float) {
             Text(
                 text = stringResource(Res.string.home_connect_with_me),
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 8.dp),
             )
 
             // Social Media Links
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 SocialMediaButton(
                     platform = stringResource(Res.string.platform_linkedin),
-                    url = stringResource(Res.string.url_linkedin)
+                    url = stringResource(Res.string.url_linkedin),
                 )
                 SocialMediaButton(
                     platform = stringResource(Res.string.platform_github),
-                    url = stringResource(Res.string.url_github)
+                    url = stringResource(Res.string.url_github),
                 )
                 SocialMediaButton(
                     platform = stringResource(Res.string.platform_bluesky),
-                    url = stringResource(Res.string.url_bluesky)
+                    url = stringResource(Res.string.url_bluesky),
                 )
                 SocialMediaButton(
                     platform = stringResource(Res.string.platform_protopro),
-                    url = stringResource(Res.string.url_protopro)
+                    url = stringResource(Res.string.url_protopro),
                 )
             }
         }
@@ -374,16 +381,19 @@ private fun ContactSection(alpha: Float) {
  * @param content The actual contact information value
  */
 @Composable
-private fun ContactItem(title: String, content: String) {
+private fun ContactItem(
+    title: String,
+    content: String,
+) {
     Column {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
         )
         Text(
             text = content,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
         )
     }
 }
@@ -394,28 +404,32 @@ private fun ContactItem(title: String, content: String) {
  * @param platform The name of the social media platform
  */
 @Composable
-private fun SocialMediaButton(platform: String, url: String) {
+private fun SocialMediaButton(
+    platform: String,
+    url: String,
+) {
     val uriHandler = LocalUriHandler.current
     OutlinedCard(
         modifier = Modifier.clickable { uriHandler.openUri(url) },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
             Text(
                 text = platform,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
             Spacer(modifier = Modifier.width(6.dp))
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
                 contentDescription = stringResource(Res.string.ui_open),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
             )
         }
     }

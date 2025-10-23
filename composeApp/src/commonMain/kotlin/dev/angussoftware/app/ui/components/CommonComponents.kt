@@ -8,7 +8,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsPropertyKey
@@ -35,18 +34,20 @@ internal const val COMMON_TOP_APP_BAR_ICON_TAG: String = "CommonTopAppBarIcon"
 internal fun SectionCard(
     alpha: Float = 1f,
     modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .alpha(alpha),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .alpha(alpha),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
         ) {
             content()
         }
@@ -59,43 +60,44 @@ internal fun SectionCard(
 @Composable
 internal fun SkillChip(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
         )
     }
 }
-
 
 @Composable
 private fun TitleWithIcon(
     title: String,
     icon: Painter?,
     modifier: Modifier = Modifier,
-    debugSemantics: Boolean = false
+    debugSemantics: Boolean = false,
 ) {
     if (icon != null) {
         Row(
             modifier = modifier,
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.Start,
         ) {
             Image(
                 painter = icon,
                 contentDescription = null,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(vertical = 8.dp)
-                    .let { base -> if (debugSemantics) base.testTag(COMMON_TOP_APP_BAR_ICON_TAG) else base }
+                modifier =
+                    Modifier
+                        .fillMaxHeight()
+                        .padding(vertical = 8.dp)
+                        .let { base -> if (debugSemantics) base.testTag(COMMON_TOP_APP_BAR_ICON_TAG) else base },
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = title)
@@ -128,17 +130,18 @@ internal fun CommonTopAppBar(
     bgAlpha: Float = 1f,
     showNonCompact: Boolean = true,
     modifier: Modifier = Modifier,
-    debugSemantics: Boolean = false
+    debugSemantics: Boolean = false,
 ) {
     if (isCompactScreen) {
-        val titleModifier = if (debugSemantics) {
-            Modifier
-                .alpha(titleAlpha)
-                .testTag(COMMON_TOP_APP_BAR_TITLE_TAG)
-                .semantics { this.set(TitleAlphaKey, titleAlpha) }
-        } else {
-            Modifier.alpha(titleAlpha)
-        }
+        val titleModifier =
+            if (debugSemantics) {
+                Modifier
+                    .alpha(titleAlpha)
+                    .testTag(COMMON_TOP_APP_BAR_TITLE_TAG)
+                    .semantics { this.set(TitleAlphaKey, titleAlpha) }
+            } else {
+                Modifier.alpha(titleAlpha)
+            }
         TopAppBar(
             modifier = if (debugSemantics) modifier.semantics { this.set(BgAlphaKey, bgAlpha) } else modifier,
             title = {
@@ -146,20 +149,22 @@ internal fun CommonTopAppBar(
                     title = title,
                     icon = icon,
                     modifier = titleModifier,
-                    debugSemantics = debugSemantics
+                    debugSemantics = debugSemantics,
                 )
             },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
-                scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha)
-            )
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
+                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = bgAlpha),
+                ),
         )
     } else if (showNonCompact) {
-        val titleModifier = if (debugSemantics) {
-            Modifier.testTag(COMMON_TOP_APP_BAR_TITLE_TAG)
-        } else {
-            Modifier
-        }
+        val titleModifier =
+            if (debugSemantics) {
+                Modifier.testTag(COMMON_TOP_APP_BAR_TITLE_TAG)
+            } else {
+                Modifier
+            }
         TopAppBar(
             modifier = modifier.shadow(4.dp),
             title = {
@@ -167,13 +172,14 @@ internal fun CommonTopAppBar(
                     title = title,
                     icon = icon,
                     modifier = titleModifier,
-                    debugSemantics = debugSemantics
+                    debugSemantics = debugSemantics,
                 )
             },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                scrolledContainerColor = MaterialTheme.colorScheme.surface
-            )
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                ),
         )
     }
 }

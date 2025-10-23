@@ -1,13 +1,15 @@
 package dev.angussoftware.app.screens
 
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
@@ -17,13 +19,8 @@ import dev.angussoftware.app.ui.utils.WindowAdaptiveInfo
 import dev.angussoftware.app.ui.utils.WindowWidthSizeClass
 import org.junit.Rule
 import org.junit.Test
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 
 class AngusSoftwareAppScreenAdditionalInstrumentedTest {
-
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
@@ -37,7 +34,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         var navController: NavHostController? = null
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 val controller = rememberNavController()
                 navController = controller
@@ -51,8 +48,13 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         }
         composeTestRule.waitForIdle()
         // Read the exposed text and assert it's a positive dp value
-        val heightText = composeTestRule.onNodeWithTag("LOCAL_NAV_BAR_HEIGHT_DP").fetchSemanticsNode()
-            .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
+        val heightText =
+            composeTestRule
+                .onNodeWithTag("LOCAL_NAV_BAR_HEIGHT_DP")
+                .fetchSemanticsNode()
+                .config[androidx.compose.ui.semantics.SemanticsProperties.Text]
+                .first()
+                .text
         val heightValue = heightText.toFloatOrNull() ?: 0f
         assert(heightValue > 0f) { "Expected LocalNavigationBarHeight to be > 0.dp in compact, but was $heightValue" }
     }
@@ -67,7 +69,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         var navController: NavHostController? = null
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 val controller = rememberNavController()
                 navController = controller
@@ -96,7 +98,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
     fun repeated_clicks_on_same_item_keepsSelectionStable() {
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 AngusSoftwareAppScreen()
             }
@@ -129,7 +131,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
 
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides windowInfoState.value
+                LocalWindowAdaptiveInfoOverride provides windowInfoState.value,
             ) {
                 AngusSoftwareAppScreen()
             }
@@ -155,7 +157,6 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         composeTestRule.onNodeWithTag(PROJECTS_SCREEN_TEST_TAG).assertExists()
     }
 
-
     /**
      * ✅ SCREENSHOT TESTED on 2025-10-22: Verified non-compact mode provides LocalNavigationBarHeight == 0.dp.
      * Visual state confirmed via runtime switch tests; initial device-level capture sometimes showed launcher due to timing,
@@ -166,7 +167,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         var heightHolder: Dp = (-1).dp
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED),
             ) {
                 // In non-compact layouts, LocalNavigationBarHeight should not be provided and default to 0.dp
                 AngusSoftwareAppScreen()
@@ -191,7 +192,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
 
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides windowInfoState.value
+                LocalWindowAdaptiveInfoOverride provides windowInfoState.value,
             ) {
                 AngusSoftwareAppScreen()
             }
@@ -225,7 +226,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         var navController: NavHostController? = null
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 val controller = rememberNavController()
                 navController = controller
@@ -267,7 +268,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
     fun idempotent_between_items_navigation_keepsSelectionStable() {
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 AngusSoftwareAppScreen()
             }
@@ -301,7 +302,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         var navController: NavHostController? = null
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 val controller = rememberNavController()
                 navController = controller
@@ -329,7 +330,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         var navController: NavHostController? = null
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED),
             ) {
                 val controller = rememberNavController()
                 navController = controller
@@ -370,8 +371,13 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         // Screenshots reviewed on 2025-10-22: compact shows bottom bar before toggle
         // Wait until height becomes non-zero in compact
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            val text = composeTestRule.onNodeWithTag("LOCAL_NAV_BAR_HEIGHT_DP").fetchSemanticsNode()
-                .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
+            val text =
+                composeTestRule
+                    .onNodeWithTag("LOCAL_NAV_BAR_HEIGHT_DP")
+                    .fetchSemanticsNode()
+                    .config[androidx.compose.ui.semantics.SemanticsProperties.Text]
+                    .first()
+                    .text
             (text.toFloatOrNull() ?: 0f) > 0f
         }
         // Toggle to expanded
@@ -380,8 +386,13 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         // Screenshot after toggle to expanded - Verified manually on 2025-10-22; screenshot code removed for CI performance
         // Wait until height resets to 0.dp in expanded
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            val text = composeTestRule.onNodeWithTag("LOCAL_NAV_BAR_HEIGHT_DP").fetchSemanticsNode()
-                .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
+            val text =
+                composeTestRule
+                    .onNodeWithTag("LOCAL_NAV_BAR_HEIGHT_DP")
+                    .fetchSemanticsNode()
+                    .config[androidx.compose.ui.semantics.SemanticsProperties.Text]
+                    .first()
+                    .text
             (text.toFloatOrNull() ?: -1f) == 0f
         }
     }
@@ -408,8 +419,13 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         // Screenshot in expanded before toggle - Verified manually on 2025-10-22; screenshot code removed for CI performance
         // Confirm initial height is 0 in expanded
         run {
-            val text = composeTestRule.onNodeWithTag("LOCAL_NAV_BAR_HEIGHT_DP").fetchSemanticsNode()
-                .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
+            val text =
+                composeTestRule
+                    .onNodeWithTag("LOCAL_NAV_BAR_HEIGHT_DP")
+                    .fetchSemanticsNode()
+                    .config[androidx.compose.ui.semantics.SemanticsProperties.Text]
+                    .first()
+                    .text
             val value = text.toFloatOrNull() ?: -1f
             assert(value == 0f) { "Expected LocalNavigationBarHeight to be 0.dp in expanded, but was $value" }
         }
@@ -419,8 +435,13 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         // Screenshot after toggle to compact - Verified manually on 2025-10-22; screenshot code removed for CI performance
         // Wait until height becomes non-zero in compact
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            val text = composeTestRule.onNodeWithTag("LOCAL_NAV_BAR_HEIGHT_DP").fetchSemanticsNode()
-                .config[androidx.compose.ui.semantics.SemanticsProperties.Text].first().text
+            val text =
+                composeTestRule
+                    .onNodeWithTag("LOCAL_NAV_BAR_HEIGHT_DP")
+                    .fetchSemanticsNode()
+                    .config[androidx.compose.ui.semantics.SemanticsProperties.Text]
+                    .first()
+                    .text
             (text.toFloatOrNull() ?: 0f) > 0f
         }
     }
@@ -435,7 +456,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         var navController: NavHostController? = null
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 val controller = rememberNavController()
                 navController = controller
@@ -477,7 +498,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         var navController: NavHostController? = null
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 val controller = rememberNavController()
                 navController = controller
@@ -504,7 +525,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         var navController: NavHostController? = null
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 val controller = rememberNavController()
                 navController = controller
@@ -531,7 +552,7 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         var navController: NavHostController? = null
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 val controller = rememberNavController()
                 navController = controller
@@ -554,5 +575,4 @@ class AngusSoftwareAppScreenAdditionalInstrumentedTest {
         composeTestRule.onNodeWithTag(NAV_ITEM_HOME_TAG).assertIsSelected()
         composeTestRule.onNodeWithTag(HOME_SCREEN_TEST_TAG).assertExists()
     }
-
 }

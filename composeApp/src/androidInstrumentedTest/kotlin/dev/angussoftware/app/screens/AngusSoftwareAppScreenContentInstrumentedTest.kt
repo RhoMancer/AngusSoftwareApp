@@ -15,21 +15,20 @@ import org.junit.Rule
 import org.junit.Test
 
 class AngusSoftwareAppScreenContentInstrumentedTest {
-
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Verifies that navigating via BottomNavigationBar swaps the content area
      * to the correct destination screen in compact mode, and that selection states reflect the route.
      * Asserts presence of HOME_SCREEN_TEST_TAG, PROJECTS_SCREEN_TEST_TAG, and BLOG_SCREEN_TEST_TAG as navigation occurs.
      * Screenshot code was used during development and removed for performance.
      */
+    @Test
     fun compact_navigation_showsCorrectContent() {
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 AngusSoftwareAppScreen()
             }
@@ -59,17 +58,17 @@ class AngusSoftwareAppScreenContentInstrumentedTest {
         composeTestRule.onNodeWithTag(BLOG_SCREEN_TEST_TAG).assertExists()
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Verifies that NavigationRail interaction (non-compact mode) correctly
      * updates selection and swaps the content area to the expected destination screens.
      * Confirms rail presence and content tags on navigation.
      * Screenshot code was used during development and removed for performance.
      */
+    @Test
     fun nonCompact_navigationRail_selectionAndContent() {
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED),
             ) {
                 AngusSoftwareAppScreen()
             }

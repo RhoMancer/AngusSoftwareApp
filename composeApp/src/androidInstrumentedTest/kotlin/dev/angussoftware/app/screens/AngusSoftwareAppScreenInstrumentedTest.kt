@@ -15,19 +15,18 @@ import org.junit.Rule
 import org.junit.Test
 
 class AngusSoftwareAppScreenInstrumentedTest {
-
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Verified compact layout shows BottomNavigationBar, hides NavigationRail,
      * and NavHost is present. Screenshot code was used during development and removed for performance.
      */
+    @Test
     fun compactLayout_showsBottomNavBar() {
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 AngusSoftwareAppScreen()
             }
@@ -37,18 +36,17 @@ class AngusSoftwareAppScreenInstrumentedTest {
         composeTestRule.onNodeWithTag(NAV_BAR_TEST_TAG).assertExists()
         composeTestRule.onNodeWithTag(NAV_RAIL_TEST_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(NAV_HOST_TEST_TAG).assertExists()
-
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Verified non-compact layout shows NavigationRail, hides BottomNavigationBar,
      * and NavHost is present. Screenshot code was used during development and removed for performance.
      */
+    @Test
     fun nonCompactLayout_showsNavigationRail() {
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED),
             ) {
                 AngusSoftwareAppScreen()
             }
@@ -58,10 +56,8 @@ class AngusSoftwareAppScreenInstrumentedTest {
         composeTestRule.onNodeWithTag(NAV_RAIL_TEST_TAG).assertExists()
         composeTestRule.onNodeWithTag(NAV_BAR_TEST_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(NAV_HOST_TEST_TAG).assertExists()
-
     }
 
-    @Test
     /**
      * ✅ SCREENSHOT TESTED: Verified navigation selection toggles as expected:
      * - Initial: Home selected, Projects not selected (03_navigation_initial)
@@ -69,10 +65,11 @@ class AngusSoftwareAppScreenInstrumentedTest {
      * - After Blog click: Blog selected, Projects unselected (05_after_blog_click)
      * Screenshot code was used during development and removed for performance; assertions remain the source of truth.
      */
+    @Test
     fun navigation_clicksUpdateSelection() {
         composeTestRule.setContent {
             CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
                 AngusSoftwareAppScreen()
             }

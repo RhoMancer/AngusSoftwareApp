@@ -7,5 +7,5 @@ internal data class BlogPost(
     val pubDate: String?,
     val summary: String?,
     val imageUrl: String?,
-    val content: String?
+    val content: String?,
 )

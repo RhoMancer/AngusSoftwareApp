@@ -7,7 +7,8 @@ import kotlin.test.assertTrue
 internal class RssParserTest {
     @Test
     internal fun parsesSingleItemFromRss() {
-        val xml = """
+        val xml =
+            """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0">
               <channel>
@@ -24,7 +25,7 @@ internal class RssParserTest {
                 </item>
               </channel>
             </rss>
-        """.trimIndent()
+            """.trimIndent()
 
         val posts = RssParser.parse(xml, limit = 20)
         assertEquals(1, posts.size, "Expected one post parsed")
@@ -40,7 +41,8 @@ internal class RssParserTest {
 
     @Test
     internal fun gracefullyHandlesMissingOptionalFields() {
-        val xml = """
+        val xml =
+            """
             <rss version="2.0">
               <channel>
                 <item>
@@ -49,7 +51,7 @@ internal class RssParserTest {
                 </item>
               </channel>
             </rss>
-        """.trimIndent()
+            """.trimIndent()
 
         val posts = RssParser.parse(xml)
         assertEquals(1, posts.size)
@@ -58,4 +60,3 @@ internal class RssParserTest {
         assertTrue(post.title.isNotBlank())
     }
 }
-
