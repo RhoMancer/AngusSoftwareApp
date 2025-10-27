@@ -184,3 +184,4 @@ dependencies {
 
 apply(from = "gradle/screenshot-tasks.gradle.kts")
 apply(from = "gradle/coverage-tasks.gradle.kts")
+apply(from = "gradle/ai-doctor-demo-task.gradle.kts")
