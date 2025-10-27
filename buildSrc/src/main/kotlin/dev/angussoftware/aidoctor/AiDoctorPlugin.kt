@@ -98,6 +98,9 @@ class AiDoctorPlugin : Plugin<Project> {
 
                             val failure = result.failure ?: return
 
+                            // Determine model/timeout with precedence (no module coupling):
+                            // - Command line or this project's gradle.properties via providers
+                            // - Built-in defaults
                             val model = modelProvider.orNull ?: "gemma3"
                             val ollamaCmd = cmdProvider.orNull ?: defaultOllamaCommand()
                             val timeoutSec = (timeoutSecProvider.orNull?.toLongOrNull() ?: 60L).coerceIn(5L, 120L)
