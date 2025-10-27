@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
  * AI Doctor Gradle plugin (local Ollama CLI).
  *
  * What it does
- * - Registers a single end-of-build hook. If the build failed and the feature is enabled, it asks the
+ * - Registers a single end-of-build hook. If the build failed and the feature is branchDoctorEnabled, it asks the
  *   local Ollama CLI to analyze the failure and prints a diagnosis to the Gradle console.
  * - Provides a demo task `aiDoctorFail` that intentionally fails so you can see the diagnosis flow end-to-end.
  *
@@ -71,7 +71,7 @@ class AiDoctorPlugin : Plugin<Project> {
         val redactProvider = project.providers.gradleProperty("aiDoctorRedact")
         val ciEnabledProvider = project.providers.gradleProperty("aiDoctorCiEnabled")
 
-        // Hook once per build, at the end. Register only when explicitly enabled and when
+        // Hook once per build, at the end. Register only when explicitly branchDoctorEnabled and when
         // configuration cache is NOT requested; otherwise, Gradle forbids listener registration.
         val willEnable = (enabledProvider.orNull == "true")
         val ccRequested =
