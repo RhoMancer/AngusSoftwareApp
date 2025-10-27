@@ -29,14 +29,20 @@
  *
  * ## Configuration Variables
  *
- * These variables must match the configuration in ScreenshotTestHelper.kt:
+ * The screenshot helper now computes the device path dynamically at runtime using the
+ * installed app's package (applicationId) and the active build type. To keep Gradle tasks
+ * aligned without hard-coding, this script derives the device path from two Gradle properties
+ * with sensible defaults:
+ * - screenshotAppId: defaults to the app's current applicationId (dev.angussoftware.app)
+ * - screenshotBuildType: defaults to "debug"
  *
- * Screenshot system configuration - MUST match ScreenshotTestHelper.kt constants
- *
+ * You can override them when running tasks, for example:
+ *   gradlew :composeApp:connectedDebugAndroidTest -PscreenshotBuildType=debug
+ *   gradlew :composeApp:fetchScreenshots -PscreenshotAppId=com.example.debug -PscreenshotBuildType=debug
  */
 
-val appId = "dev.angussoftware.app" // Application ID for namespacing
-val buildType = "debug" // Build type (debug/release)
+val appId = (findProperty("screenshotAppId") as String?) ?: "dev.angussoftware.app" // Application ID for namespacing. Override with -PscreenshotAppId=com.example
+val buildType = (findProperty("screenshotBuildType") as String?) ?: "debug" // Build type (debug/release). Override with -PscreenshotBuildType=release
 val screenshotsDeviceDir = "/sdcard/Download/$appId/$buildType/screenshots" // Device storage path
 val screenshotsLocalDir = file("screenshots") // Local project directory for screenshots
 
@@ -214,8 +220,8 @@ tasks.register<Exec>("clearScreenshots") {
  * 3. Ensure device/emulator is connected: `adb devices`
  *
  * **Screenshots not fetched:**
- * 1. Check device path exists: `adb shell ls -la /sdcard/Download/dev.angussoftware.app/debug/screenshots/`
- * 2. Manually pull: `adb pull /sdcard/Download/dev.angussoftware.app/debug/screenshots/ ./composeApp/screenshots/`
+ * 1. Check device path exists: `adb shell ls -la /sdcard/Download/${appId}/${buildType}/screenshots/`
+ * 2. Manually pull: `adb pull /sdcard/Download/${appId}/${buildType}/screenshots/ ./composeApp/screenshots/`
  * 3. Check ADB connection and permissions
  *
  * **Task failures:**
@@ -224,9 +230,9 @@ tasks.register<Exec>("clearScreenshots") {
  * 3. Verify ADB is in PATH and device is authorized
  *
  * **Configuration mismatch:**
- * 1. Ensure appId and buildType match ScreenshotTestHelper.kt constants
- * 2. Verify SCREENSHOTS_DIR path construction is identical
- * 3. Check that APP_ID = "dev.angussoftware.app" matches applicationId
+ * 1. Ensure the runtime path (computed in ScreenshotTestHelper) and these Gradle properties resolve to the same device directory.
+ * 2. If needed, override with -PscreenshotAppId=<finalApplicationId> and/or -PscreenshotBuildType=<variant> when running tasks.
+ * 3. Prefer running connectedDebugAndroidTest so the defaults (debug + app's applicationId) are correct.
  */
 tasks.matching { it.name == "connectedDebugAndroidTest" }.configureEach {
     // BEFORE tests: create directory (ensures screenshots have storage location)

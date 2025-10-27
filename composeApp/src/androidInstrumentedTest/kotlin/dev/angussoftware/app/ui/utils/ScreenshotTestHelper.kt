@@ -93,10 +93,20 @@ import java.io.FileOutputStream
  */
 object ScreenshotTestHelper {
     private const val TAG = "ScreenshotTest"
-    private const val APP_ID = "dev.angussoftware.app"
-    private const val BUILD_TYPE = "debug"
-    private const val BASE_DIR = "/sdcard/Download"
-    private const val SCREENSHOTS_DIR = "$BASE_DIR/$APP_ID/$BUILD_TYPE/screenshots"
+
+    // Compute the screenshots directory dynamically so it always matches the installed app
+    // and the active build variant (no hard-coded appId/buildType).
+    private fun computeScreenshotsDir(): String {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val appId = instrumentation.targetContext.packageName
+        val buildType = runCatching {
+            val clazz = instrumentation.targetContext.classLoader.loadClass("${appId}.BuildConfig")
+            val field = clazz.getField("BUILD_TYPE")
+            field.get(null) as String
+        }.getOrElse { "debug" }
+        val baseDir = "/sdcard/Download"
+        return "$baseDir/$appId/$buildType/screenshots"
+    }
 
     /**
      * Captures a device-level screenshot (entire screen).
@@ -161,12 +171,12 @@ object ScreenshotTestHelper {
         fileName: String,
         subdirectory: String,
     ) {
-        val targetDir =
-            if (subdirectory.isNotEmpty()) {
-                File(SCREENSHOTS_DIR, subdirectory)
-            } else {
-                File(SCREENSHOTS_DIR)
-            }
+        val baseDir = computeScreenshotsDir()
+        val targetDir = if (subdirectory.isNotEmpty()) {
+            File(baseDir, subdirectory)
+        } else {
+            File(baseDir)
+        }
 
         if (!targetDir.exists()) {
             val created = targetDir.mkdirs()
