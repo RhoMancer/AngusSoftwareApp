@@ -141,3 +141,40 @@ See CONTRIBUTING.md
 
 ## License
 No open-source license has been selected yet. Until a license is added, all rights are reserved by the author. If you intend to use code from this repository, please open an issue to discuss licensing first.
+
+## Code Coverage
+
+This project is configured to generate code coverage reports for both:
+- Unit tests (via Kover)
+- Android instrumented tests (via the Android Gradle Plugin + JaCoCo)
+
+Prerequisites
+- An emulator or device must be running for instrumented tests.
+
+Generate unit test coverage (HTML)
+```bash
+# Module-level Kover report
+gradlew :composeApp:koverHtmlReport
+```
+Report location:
+- composeApp/build/reports/kover/html/index.html
+
+Generate Android instrumented test coverage (HTML)
+```bash
+# Runs connected instrumented tests and produces a JaCoCo coverage report
+gradlew :composeApp:androidInstrumentedCoverage
+```
+Report location:
+- composeApp/build/reports/jacoco/androidConnectedTest/html/index.html
+
+Generate both coverage reports together
+```bash
+gradlew :composeApp:fullCoverageReport
+```
+This will:
+- Run unit-test coverage (Kover) → composeApp/build/reports/kover/html/index.html
+- Run Android instrumented coverage (JaCoCo) → composeApp/build/reports/jacoco/androidConnectedTest/html/index.html
+
+Notes
+- Coverage for instrumented tests is enabled for the debug build type (test coverage is turned on in Gradle).
+- If the instrumented coverage task isn’t found, ensure you are on a recent Android Gradle Plugin and try running with `--info` to inspect available tasks.
