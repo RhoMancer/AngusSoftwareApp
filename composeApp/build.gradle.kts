@@ -13,6 +13,44 @@ plugins {
     alias(libs.plugins.kover)
 }
 
+// --- AI Doctor policy for composeApp ---------------------------------------------------------
+// This module is set up to run AI Doctor by default and to avoid the Gradle configuration cache
+// when AI Doctor is enabled. AI Doctor relies on an end-of-build listener that Gradle skips when
+// the configuration cache is requested, so diagnostics would not run under the cache.
+//
+// Defaults (see gradle.properties):
+// - aiDoctor=true  -> enables AI Doctor by default so failed builds print a diagnosis
+// - org.gradle.configuration-cache=false -> disables the configuration cache by default for reliability
+//
+// How to temporarily override per run:
+// - Disable AI Doctor for this run:
+//     gradlew <tasks> -PaiDoctor=false
+// - OR allow configuration cache (diagnostics will be skipped):
+//     gradlew <tasks> --configuration-cache -PaiDoctorEnforceNoConfigCache=false
+//
+// Why you might want to run with configuration cache:
+// - It can significantly speed up repeated Gradle invocations by reusing configuration state.
+// - Particularly useful in CI for faster, more deterministic builds when you don't need interactive
+//   AI diagnostics in the logs.
+//
+// Guard: fail fast if configuration cache is requested while AI Doctor enforcement is on.
+val aiDoctorEnabledForRun = (providers.gradleProperty("aiDoctor").orNull ?: "true").equals("true", ignoreCase = true)
+val aiDoctorEnforceNoConfigCache =
+    (
+        providers
+            .gradleProperty(
+                "aiDoctorEnforceNoConfigCache",
+            ).orNull ?: "true"
+    ).equals("true", ignoreCase = true)
+if (aiDoctorEnabledForRun && aiDoctorEnforceNoConfigCache && gradle.startParameter.isConfigurationCacheRequested) {
+    throw org.gradle.api.GradleException(
+        "composeApp: Configuration cache requested but AI Doctor is enabled. Rerun with --no-configuration-cache, " +
+            "or override with -PaiDoctorEnforceNoConfigCache=false, or disable AI Doctor with -PaiDoctor=false. " +
+            "Note: under configuration cache Gradle skips end-of-build listeners, so AI diagnosis will not run.",
+    )
+}
+// ------------------------------------------------------------------------------------------------
+
 kover {
     merge {
         subprojects()
