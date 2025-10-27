@@ -15,7 +15,7 @@ plugins {
 
 // --- AI Doctor policy for composeApp ---------------------------------------------------------
 // This module is set up to run AI Doctor by default and to avoid the Gradle configuration cache
-// when AI Doctor is enabled. AI Doctor relies on an end-of-build listener that Gradle skips when
+// when AI Doctor is branchDoctorEnabled. AI Doctor relies on an end-of-build listener that Gradle skips when
 // the configuration cache is requested, so diagnostics would not run under the cache.
 //
 // Defaults (see gradle.properties):
@@ -44,7 +44,7 @@ val aiDoctorEnforceNoConfigCache =
     ).equals("true", ignoreCase = true)
 if (aiDoctorEnabledForRun && aiDoctorEnforceNoConfigCache && gradle.startParameter.isConfigurationCacheRequested) {
     throw org.gradle.api.GradleException(
-        "composeApp: Configuration cache requested but AI Doctor is enabled. Rerun with --no-configuration-cache, " +
+        "composeApp: Configuration cache requested but AI Doctor is branchDoctorEnabled. Rerun with --no-configuration-cache, " +
             "or override with -PaiDoctorEnforceNoConfigCache=false, or disable AI Doctor with -PaiDoctor=false. " +
             "Note: under configuration cache Gradle skips end-of-build listeners, so AI diagnosis will not run.",
     )
