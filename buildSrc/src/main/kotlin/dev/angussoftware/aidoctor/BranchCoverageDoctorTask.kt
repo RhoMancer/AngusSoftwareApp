@@ -739,20 +739,43 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         val tErr = Thread { proc.errorStream.copyTo(stderr) }
         tOut.start()
         tErr.start()
+        // Send prompt via stdin to start generation
         try {
             proc.outputStream.use { os ->
                 os.write(prompt.toByteArray(Charsets.UTF_8))
                 os.flush()
             }
         } catch (_: Exception) {
+            // ignore
         }
-        val finished = proc.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS)
-        if (!finished) {
+
+        // Progress ticker: log every second until the process finishes or times out
+        val totalSec = timeout.seconds.coerceAtLeast(1)
+        var elapsedSec = 0L
+        while (true) {
+            val finishedOneSec = proc.waitFor(1, TimeUnit.SECONDS)
+            elapsedSec = (elapsedSec + 1).coerceAtMost(totalSec)
+            val remaining = (totalSec - elapsedSec).coerceAtLeast(0)
+            logger.lifecycle("[BranchDoctor] [AI] ${elapsedSec} / ${totalSec}s , ${remaining}s until AI timeout")
+            if (finishedOneSec) break
+            if (elapsedSec >= totalSec) break
+        }
+
+        if (proc.isAlive) {
+            // Timed out
+            logger.lifecycle("[BranchDoctor] [AI] Timed out after ${elapsedSec}s. Collecting partial output...")
             proc.destroyForcibly()
-            tOut.join(100)
-            tErr.join(100)
-            return "Ollama timed out after ${timeout.seconds}s. Increase with -PbranchDoctorTimeoutSec."
+            tOut.join(200)
+            tErr.join(200)
+            val partial = stdout.toString("UTF-8").ifBlank { stderr.toString("UTF-8") }
+            return buildString {
+                append(partial)
+                if (partial.isNotBlank()) append("\n\n")
+                append("AI timed out after ${elapsedSec} seconds")
+            }
         }
+
+        // Completed within time
         tOut.join(200)
         tErr.join(200)
         val code = proc.exitValue()

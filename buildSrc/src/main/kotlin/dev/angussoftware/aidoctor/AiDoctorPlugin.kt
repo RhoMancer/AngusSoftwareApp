@@ -157,6 +157,7 @@ class AiDoctorPlugin : Plugin<Project> {
                                         prompt = clippedPrompt,
                                         workingDir = project.rootDir,
                                         timeout = Duration.ofSeconds(timeoutSec),
+                                        logger = project.logger,
                                     )
                                 } catch (e: Exception) {
                                     project.logger.lifecycle("[AI Doctor] Ollama invocation failed: ${e::class.simpleName}: ${e.message}")
@@ -216,6 +217,7 @@ class AiDoctorPlugin : Plugin<Project> {
         prompt: String,
         workingDir: File,
         timeout: Duration,
+        logger: org.gradle.api.logging.Logger,
     ): String {
         // Use: `ollama run <model>` and feed the prompt via STDIN (portable across CLI versions)
         val cmd = listOf(command, "run", model)
@@ -250,12 +252,30 @@ class AiDoctorPlugin : Plugin<Project> {
             // Ignore stdin write errors; we'll surface stderr/stdout below
         }
 
-        val finished = process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS)
-        if (!finished) {
+        // Progress ticker: log every second until finished or timeout
+        val totalSec = timeout.seconds.coerceAtLeast(1)
+        var elapsedSec = 0L
+        while (true) {
+            val finishedOneSec = process.waitFor(1, TimeUnit.SECONDS)
+            elapsedSec = (elapsedSec + 1).coerceAtMost(totalSec)
+            val remaining = (totalSec - elapsedSec).coerceAtLeast(0)
+            logger.lifecycle("[AI Doctor] ${elapsedSec} / ${totalSec}s , ${remaining}s until AI timeout")
+            if (finishedOneSec) break
+            if (elapsedSec >= totalSec) break
+        }
+
+        if (process.isAlive) {
+            // Timed out — collect partial output and do not fail hard
+            logger.lifecycle("[AI Doctor] Timed out after ${elapsedSec}s. Collecting partial output...")
             process.destroyForcibly()
-            outThread.join(100)
-            errThread.join(100)
-            return "Ollama timed out after ${timeout.seconds}s. You can increase with -PaiDoctorTimeoutSec."
+            outThread.join(200)
+            errThread.join(200)
+            val partial = stdout.toString("UTF-8").ifBlank { stderr.toString("UTF-8") }
+            return buildString {
+                append(partial)
+                if (partial.isNotBlank()) append("\n\n")
+                append("AI timed out after ${elapsedSec} seconds")
+            }
         }
 
         outThread.join(200)
