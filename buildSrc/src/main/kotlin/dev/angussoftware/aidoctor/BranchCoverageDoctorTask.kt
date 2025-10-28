@@ -190,13 +190,16 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                 finalPromptUsed = if (redact.getOrElse(true)) redactSensitive(clipped) else clipped
                 aiResponse =
                     askOllama(ollamaCmd.get(), model.get(), finalPromptUsed!!, project.rootDir, Duration.ofSeconds(timeoutSec.get().toLong()))
+
+                // Inject code windows next to the model's per-line recommendations where possible.
+                val (enhancedResponse, injectedCount) = injectCodeWindowsIntoResponse(aiResponse ?: "", aiData)
+                val finalResponse = if (injectedCount > 0) enhancedResponse else enhancedResponse + buildCodeAppendix(aiData)
+
                 outputAiMd.asFile.get().writeText(
                     "## Branch Coverage Doctor — AI Suggestions\n\n" +
                         "Model: ${model.get()}\n\n" +
                         "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(true)}  | MinCoveredBranchesForAi: ${minCbAi}\n\n" +
-                        "### Prompt (as sent to CLI)\n" +
-                        "```\n" + finalPromptUsed + "\n```\n\n" +
-                        aiResponse + "\n",
+                        finalResponse + "\n",
                 )
             }
         }
@@ -559,6 +562,118 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         sb.appendLine(
             "Output format per file:\n- Bullets of missing logical scenarios\n- Specific test steps / UI flows\n- Optional refactor suggestions to increase testability",
         )
+        return sb.toString()
+    }
+
+    // Injects code windows directly after headings in the AI response.
+    // Recognizes headings like "### HomeScreen.kt" and line anchors like "#### Line 47:" or "- Line 47".
+    private fun injectCodeWindowsIntoResponse(response: String, data: ReportDataDetailed): Pair<String, Int> {
+        if (response.isBlank()) return response to 0
+
+        // Build lookup: baseFileName (lowercased) -> (line -> pair(file, enrichedLine))
+        val fileMap: Map<String, Map<Int, Pair<FileFindingsDetailed, EnrichedLine>>> = data.files.associate { f ->
+            val base = File(f.path).name.lowercase()
+            val lines = f.lines.associateBy({ it.line }, { f to it })
+            base to lines
+        }
+
+        val lines = response.lines().toMutableList()
+        val out = StringBuilder()
+        var injected = 0
+        var i = 0
+        var currentFileKey: String? = null
+
+        fun wouldFollowWithCodeFence(startIdx: Int): Boolean {
+            val end = minOf(lines.size, startIdx + 5)
+            for (k in startIdx until end) {
+                val t = lines[k].trimStart()
+                if (t.startsWith("```")) return true
+                if (t.startsWith("####") || t.startsWith("###") || t.startsWith("##")) return false
+            }
+            return false
+        }
+
+        while (i < lines.size) {
+            val raw = lines[i]
+            val trimmed = raw.trim()
+
+            // Detect file heading patterns
+            val fileHeading = extractFileKeyFromHeading(trimmed)
+            if (fileHeading != null) {
+                currentFileKey = fileHeading
+                out.appendLine(raw)
+                i++
+                continue
+            }
+
+            // Detect line anchors within a file context
+            val lineNum = extractLineNumber(trimmed)
+            if (lineNum != null && currentFileKey != null) {
+                val hit = fileMap[currentFileKey!!]?.get(lineNum)
+                out.appendLine(raw)
+                if (hit != null && !wouldFollowWithCodeFence(i + 1)) {
+                    val code = formatCodeBlockForLine(hit.first, hit.second)
+                    out.append(code)
+                    injected++
+                }
+                i++
+                continue
+            }
+
+            out.appendLine(raw)
+            i++
+        }
+
+        return out.toString() to injected
+    }
+
+    private fun extractFileKeyFromHeading(heading: String): String? {
+        // Examples accepted:
+        //   "### HomeScreen.kt"
+        //   "## File: dev/angus/.../HomeScreen.kt"
+        //   "File: dev/.../HomeScreen.kt  (missed: 5)"
+        val ktOrJava = Regex("""([A-Za-z0-9_]+\.(kt|java))""")
+        val m = ktOrJava.find(heading)
+        return m?.groups?.get(1)?.value?.lowercase()
+    }
+
+    private fun extractLineNumber(text: String): Int? {
+        // Matches many variants, anywhere in the line (bold, bullets, numbered lists):
+        // "1. **Line 47**:", "- Line 47", "#### Line 47:", "Line 47"
+        val r = Regex("\\bLine\\s+(\\d+)", RegexOption.IGNORE_CASE)
+        val m = r.find(text)
+        return m?.groups?.get(1)?.value?.toIntOrNull()
+    }
+
+    private fun formatCodeBlockForLine(file: FileFindingsDetailed, l: EnrichedLine): String {
+        val sb = StringBuilder()
+        sb.appendLine()
+        sb.appendLine("```kotlin")
+        val start = l.window.start
+        l.window.lines.forEachIndexed { idx, t ->
+            val no = start + idx
+            val mark = if (no == l.line) "▶" else " "
+            sb.appendLine("$mark ${no.toString().padStart(4, ' ')} | $t")
+        }
+        sb.appendLine("```")
+        sb.appendLine()
+        return sb.toString()
+    }
+
+    private fun buildCodeAppendix(data: ReportDataDetailed): String {
+        val sb = StringBuilder()
+        sb.appendLine()
+        sb.appendLine("---")
+        sb.appendLine()
+        sb.appendLine("### Code windows (appendix)")
+        data.files.forEach { f ->
+            sb.appendLine()
+            sb.appendLine("#### ${f.path}")
+            f.lines.forEach { l ->
+                sb.appendLine("Line ${l.line}: mb=${l.mb}, cb=${l.cb}, type=${l.classification}")
+                sb.append(formatCodeBlockForLine(f, l))
+            }
+        }
         return sb.toString()
     }
 
