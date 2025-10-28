@@ -170,6 +170,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
 
         // Optional AI step
         if (willRunAi) {
+            logger.lifecycle("[BranchDoctor] [AI] Preparing analysis from coverage data...")
             // Filter lines for AI based on covered branches threshold
             val aiFiles = limited.files.mapNotNull { f ->
                 val eligibleLines = f.lines.filter { it.cb >= minCbAi }
@@ -178,6 +179,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             val aiData = limited.copy(totalMissed = aiFiles.sumOf { it.totalMissed }, files = aiFiles)
 
             if (aiData.files.isEmpty()) {
+                logger.lifecycle("[BranchDoctor] [AI] No eligible lines for AI (minCoveredBranchesForAi=$minCbAi). Skipping Ollama call.")
                 outputAiMd.asFile.get().writeText(
                     "## Branch Coverage Doctor — AI Suggestions\n\n" +
                         "Model: ${model.get()}\n\n" +
@@ -185,14 +187,23 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                         "No lines eligible for AI analysis. Threshold minCoveredBranchesForAi=${minCbAi} excluded lines with cb < ${minCbAi}.\n",
                 )
             } else {
+                val fileCount = aiData.files.size
+                val lineCount = aiData.files.sumOf { it.lines.size }
+                logger.lifecycle("[BranchDoctor] [AI] Building prompt for $fileCount file(s), $lineCount line(s) (contextLines=$ctx, minCbAi=$minCbAi, redact=${redact.getOrElse(true)}).")
                 val prompt = buildAiPrompt(aiData)
                 val clipped = clipPrompt(prompt, maxPrompt.get())
                 finalPromptUsed = if (redact.getOrElse(true)) redactSensitive(clipped) else clipped
+                logger.lifecycle("[BranchDoctor] [AI] Prompt prepared (length=${finalPromptUsed!!.length} chars, maxPrompt=${maxPrompt.get()}).")
+                val startNs = System.nanoTime()
+                logger.lifecycle("[BranchDoctor] [AI] Invoking Ollama CLI '${ollamaCmd.get()}' (model=${model.get()}, timeout=${timeoutSec.get()}s). This may take a while...")
                 aiResponse =
                     askOllama(ollamaCmd.get(), model.get(), finalPromptUsed!!, project.rootDir, Duration.ofSeconds(timeoutSec.get().toLong()))
+                val durSec = (System.nanoTime() - startNs) / 1_000_000_000.0
+                logger.lifecycle("[BranchDoctor] [AI] Ollama call finished in ${"%.1f".format(durSec)}s (responseLength=${aiResponse?.length ?: 0}).")
 
                 // Inject code windows next to the model's per-line recommendations where possible.
                 val (enhancedResponse, injectedCount) = injectCodeWindowsIntoResponse(aiResponse ?: "", aiData)
+                logger.lifecycle("[BranchDoctor] [AI] Injected $injectedCount code window(s) into AI response.")
                 val finalResponse = if (injectedCount > 0) enhancedResponse else enhancedResponse + buildCodeAppendix(aiData)
 
                 outputAiMd.asFile.get().writeText(
@@ -201,7 +212,16 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                         "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(true)}  | MinCoveredBranchesForAi: ${minCbAi}\n\n" +
                         finalResponse + "\n",
                 )
+                logger.lifecycle("[BranchDoctor] [AI] Suggestions written: ${outputAiMd.asFile.get().absolutePath}")
             }
+        } else {
+            val isCi = System.getenv("CI")?.equals("true", ignoreCase = true) == true
+            val reason = when {
+                !aiEnabled.getOrElse(false) -> "aiEnabled=false"
+                isCi && !ciEnabled.getOrElse(false) -> "CI=true and ciEnabled=false"
+                else -> "not requested"
+            }
+            logger.lifecycle("[BranchDoctor] [AI] Skipped ($reason).")
         }
 
         // Write metadata for debugging (before enforcing thresholds)
