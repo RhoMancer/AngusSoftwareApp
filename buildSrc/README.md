@@ -74,6 +74,7 @@ Source: buildSrc/src/main/kotlin/dev/angussoftware/aidoctor/AiDoctorPlugin.kt
   - outputJson, outputMd, outputAiMd, outputMeta.
 - AI behavior and CI gating
   - AI suggestions run only when aiEnabled=true. If `CI=true`, they additionally require ciEnabled=true.
+  - Lines are eligible for AI only if their covered branches (cb) >= `branchDoctorMinCoveredBranchesForAi` (default 1). By default, lines with cb=0 are not sent to AI.
   - The prompt is clipped to maxPrompt characters and can redact HOME/PROJECT_ROOT.
   - Ollama is invoked as `listOf(command, "run", model)`; the prompt is fed via STDIN; a timeout is enforced.
 - Threshold enforcement
@@ -123,6 +124,7 @@ AI configuration properties used by composeApp wiring:
 - -PbranchDoctorTimeoutSec=<5..120>          CLI timeout seconds (default 60).
 - -PbranchDoctorMaxPrompt=<1000..30000>      Max prompt characters (default 6000).
 - -PbranchDoctorRedact=true|false            Redact HOME/PROJECT_ROOT in prompt (default true).
+- -PbranchDoctorMinCoveredBranchesForAi=<int> Minimum covered branches (cb) for a line to be considered by AI (default 1).
 
 Notes:
 - The XML is generated at composeApp/build/reports/jacoco/androidConnectedTest/report.xml by the provided task.

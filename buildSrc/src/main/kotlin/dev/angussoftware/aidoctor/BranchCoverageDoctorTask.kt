@@ -25,6 +25,10 @@ import org.xml.sax.InputSource
  */
 @CacheableTask
 abstract class BranchCoverageDoctorTask : DefaultTask() {
+    init {
+        // Default: exclude lines with zero covered branches from AI suggestions
+        minCoveredBranchesForAi.convention(1)
+    }
     // Inputs
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -45,6 +49,10 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
 
     @get:Input
     abstract val contextLines: Property<Int> // default 5, -1 = whole file
+
+    /** Minimum covered branches (cb) required for a line to be included in AI analysis; default 1. */
+    @get:Input
+    abstract val minCoveredBranchesForAi: Property<Int>
 
     @get:Optional
     @get:Input
@@ -102,6 +110,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         val sources = sourceRoots.getOrElse(emptyList()).map(::File)
         val ctx = contextLines.getOrElse(5)
         val topN = topNFiles.orNull?.takeIf { it > 0 }
+        val minCbAi = minCoveredBranchesForAi.getOrElse(1).coerceAtLeast(0)
 
         val willRunAi = aiShouldRun()
         var finalPromptUsed: String? = null
@@ -132,6 +141,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                 topNFiles.orNull,
                 failIfMissedBranches.orNull,
                 failIfMissedBranchesPerFile.orNull,
+                minCbAi,
                 model.getOrElse("gemma3"),
                 ollamaCmd.getOrElse(if (System.getProperty("os.name").lowercase().contains("win")) "ollama.exe" else "ollama"),
                 timeoutSec.getOrElse(60),
@@ -160,21 +170,35 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
 
         // Optional AI step
         if (willRunAi) {
-            val prompt = buildAiPrompt(limited)
-            val clipped = clipPrompt(prompt, maxPrompt.get())
-            finalPromptUsed = if (redact.getOrElse(true)) redactSensitive(clipped) else clipped
-            aiResponse =
-                askOllama(ollamaCmd.get(), model.get(), finalPromptUsed!!, project.rootDir, Duration.ofSeconds(timeoutSec.get().toLong()))
-            outputAiMd.asFile.get().writeText(
-                "## Branch Coverage Doctor — AI Suggestions\n\n" +
-                    "Model: ${model.get()}\n\n" +
-                    "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(
-                        true,
-                    )}\n\n" +
-                    "### Prompt (as sent to CLI)\n" +
-                    "```\n" + finalPromptUsed + "\n```\n\n" +
-                    aiResponse + "\n",
-            )
+            // Filter lines for AI based on covered branches threshold
+            val aiFiles = limited.files.mapNotNull { f ->
+                val eligibleLines = f.lines.filter { it.cb >= minCbAi }
+                if (eligibleLines.isEmpty()) null else f.copy(totalMissed = eligibleLines.sumOf { it.mb }, lines = eligibleLines)
+            }
+            val aiData = limited.copy(totalMissed = aiFiles.sumOf { it.totalMissed }, files = aiFiles)
+
+            if (aiData.files.isEmpty()) {
+                outputAiMd.asFile.get().writeText(
+                    "## Branch Coverage Doctor — AI Suggestions\n\n" +
+                        "Model: ${model.get()}\n\n" +
+                        "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(true)}  | MinCoveredBranchesForAi: ${minCbAi}\n\n" +
+                        "No lines eligible for AI analysis. Threshold minCoveredBranchesForAi=${minCbAi} excluded lines with cb < ${minCbAi}.\n",
+                )
+            } else {
+                val prompt = buildAiPrompt(aiData)
+                val clipped = clipPrompt(prompt, maxPrompt.get())
+                finalPromptUsed = if (redact.getOrElse(true)) redactSensitive(clipped) else clipped
+                aiResponse =
+                    askOllama(ollamaCmd.get(), model.get(), finalPromptUsed!!, project.rootDir, Duration.ofSeconds(timeoutSec.get().toLong()))
+                outputAiMd.asFile.get().writeText(
+                    "## Branch Coverage Doctor — AI Suggestions\n\n" +
+                        "Model: ${model.get()}\n\n" +
+                        "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(true)}  | MinCoveredBranchesForAi: ${minCbAi}\n\n" +
+                        "### Prompt (as sent to CLI)\n" +
+                        "```\n" + finalPromptUsed + "\n```\n\n" +
+                        aiResponse + "\n",
+                )
+            }
         }
 
         // Write metadata for debugging (before enforcing thresholds)
@@ -190,6 +214,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             topNFiles.orNull,
             failIfMissedBranches.orNull,
             failIfMissedBranchesPerFile.orNull,
+            minCbAi,
             model.getOrElse("gemma3"),
             ollamaCmd.getOrElse(if (System.getProperty("os.name").lowercase().contains("win")) "ollama.exe" else "ollama"),
             timeoutSec.getOrElse(60),
@@ -442,6 +467,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         topNFiles: Int?,
         failIfMissedBranches: Int?,
         failIfMissedBranchesPerFile: Int?,
+        minCoveredBranchesForAi: Int,
         model: String,
         ollamaCmd: String,
         timeoutSec: Int,
@@ -477,7 +503,8 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         sb.append("    \"contextLines\": ").append(contextLines).append(",\n")
         sb.append("    \"topNFiles\": ").append(topNFiles?.toString() ?: "null").append(",\n")
         sb.append("    \"failIfMissedBranches\": ").append(failIfMissedBranches?.toString() ?: "null").append(",\n")
-        sb.append("    \"failIfMissedBranchesPerFile\": ").append(failIfMissedBranchesPerFile?.toString() ?: "null").append("\n")
+        sb.append("    \"failIfMissedBranchesPerFile\": ").append(failIfMissedBranchesPerFile?.toString() ?: "null").append(",\n")
+        sb.append("    \"minCoveredBranchesForAi\": ").append(minCoveredBranchesForAi).append("\n")
         sb.append("  },\n")
         sb.append("  \"ai\": {\n")
         sb.append("    \"willRunAi\": ").append(willRunAi).append(",\n")
