@@ -94,7 +94,10 @@ class AiDoctorPlugin : Plugin<Project> {
 
                             val isCi = System.getenv("CI")?.equals("true", ignoreCase = true) == true
                             val ciEnabled = (ciEnabledProvider.orNull == "true")
-                            if (isCi && !ciEnabled) return
+                            if (isCi && !ciEnabled) {
+                                project.logger.lifecycle("[AI Doctor] Skipped on CI (aiDoctorCiEnabled=false).")
+                                return
+                            }
 
                             val failure = result.failure ?: return
 
@@ -141,6 +144,11 @@ class AiDoctorPlugin : Plugin<Project> {
                             val prompt = if (redact) redactSensitive(promptRaw, project) else promptRaw
                             val clippedPrompt = clip(prompt, maxPrompt)
 
+                            project.logger.lifecycle("[AI Doctor] Build failed; starting AI diagnosis (model=$model, timeout=${timeoutSec}s, maxPrompt=$maxPrompt, redact=$redact).")
+                            project.logger.lifecycle("[AI Doctor] Prompt prepared (length=${clippedPrompt.length} chars).")
+                            project.logger.lifecycle("[AI Doctor] Invoking Ollama CLI '$ollamaCmd'... This may take a while.")
+                            val startNs = System.nanoTime()
+
                             val analysis =
                                 try {
                                     askOllamaCli(
@@ -151,7 +159,11 @@ class AiDoctorPlugin : Plugin<Project> {
                                         timeout = Duration.ofSeconds(timeoutSec),
                                     )
                                 } catch (e: Exception) {
+                                    project.logger.lifecycle("[AI Doctor] Ollama invocation failed: ${e::class.simpleName}: ${e.message}")
                                     "AI analysis failed: ${e::class.simpleName}: ${e.message}"
+                                }.also {
+                                    val durSec = (System.nanoTime() - startNs) / 1_000_000_000.0
+                                    project.logger.lifecycle("[AI Doctor] AI diagnosis finished in ${"%.1f".format(durSec)}s (responseLength=${it.length}).")
                                 }
 
                             project.logger.quiet(
