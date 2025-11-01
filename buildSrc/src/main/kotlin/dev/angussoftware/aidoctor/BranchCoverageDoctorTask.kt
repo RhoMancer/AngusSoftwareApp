@@ -182,15 +182,32 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             logger.lifecycle("[BranchDoctor] [AI] Preparing analysis from coverage data...")
             // Filter lines for AI based on covered branches threshold
             // Then cap the total number of lines analyzed by AI across all files (maxAiAnalyses)
-            val allEligible = mutableListOf<Pair<FileFindingsDetailed, EnrichedLine>>()
+            // Prioritize lines by highest percentage of covered branches (cb / (cb + mb)) so that
+            // when trimming occurs, the most partially-covered lines remain.
+            data class Eligible(val file: FileFindingsDetailed, val line: EnrichedLine, val pctCovered: Double)
+            val allEligible = mutableListOf<Eligible>()
             limited.files.forEach { f ->
-                f.lines.forEach { l -> if (l.cb >= minCbAi) allEligible += f to l }
+                f.lines.forEach { l ->
+                    if (l.cb >= minCbAi) {
+                        val total = (l.cb + l.mb).coerceAtLeast(1) // guard against 0
+                        val pct = l.cb.toDouble() / total.toDouble()
+                        allEligible += Eligible(f, l, pct)
+                    }
+                }
             }
             val totalEligible = allEligible.size
-            val selected = allEligible.take(maxAi)
+            val selectedTriples = allEligible
+                .sortedWith(
+                    compareByDescending<Eligible> { it.pctCovered }
+                        .thenByDescending { it.line.cb }
+                        .thenBy { it.file.path }
+                        .thenBy { it.line.line }
+                )
+                .take(maxAi)
+            val selected = selectedTriples.map { it.file to it.line }
             if (totalEligible > 0) {
                 logger.lifecycle(
-                    "[BranchDoctor] [AI] Eligible lines: ${'$'}totalEligible, selected: ${'$'}{selected.size} (maxAiAnalyses=${'$'}maxAi)",
+                    "[BranchDoctor] [AI] Eligible lines: ${'$'}totalEligible, selected: ${'$'}{selected.size} (maxAiAnalyses=${'$'}maxAi, ordering=coverage% desc)",
                 )
             }
             val grouped: List<FileFindingsDetailed> =
@@ -481,7 +498,12 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             sb.append("      \"sourceFile\": \"").append(esc(f.sourceFile)).append("\",\n")
             sb.append("      \"totalMissed\": ").append(f.totalMissed).append(",\n")
             sb.append("      \"lines\": [\n")
-            f.lines.forEachIndexed { j, l ->
+            val sortedLines = f.lines.sortedWith(
+                compareByDescending<EnrichedLine> { it.cb.toDouble() / (it.cb + it.mb).coerceAtLeast(1).toDouble() }
+                    .thenByDescending { it.cb }
+                    .thenBy { it.line }
+            )
+            sortedLines.forEachIndexed { j, l ->
                 if (j > 0) sb.append(",\n")
                 sb.append("        {\n")
                 sb.append("          \"line\": ").append(l.line).append(",\n")
@@ -523,7 +545,12 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             sb.appendLine("### ${f.path}  (missed: ${f.totalMissed})")
             sb.appendLine("Source: ${f.sourceFile}")
             sb.appendLine()
-            f.lines.forEach { l ->
+            val sortedLines = f.lines.sortedWith(
+                compareByDescending<EnrichedLine> { it.cb.toDouble() / (it.cb + it.mb).coerceAtLeast(1).toDouble() }
+                    .thenByDescending { it.cb }
+                    .thenBy { it.line }
+            )
+            sortedLines.forEach { l ->
                 sb.appendLine("- Line ${l.line}: mb=${l.mb}, cb=${l.cb}, type=${l.classification}")
                 sb.appendLine()
                 sb.appendLine("```kotlin")
