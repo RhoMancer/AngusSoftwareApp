@@ -7,11 +7,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.nio.charset.Charset
 import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 /**
  * AI Doctor Gradle plugin (local Ollama CLI).
@@ -92,7 +88,7 @@ class AiDoctorPlugin : Plugin<Project> {
                             val enabled = (enabledProvider.orNull == "true")
                             if (!enabled) return
 
-                            val isCi = System.getenv("CI")?.equals("true", ignoreCase = true) == true
+                            val isCi = Os.isCi()
                             val ciEnabled = (ciEnabledProvider.orNull == "true")
                             if (isCi && !ciEnabled) {
                                 project.logger.lifecycle("[AI Doctor] Skipped on CI (aiDoctorCiEnabled=false).")
