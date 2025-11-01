@@ -152,7 +152,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                 minCbAi,
                 maxAi,
                 model.getOrElse("gemma3"),
-                ollamaCmd.getOrElse(if (System.getProperty("os.name").lowercase().contains("win")) "ollama.exe" else "ollama"),
+                ollamaCmd.getOrElse(Os.defaultOllamaCommand()),
                 timeoutSec.getOrElse(60),
                 maxPrompt.getOrElse(6000),
                 redact.getOrElse(true),
@@ -243,8 +243,8 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                     )}).",
                 )
                 val prompt = buildAiPrompt(aiData)
-                val clipped = clipPrompt(prompt, maxPrompt.get())
-                finalPromptUsed = if (redact.getOrElse(true)) redactSensitive(clipped) else clipped
+                val clipped = AiText.clip(prompt, maxPrompt.get())
+                finalPromptUsed = if (redact.getOrElse(true)) AiText.redactSensitive(clipped, project.rootDir) else clipped
                 logger.lifecycle(
                     "[BranchDoctor] [AI] Prompt prepared (length=${finalPromptUsed!!.length} chars, maxPrompt=${maxPrompt.get()}).",
                 )
@@ -253,12 +253,16 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                     "[BranchDoctor] [AI] Invoking Ollama CLI '${ollamaCmd.get()}' (model=${model.get()}, timeout=${timeoutSec.get()}s). This may take a while...",
                 )
                 aiResponse =
-                    askOllama(
-                        ollamaCmd.get(),
-                        model.get(),
-                        finalPromptUsed!!,
-                        project.rootDir,
-                        Duration.ofSeconds(timeoutSec.get().toLong()),
+                    OllamaClient.run(
+                        config = OllamaClient.Config(
+                            command = ollamaCmd.get(),
+                            model = model.get(),
+                            workingDir = project.rootDir,
+                            timeout = Duration.ofSeconds(timeoutSec.get().toLong()),
+                            logTag = "BranchDoctor [AI]",
+                        ),
+                        prompt = finalPromptUsed!!,
+                        logger = logger,
                     )
                 val durSec = (System.nanoTime() - startNs) / 1_000_000_000.0
                 logger.lifecycle(
@@ -307,7 +311,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             minCbAi,
             maxAi,
             model.getOrElse("gemma3"),
-            ollamaCmd.getOrElse(if (System.getProperty("os.name").lowercase().contains("win")) "ollama.exe" else "ollama"),
+            ollamaCmd.getOrElse(Os.defaultOllamaCommand()),
             timeoutSec.getOrElse(60),
             maxPrompt.getOrElse(6000),
             redact.getOrElse(true),
@@ -339,10 +343,10 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
     }
 
     private fun aiShouldRun(): Boolean {
-        if (!aiEnabled.getOrElse(false)) return false
-        val isCi = System.getenv("CI")?.equals("true", ignoreCase = true) == true
-        if (isCi && !ciEnabled.getOrElse(false)) return false
-        return true
+        return AiGate.shouldRun(
+            aiEnabled = aiEnabled.getOrElse(false),
+            ciEnabled = ciEnabled.getOrElse(false),
+        )
     }
 
     // ---------------- XML parsing and models ----------------
@@ -804,93 +808,6 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         return sb.toString()
     }
 
-    private fun clipPrompt(
-        text: String,
-        maxLen: Int,
-    ): String {
-        val m = maxLen.coerceIn(1000, 30000)
-        return if (text.length <= m) text else text.take(m) + "\n... [clipped]"
-    }
-
-    private fun redactSensitive(input: String): String {
-        var out = input
-        val home = System.getProperty("user.home")?.let { File(it).absolutePath }
-        val root = project.rootDir.absolutePath
-        if (!home.isNullOrBlank()) {
-            val homeEsc = Regex.escape(home)
-            out = out.replace(Regex(homeEsc, RegexOption.IGNORE_CASE), "<HOME>")
-        }
-        val rootEsc = Regex.escape(root)
-        out = out.replace(Regex(rootEsc, RegexOption.IGNORE_CASE), "<PROJECT_ROOT>")
-        return out
-    }
-
-    private fun askOllama(
-        command: String,
-        model: String,
-        prompt: String,
-        workingDir: File,
-        timeout: Duration,
-    ): String {
-        val cmd = listOf(command, "run", model)
-        val pb = ProcessBuilder(cmd).directory(workingDir).redirectErrorStream(false)
-        val proc =
-            try {
-                pb.start()
-            } catch (e: Exception) {
-                throw GradleException("Failed to start Ollama CLI ('$command'). Is it installed and on PATH? ${e.message}")
-            }
-        val stdout = ByteArrayOutputStream()
-        val stderr = ByteArrayOutputStream()
-        val tOut = Thread { proc.inputStream.copyTo(stdout) }
-        val tErr = Thread { proc.errorStream.copyTo(stderr) }
-        tOut.start()
-        tErr.start()
-        // Send prompt via stdin to start generation
-        try {
-            proc.outputStream.use { os ->
-                os.write(prompt.toByteArray(Charsets.UTF_8))
-                os.flush()
-            }
-        } catch (_: Exception) {
-            // ignore
-        }
-
-        // Progress ticker: log every second until the process finishes or times out
-        val totalSec = timeout.seconds.coerceAtLeast(1)
-        var elapsedSec = 0L
-        while (true) {
-            val finishedOneSec = proc.waitFor(1, TimeUnit.SECONDS)
-            elapsedSec = (elapsedSec + 1).coerceAtMost(totalSec)
-            val remaining = (totalSec - elapsedSec).coerceAtLeast(0)
-            logger.lifecycle("[BranchDoctor] [AI] $elapsedSec / ${totalSec}s , ${remaining}s until AI timeout")
-            if (finishedOneSec) break
-            if (elapsedSec >= totalSec) break
-        }
-
-        if (proc.isAlive) {
-            // Timed out
-            logger.lifecycle("[BranchDoctor] [AI] Timed out after ${elapsedSec}s. Collecting partial output...")
-            proc.destroyForcibly()
-            tOut.join(200)
-            tErr.join(200)
-            val partial = stdout.toString("UTF-8").ifBlank { stderr.toString("UTF-8") }
-            return buildString {
-                append(partial)
-                if (partial.isNotBlank()) append("\n\n")
-                append("AI timed out after $elapsedSec seconds")
-            }
-        }
-
-        // Completed within time
-        tOut.join(200)
-        tErr.join(200)
-        val code = proc.exitValue()
-        val out = stdout.toString("UTF-8")
-        val err = stderr.toString("UTF-8")
-        if (code != 0 && out.isBlank()) return "Ollama exited with code $code. Error: ${if (err.isBlank()) "<no stderr>" else err}"
-        return if (out.isNotBlank()) out else err.ifBlank { "<no output>" }
-    }
 }
 
 // ---------------- Data models ----------------
