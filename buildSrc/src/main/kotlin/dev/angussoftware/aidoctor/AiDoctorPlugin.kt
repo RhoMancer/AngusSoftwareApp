@@ -105,7 +105,7 @@ class AiDoctorPlugin : Plugin<Project> {
                             // - Command line or this project's gradle.properties via providers
                             // - Built-in defaults
                             val model = modelProvider.orNull ?: "gemma3"
-                            val ollamaCmd = cmdProvider.orNull ?: defaultOllamaCommand()
+                            val ollamaCmd = cmdProvider.orNull ?: Os.defaultOllamaCommand()
                             val timeoutSec = (timeoutSecProvider.orNull?.toLongOrNull() ?: 60L).coerceIn(5L, 120L)
                             val maxPrompt = (maxPromptProvider.orNull?.toIntOrNull() ?: 6000).coerceIn(1000, 30000)
                             val redact =
@@ -116,7 +116,7 @@ class AiDoctorPlugin : Plugin<Project> {
 
                             // Build prompt
                             val stack = failure.stackTraceToString()
-                            val clippedStack = clip(stack, maxPrompt / 2) // keep room for headers
+                            val clippedStack = AiText.clip(stack, maxPrompt / 2) // keep room for headers
                             val envMeta =
                                 buildString {
                                     appendLine("Gradle: ${project.gradle.gradleVersion}")
@@ -141,22 +141,28 @@ class AiDoctorPlugin : Plugin<Project> {
                                 - Any relevant Gradle flags or diagnostics to run
                                 """.trimIndent()
 
-                            val prompt = if (redact) redactSensitive(promptRaw, project) else promptRaw
-                            val clippedPrompt = clip(prompt, maxPrompt)
+                            val prompt = if (redact) AiText.redactSensitive(promptRaw, project.rootDir) else promptRaw
+                            val clippedPrompt = AiText.clip(prompt, maxPrompt)
 
-                            project.logger.lifecycle("[AI Doctor] Build failed; starting AI diagnosis (model=$model, timeout=${timeoutSec}s, maxPrompt=$maxPrompt, redact=$redact).")
+                            project.logger.lifecycle(
+                                "[AI Doctor] Build failed; starting AI diagnosis (model=$model, timeout=${timeoutSec}s, maxPrompt=$maxPrompt, redact=$redact).",
+                            )
                             project.logger.lifecycle("[AI Doctor] Prompt prepared (length=${clippedPrompt.length} chars).")
                             project.logger.lifecycle("[AI Doctor] Invoking Ollama CLI '$ollamaCmd'... This may take a while.")
                             val startNs = System.nanoTime()
 
                             val analysis =
                                 try {
-                                    askOllamaCli(
-                                        command = ollamaCmd,
-                                        model = model,
+                                    OllamaClient.run(
+                                        config =
+                                            OllamaClient.Config(
+                                                command = ollamaCmd,
+                                                model = model,
+                                                workingDir = project.rootDir,
+                                                timeout = Duration.ofSeconds(timeoutSec),
+                                                logTag = "AI Doctor",
+                                            ),
                                         prompt = clippedPrompt,
-                                        workingDir = project.rootDir,
-                                        timeout = Duration.ofSeconds(timeoutSec),
                                         logger = project.logger,
                                     )
                                 } catch (e: Exception) {
@@ -164,7 +170,9 @@ class AiDoctorPlugin : Plugin<Project> {
                                     "AI analysis failed: ${e::class.simpleName}: ${e.message}"
                                 }.also {
                                     val durSec = (System.nanoTime() - startNs) / 1_000_000_000.0
-                                    project.logger.lifecycle("[AI Doctor] AI diagnosis finished in ${"%.1f".format(durSec)}s (responseLength=${it.length}).")
+                                    project.logger.lifecycle(
+                                        "[AI Doctor] AI diagnosis finished in ${"%.1f".format(durSec)}s (responseLength=${it.length}).",
+                                    )
                                 }
 
                             project.logger.quiet(
@@ -183,113 +191,6 @@ class AiDoctorPlugin : Plugin<Project> {
             group = "Help"
             description = "Intentionally fails the build to demo AI diagnosis. Provide message with -PaiMessage=..."
         }
-    }
-
-    private fun defaultOllamaCommand(): String = if (isWindows()) "ollama.exe" else "ollama"
-
-    private fun isWindows(): Boolean = System.getProperty("os.name").lowercase().contains("win")
-
-    private fun clip(
-        text: String,
-        maxLen: Int,
-    ): String = if (text.length <= maxLen) text else text.take(maxLen) + "\n... [clipped]"
-
-    private fun redactSensitive(
-        input: String,
-        project: Project,
-    ): String {
-        var out = input
-        val home = System.getProperty("user.home")?.let { File(it).absolutePath }
-        val root = project.rootDir.absolutePath
-        if (!home.isNullOrBlank()) {
-            // Normalize slashes for both Windows and Unix paths
-            val homeEscaped = Regex.escape(home)
-            out = out.replace(Regex(homeEscaped, RegexOption.IGNORE_CASE), "<HOME>")
-        }
-        val rootEscaped = Regex.escape(root)
-        out = out.replace(Regex(rootEscaped, RegexOption.IGNORE_CASE), "<PROJECT_ROOT>")
-        return out
-    }
-
-    private fun askOllamaCli(
-        command: String,
-        model: String,
-        prompt: String,
-        workingDir: File,
-        timeout: Duration,
-        logger: org.gradle.api.logging.Logger,
-    ): String {
-        // Use: `ollama run <model>` and feed the prompt via STDIN (portable across CLI versions)
-        val cmd = listOf(command, "run", model)
-        val processBuilder =
-            ProcessBuilder(cmd)
-                .directory(workingDir)
-                .redirectErrorStream(false)
-
-        val process: Process =
-            try {
-                processBuilder.start()
-            } catch (e: Exception) {
-                throw GradleException("Failed to start Ollama CLI ('$command'). Is it installed and on PATH? ${e.message}")
-            }
-
-        val stdout = ByteArrayOutputStream()
-        val stderr = ByteArrayOutputStream()
-
-        val outThread = Thread { process.inputStream.copyTo(stdout) }
-        val errThread = Thread { process.errorStream.copyTo(stderr) }
-        outThread.start()
-        errThread.start()
-
-        // Write the prompt to stdin and close it, so the CLI starts generating
-        try {
-            val bytes = prompt.toByteArray(Charsets.UTF_8)
-            process.outputStream.use { os ->
-                os.write(bytes)
-                os.flush()
-            }
-        } catch (_: Exception) {
-            // Ignore stdin write errors; we'll surface stderr/stdout below
-        }
-
-        // Progress ticker: log every second until finished or timeout
-        val totalSec = timeout.seconds.coerceAtLeast(1)
-        var elapsedSec = 0L
-        while (true) {
-            val finishedOneSec = process.waitFor(1, TimeUnit.SECONDS)
-            elapsedSec = (elapsedSec + 1).coerceAtMost(totalSec)
-            val remaining = (totalSec - elapsedSec).coerceAtLeast(0)
-            logger.lifecycle("[AI Doctor] ${elapsedSec} / ${totalSec}s , ${remaining}s until AI timeout")
-            if (finishedOneSec) break
-            if (elapsedSec >= totalSec) break
-        }
-
-        if (process.isAlive) {
-            // Timed out — collect partial output and do not fail hard
-            logger.lifecycle("[AI Doctor] Timed out after ${elapsedSec}s. Collecting partial output...")
-            process.destroyForcibly()
-            outThread.join(200)
-            errThread.join(200)
-            val partial = stdout.toString("UTF-8").ifBlank { stderr.toString("UTF-8") }
-            return buildString {
-                append(partial)
-                if (partial.isNotBlank()) append("\n\n")
-                append("AI timed out after ${elapsedSec} seconds")
-            }
-        }
-
-        outThread.join(200)
-        errThread.join(200)
-
-        val code = process.exitValue()
-        val outStr = stdout.toString("UTF-8")
-        val errStr = stderr.toString("UTF-8")
-
-        if (code != 0 && outStr.isBlank()) {
-            return "Ollama exited with code $code. Error: ${errStr.ifBlank { "<no stderr>" }}"
-        }
-        // The CLI prints the model’s full response to stdout
-        return outStr.ifBlank { errStr.ifBlank { "<no output>" } }
     }
 }
 
