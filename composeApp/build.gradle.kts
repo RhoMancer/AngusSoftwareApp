@@ -13,40 +13,35 @@ plugins {
     alias(libs.plugins.kover)
 }
 
-// --- AI Doctor policy for composeApp ---------------------------------------------------------
-// This module is set up to run AI Doctor by default and to avoid the Gradle configuration cache
-// when AI Doctor is branchDoctorEnabled. AI Doctor relies on an end-of-build listener that Gradle skips when
+// --- Build Failure analysis policy for composeApp --------------------------------------------
+// This module can run build failure analysis by default and avoid the Gradle configuration cache
+// when the analysis is enabled. The analysis relies on an end-of-build listener that Gradle skips when
 // the configuration cache is requested, so diagnostics would not run under the cache.
 //
 // Defaults (see gradle.properties):
-// - aiDoctor=true  -> enables AI Doctor by default so failed builds print a diagnosis
+// - buildFailureEnabled=true  -> enables analysis by default so failed builds print a diagnosis
 // - org.gradle.configuration-cache=false -> disables the configuration cache by default for reliability
 //
 // How to temporarily override per run:
-// - Disable AI Doctor for this run:
-//     gradlew <tasks> -PaiDoctor=false
+// - Disable analysis for this run:
+//     gradlew <tasks> -PbuildFailureEnabled=false
 // - OR allow configuration cache (diagnostics will be skipped):
-//     gradlew <tasks> --configuration-cache -PaiDoctorEnforceNoConfigCache=false
+//     gradlew <tasks> --configuration-cache -PbuildFailureEnforceNoConfigCache=false
 //
-// Why you might want to run with configuration cache:
-// - It can significantly speed up repeated Gradle invocations by reusing configuration state.
-// - Particularly useful in CI for faster, more deterministic builds when you don't need interactive
-//   AI diagnostics in the logs.
-//
-// Guard: fail fast if configuration cache is requested while AI Doctor enforcement is on.
-val aiDoctorEnabledForRun = (providers.gradleProperty("aiDoctor").orNull ?: "true").equals("true", ignoreCase = true)
-val aiDoctorEnforceNoConfigCache =
+// Guard: fail fast if configuration cache is requested while enforcement is on.
+val buildFailureEnabledForRun = (providers.gradleProperty("buildFailureEnabled").orNull ?: "true").equals("true", ignoreCase = true)
+val buildFailureEnforceNoConfigCache =
     (
         providers
             .gradleProperty(
-                "aiDoctorEnforceNoConfigCache",
+                "buildFailureEnforceNoConfigCache",
             ).orNull ?: "true"
     ).equals("true", ignoreCase = true)
-if (aiDoctorEnabledForRun && aiDoctorEnforceNoConfigCache && gradle.startParameter.isConfigurationCacheRequested) {
+if (buildFailureEnabledForRun && buildFailureEnforceNoConfigCache && gradle.startParameter.isConfigurationCacheRequested) {
     throw org.gradle.api.GradleException(
-        "composeApp: Configuration cache requested but AI Doctor is branchDoctorEnabled. Rerun with --no-configuration-cache, " +
-            "or override with -PaiDoctorEnforceNoConfigCache=false, or disable AI Doctor with -PaiDoctor=false. " +
-            "Note: under configuration cache Gradle skips end-of-build listeners, so AI diagnosis will not run.",
+        "composeApp: Configuration cache requested but build-failure analysis is enabled. Rerun with --no-configuration-cache, " +
+            "or override with -PbuildFailureEnforceNoConfigCache=false, or disable analysis with -PbuildFailureEnabled=false. " +
+            "Note: under configuration cache Gradle skips end-of-build listeners, so analysis will not run.",
     )
 }
 // ------------------------------------------------------------------------------------------------
@@ -184,4 +179,4 @@ dependencies {
 
 apply(from = "gradle/screenshot-tasks.gradle.kts")
 apply(from = "gradle/coverage-tasks.gradle.kts")
-apply(from = "gradle/ai-doctor-demo-task.gradle.kts")
+apply(from = "gradle/build-failure-demo-task.gradle.kts")
