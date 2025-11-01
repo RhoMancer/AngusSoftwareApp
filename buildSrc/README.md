@@ -125,6 +125,7 @@ AI configuration properties used by composeApp wiring:
 - -PbranchDoctorMaxPrompt=<1000..30000>      Max prompt characters (default 6000).
 - -PbranchDoctorRedact=true|false            Redact HOME/PROJECT_ROOT in prompt (default true).
 - -PbranchDoctorMinCoveredBranchesForAi=<int> Minimum covered branches (cb) for a line to be considered by AI (default 1).
+- -PbranchDoctorMaxAiAnalyses=<int>     Maximum number of lines to include in AI analysis across all files (default 20).
 
 Notes:
 - The XML is generated at composeApp/build/reports/jacoco/androidConnectedTest/report.xml by the provided task.

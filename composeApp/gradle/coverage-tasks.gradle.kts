@@ -158,6 +158,10 @@ tasks.register<BranchCoverageDoctorTask>("androidCoverageBranchDoctor") {
     maxPrompt.set(providers.gradleProperty("branchDoctorMaxPrompt").map { (it.toIntOrNull() ?: 6000).coerceIn(1000, 30000) }.orElse(6000))
     redact.set(providers.gradleProperty("branchDoctorRedact").map { it.equals("true", true) }.orElse(true))
 
+    // AI selection thresholds
+    minCoveredBranchesForAi.set(providers.gradleProperty("branchDoctorMinCoveredBranchesForAi").map { it.toIntOrNull() ?: 1 }.orElse(1))
+    maxAiAnalyses.set(providers.gradleProperty("branchDoctorMaxAiAnalyses").map { (it.toIntOrNull() ?: 20).coerceAtLeast(1) }.orElse(20))
+
     // Outputs live next to the JaCoCo XML
     val reportDirProvider = xmlReport.map { it.asFile.parentFile }
     outputJson.set(layout.file(reportDirProvider.map { File(it, "branch-gaps.json") }))
