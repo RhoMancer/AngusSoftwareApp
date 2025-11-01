@@ -6,15 +6,15 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.StringReader
 import java.time.Duration
 import java.util.concurrent.TimeUnit
-import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.XMLConstants
-import org.xml.sax.EntityResolver
-import org.xml.sax.InputSource
+import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * Parses a JaCoCo XML report to identify lines with missed branches (mb > 0),
@@ -28,7 +28,10 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
     init {
         // Default: exclude lines with zero covered branches from AI suggestions
         minCoveredBranchesForAi.convention(1)
+        // Default: cap the number of lines analyzed by AI to avoid overly long prompts
+        maxAiAnalyses.convention(20)
     }
+
     // Inputs
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -53,6 +56,10 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
     /** Minimum covered branches (cb) required for a line to be included in AI analysis; default 1. */
     @get:Input
     abstract val minCoveredBranchesForAi: Property<Int>
+
+    /** Maximum number of lines to include in AI analysis across all files; default 20. */
+    @get:Input
+    abstract val maxAiAnalyses: Property<Int>
 
     @get:Optional
     @get:Input
@@ -111,6 +118,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         val ctx = contextLines.getOrElse(5)
         val topN = topNFiles.orNull?.takeIf { it > 0 }
         val minCbAi = minCoveredBranchesForAi.getOrElse(1).coerceAtLeast(0)
+        val maxAi = maxAiAnalyses.getOrElse(20).coerceAtLeast(1)
 
         val willRunAi = aiShouldRun()
         var finalPromptUsed: String? = null
@@ -142,6 +150,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                 failIfMissedBranches.orNull,
                 failIfMissedBranchesPerFile.orNull,
                 minCbAi,
+                maxAi,
                 model.getOrElse("gemma3"),
                 ollamaCmd.getOrElse(if (System.getProperty("os.name").lowercase().contains("win")) "ollama.exe" else "ollama"),
                 timeoutSec.getOrElse(60),
@@ -172,34 +181,72 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         if (willRunAi) {
             logger.lifecycle("[BranchDoctor] [AI] Preparing analysis from coverage data...")
             // Filter lines for AI based on covered branches threshold
-            val aiFiles = limited.files.mapNotNull { f ->
-                val eligibleLines = f.lines.filter { it.cb >= minCbAi }
-                if (eligibleLines.isEmpty()) null else f.copy(totalMissed = eligibleLines.sumOf { it.mb }, lines = eligibleLines)
+            // Then cap the total number of lines analyzed by AI across all files (maxAiAnalyses)
+            val allEligible = mutableListOf<Pair<FileFindingsDetailed, EnrichedLine>>()
+            limited.files.forEach { f ->
+                f.lines.forEach { l -> if (l.cb >= minCbAi) allEligible += f to l }
             }
-            val aiData = limited.copy(totalMissed = aiFiles.sumOf { it.totalMissed }, files = aiFiles)
+            val totalEligible = allEligible.size
+            val selected = allEligible.take(maxAi)
+            if (totalEligible > 0) {
+                logger.lifecycle(
+                    "[BranchDoctor] [AI] Eligible lines: ${'$'}totalEligible, selected: ${'$'}{selected.size} (maxAiAnalyses=${'$'}maxAi)",
+                )
+            }
+            val grouped: List<FileFindingsDetailed> =
+                if (selected.isEmpty()) {
+                    emptyList()
+                } else {
+                    selected
+                        .groupBy({ it.first.path }) { it }
+                        .map { (_, pairs) ->
+                            val file = pairs.first().first
+                            val lines = pairs.map { it.second }
+                            file.copy(totalMissed = lines.sumOf { it.mb }, lines = lines)
+                        }
+                }
+            val aiData = limited.copy(totalMissed = grouped.sumOf { it.totalMissed }, files = grouped)
 
             if (aiData.files.isEmpty()) {
                 logger.lifecycle("[BranchDoctor] [AI] No eligible lines for AI (minCoveredBranchesForAi=$minCbAi). Skipping Ollama call.")
                 outputAiMd.asFile.get().writeText(
                     "## Branch Coverage Doctor — AI Suggestions\n\n" +
                         "Model: ${model.get()}\n\n" +
-                        "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(true)}  | MinCoveredBranchesForAi: ${minCbAi}\n\n" +
-                        "No lines eligible for AI analysis. Threshold minCoveredBranchesForAi=${minCbAi} excluded lines with cb < ${minCbAi}.\n",
+                        "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(
+                            true,
+                        )}  | MinCoveredBranchesForAi: $minCbAi  | MaxAiAnalyses: ${maxAi}\n\n" +
+                        "No lines eligible for AI analysis. Threshold minCoveredBranchesForAi=$minCbAi excluded lines with cb < $minCbAi.\n",
                 )
             } else {
                 val fileCount = aiData.files.size
                 val lineCount = aiData.files.sumOf { it.lines.size }
-                logger.lifecycle("[BranchDoctor] [AI] Building prompt for $fileCount file(s), $lineCount line(s) (contextLines=$ctx, minCbAi=$minCbAi, redact=${redact.getOrElse(true)}).")
+                logger.lifecycle(
+                    "[BranchDoctor] [AI] Building prompt for $fileCount file(s), $lineCount line(s) (contextLines=$ctx, minCbAi=$minCbAi, maxAiAnalyses=$maxAi, redact=${redact.getOrElse(
+                        true,
+                    )}).",
+                )
                 val prompt = buildAiPrompt(aiData)
                 val clipped = clipPrompt(prompt, maxPrompt.get())
                 finalPromptUsed = if (redact.getOrElse(true)) redactSensitive(clipped) else clipped
-                logger.lifecycle("[BranchDoctor] [AI] Prompt prepared (length=${finalPromptUsed!!.length} chars, maxPrompt=${maxPrompt.get()}).")
+                logger.lifecycle(
+                    "[BranchDoctor] [AI] Prompt prepared (length=${finalPromptUsed!!.length} chars, maxPrompt=${maxPrompt.get()}).",
+                )
                 val startNs = System.nanoTime()
-                logger.lifecycle("[BranchDoctor] [AI] Invoking Ollama CLI '${ollamaCmd.get()}' (model=${model.get()}, timeout=${timeoutSec.get()}s). This may take a while...")
+                logger.lifecycle(
+                    "[BranchDoctor] [AI] Invoking Ollama CLI '${ollamaCmd.get()}' (model=${model.get()}, timeout=${timeoutSec.get()}s). This may take a while...",
+                )
                 aiResponse =
-                    askOllama(ollamaCmd.get(), model.get(), finalPromptUsed!!, project.rootDir, Duration.ofSeconds(timeoutSec.get().toLong()))
+                    askOllama(
+                        ollamaCmd.get(),
+                        model.get(),
+                        finalPromptUsed!!,
+                        project.rootDir,
+                        Duration.ofSeconds(timeoutSec.get().toLong()),
+                    )
                 val durSec = (System.nanoTime() - startNs) / 1_000_000_000.0
-                logger.lifecycle("[BranchDoctor] [AI] Ollama call finished in ${"%.1f".format(durSec)}s (responseLength=${aiResponse?.length ?: 0}).")
+                logger.lifecycle(
+                    "[BranchDoctor] [AI] Ollama call finished in ${"%.1f".format(durSec)}s (responseLength=${aiResponse?.length ?: 0}).",
+                )
 
                 // Inject code windows next to the model's per-line recommendations where possible.
                 val (enhancedResponse, injectedCount) = injectCodeWindowsIntoResponse(aiResponse ?: "", aiData)
@@ -209,18 +256,21 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                 outputAiMd.asFile.get().writeText(
                     "## Branch Coverage Doctor — AI Suggestions\n\n" +
                         "Model: ${model.get()}\n\n" +
-                        "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(true)}  | MinCoveredBranchesForAi: ${minCbAi}\n\n" +
+                        "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(
+                            true,
+                        )}  | MinCoveredBranchesForAi: $minCbAi  | MaxAiAnalyses: ${maxAi}\n\n" +
                         finalResponse + "\n",
                 )
                 logger.lifecycle("[BranchDoctor] [AI] Suggestions written: ${outputAiMd.asFile.get().absolutePath}")
             }
         } else {
             val isCi = System.getenv("CI")?.equals("true", ignoreCase = true) == true
-            val reason = when {
-                !aiEnabled.getOrElse(false) -> "aiEnabled=false"
-                isCi && !ciEnabled.getOrElse(false) -> "CI=true and ciEnabled=false"
-                else -> "not requested"
-            }
+            val reason =
+                when {
+                    !aiEnabled.getOrElse(false) -> "aiEnabled=false"
+                    isCi && !ciEnabled.getOrElse(false) -> "CI=true and ciEnabled=false"
+                    else -> "not requested"
+                }
             logger.lifecycle("[BranchDoctor] [AI] Skipped ($reason).")
         }
 
@@ -238,6 +288,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             failIfMissedBranches.orNull,
             failIfMissedBranchesPerFile.orNull,
             minCbAi,
+            maxAi,
             model.getOrElse("gemma3"),
             ollamaCmd.getOrElse(if (System.getProperty("os.name").lowercase().contains("win")) "ollama.exe" else "ollama"),
             timeoutSec.getOrElse(60),
@@ -284,10 +335,22 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         // Security and robustness: do not fetch external DTDs, but allow DOCTYPE so JaCoCo XML parses.
         factory.setNamespaceAware(false)
         factory.setValidating(false)
-        try { factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true) } catch (_: Exception) {}
-        try { factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false) } catch (_: Exception) {}
-        try { factory.setFeature("http://xml.org/sax/features/external-general-entities", false) } catch (_: Exception) {}
-        try { factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false) } catch (_: Exception) {}
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+        } catch (_: Exception) {
+        }
+        try {
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+        } catch (_: Exception) {
+        }
+        try {
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false)
+        } catch (_: Exception) {
+        }
+        try {
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+        } catch (_: Exception) {
+        }
 
         val builder = factory.newDocumentBuilder()
         // Resolve any external entities (like JaCoCo's report.dtd) to an empty string to avoid FileNotFound
@@ -491,6 +554,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         failIfMissedBranches: Int?,
         failIfMissedBranchesPerFile: Int?,
         minCoveredBranchesForAi: Int,
+        maxAiAnalyses: Int,
         model: String,
         ollamaCmd: String,
         timeoutSec: Int,
@@ -527,7 +591,8 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         sb.append("    \"topNFiles\": ").append(topNFiles?.toString() ?: "null").append(",\n")
         sb.append("    \"failIfMissedBranches\": ").append(failIfMissedBranches?.toString() ?: "null").append(",\n")
         sb.append("    \"failIfMissedBranchesPerFile\": ").append(failIfMissedBranchesPerFile?.toString() ?: "null").append(",\n")
-        sb.append("    \"minCoveredBranchesForAi\": ").append(minCoveredBranchesForAi).append("\n")
+        sb.append("    \"minCoveredBranchesForAi\": ").append(minCoveredBranchesForAi).append(",\n")
+        sb.append("    \"maxAiAnalyses\": ").append(maxAiAnalyses).append("\n")
         sb.append("  },\n")
         sb.append("  \"ai\": {\n")
         sb.append("    \"willRunAi\": ").append(willRunAi).append(",\n")
@@ -587,15 +652,19 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
 
     // Injects code windows directly after headings in the AI response.
     // Recognizes headings like "### HomeScreen.kt" and line anchors like "#### Line 47:" or "- Line 47".
-    private fun injectCodeWindowsIntoResponse(response: String, data: ReportDataDetailed): Pair<String, Int> {
+    private fun injectCodeWindowsIntoResponse(
+        response: String,
+        data: ReportDataDetailed,
+    ): Pair<String, Int> {
         if (response.isBlank()) return response to 0
 
         // Build lookup: baseFileName (lowercased) -> (line -> pair(file, enrichedLine))
-        val fileMap: Map<String, Map<Int, Pair<FileFindingsDetailed, EnrichedLine>>> = data.files.associate { f ->
-            val base = File(f.path).name.lowercase()
-            val lines = f.lines.associateBy({ it.line }, { f to it })
-            base to lines
-        }
+        val fileMap: Map<String, Map<Int, Pair<FileFindingsDetailed, EnrichedLine>>> =
+            data.files.associate { f ->
+                val base = File(f.path).name.lowercase()
+                val lines = f.lines.associateBy({ it.line }, { f to it })
+                base to lines
+            }
 
         val lines = response.lines().toMutableList()
         val out = StringBuilder()
@@ -654,7 +723,11 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         //   "File: dev/.../HomeScreen.kt  (missed: 5)"
         val ktOrJava = Regex("""([A-Za-z0-9_]+\.(kt|java))""")
         val m = ktOrJava.find(heading)
-        return m?.groups?.get(1)?.value?.lowercase()
+        return m
+            ?.groups
+            ?.get(1)
+            ?.value
+            ?.lowercase()
     }
 
     private fun extractLineNumber(text: String): Int? {
@@ -662,10 +735,17 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         // "1. **Line 47**:", "- Line 47", "#### Line 47:", "Line 47"
         val r = Regex("\\bLine\\s+(\\d+)", RegexOption.IGNORE_CASE)
         val m = r.find(text)
-        return m?.groups?.get(1)?.value?.toIntOrNull()
+        return m
+            ?.groups
+            ?.get(1)
+            ?.value
+            ?.toIntOrNull()
     }
 
-    private fun formatCodeBlockForLine(file: FileFindingsDetailed, l: EnrichedLine): String {
+    private fun formatCodeBlockForLine(
+        file: FileFindingsDetailed,
+        l: EnrichedLine,
+    ): String {
         val sb = StringBuilder()
         sb.appendLine()
         sb.appendLine("```kotlin")
@@ -756,7 +836,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             val finishedOneSec = proc.waitFor(1, TimeUnit.SECONDS)
             elapsedSec = (elapsedSec + 1).coerceAtMost(totalSec)
             val remaining = (totalSec - elapsedSec).coerceAtLeast(0)
-            logger.lifecycle("[BranchDoctor] [AI] ${elapsedSec} / ${totalSec}s , ${remaining}s until AI timeout")
+            logger.lifecycle("[BranchDoctor] [AI] $elapsedSec / ${totalSec}s , ${remaining}s until AI timeout")
             if (finishedOneSec) break
             if (elapsedSec >= totalSec) break
         }
@@ -771,7 +851,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             return buildString {
                 append(partial)
                 if (partial.isNotBlank()) append("\n\n")
-                append("AI timed out after ${elapsedSec} seconds")
+                append("AI timed out after $elapsedSec seconds")
             }
         }
 
