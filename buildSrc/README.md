@@ -1,8 +1,8 @@
-# AI Doctor (Ollama CLI) — Gradle buildSrc plugin and Branch Coverage Doctor task
+# Angus Gradle Tools — Build Failure Analysis and Branch Coverage Gaps Task
 
 This repository’s buildSrc module provides two reusable capabilities that leverage a local Ollama LLM:
-- AiDoctorPlugin (plugin id `dev.angussoftware.ai-doctor`) — prints an AI diagnosis to the Gradle console when a build fails (end-of-build listener, opt‑in per run).
-- BranchCoverageDoctorTask — parses a JaCoCo XML report to highlight missed branches, maps them back to source, emits JSON/Markdown reports, and can optionally include AI suggestions for improving test coverage.
+- AngusGradleToolsPlugin (plugin id `dev.angussoftware.gradle-tools`) — prints a build-failure analysis to the Gradle console when a build fails (end-of-build listener, opt‑in per run).
+- BranchCoverageGapsReportTask — parses a JaCoCo XML report to highlight missed branches, maps them back to source, emits JSON/Markdown reports, and can optionally include AI suggestions for improving test coverage.
 
 Both live under buildSrc, so they’re automatically available to all modules in this build (including composeApp).
 
@@ -23,38 +23,38 @@ echo "Say hi" | ollama run gemma3
 
 ## Components
 
-### AiDoctorPlugin — end‑of‑build failure diagnosis
+### AngusGradleToolsPlugin — end‑of‑build failure analysis
 - What it does
   - Registers a single buildFinished listener (only when explicitly enabled).
   - If the build failed, sends a prompt to Ollama via STDIN (`ollama run <model>`) containing Gradle/OS/Java metadata, the exception summary, and a clipped stack trace.
   - Prints the model’s response under an “AI diagnosis” banner in the Gradle output.
 - Activation and constraints
-  - Opt‑in per run with `-PaiDoctor=true`.
+  - Opt‑in per run with `-PbuildFailureEnabled=true`.
   - The listener is NOT registered when the configuration cache is requested; run with `--no-configuration-cache` when you want the diagnosis.
-  - CI: when `CI=true`, the plugin is skipped by default; enable with `-PaiDoctorCiEnabled=true`.
+  - CI: when `CI=true`, the plugin is skipped by default; enable with `-PbuildFailureCiEnabled=true`.
 - Redaction and privacy
-  - By default, HOME and the project root paths are redacted to `<HOME>` and `<PROJECT_ROOT>` in the prompt. Disable with `-PaiDoctorRedact=false`.
+  - By default, HOME and the project root paths are redacted to `<HOME>` and `<PROJECT_ROOT>` in the prompt. Disable with `-PbuildFailureRedact=false`.
 - Config flags and defaults
-  - `-PaiDoctor=true`                 Enable for this build (required to activate)
-  - `-PaiDoctorModel=<name>`          Model (default `gemma3`)
-  - `-PaiDoctorOllamaCmd=<path>`      Ollama CLI (`ollama`/`ollama.exe`) — default auto-detected
-  - `-PaiDoctorTimeoutSec=<n>`        Timeout seconds (default 60, range 5–120)
-  - `-PaiDoctorMaxPrompt=<n>`         Max prompt size (default 6000, range 1000–30000)
-  - `-PaiDoctorRedact=<true|false>`   Redact HOME/PROJECT_ROOT (default true)
-  - `-PaiDoctorCiEnabled=<true|false>`Allow on CI when `CI=true` (default false)
+  - `-PbuildFailureEnabled=true`      Enable build-failure analysis for this build (required to activate)
+  - `-PbuildFailureModel=<name>`     Model (default `gemma3`)
+  - `-PbuildFailureOllamaCmd=<path>`  Ollama CLI (`ollama`/`ollama.exe`) — default auto-detected
+  - `-PbuildFailureTimeoutSec=<n>`    Timeout seconds (default 60, range 5–120)
+  - `-PbuildFailureMaxPrompt=<n>`     Max prompt size (default 6000, range 1000–30000)
+  - `-PbuildFailureRedact=<true|false>` Redact HOME/PROJECT_ROOT (default true)
+  - `-PbuildFailureCiEnabled=<true|false>` Allow on CI when `CI=true` (default false)
 - Demo task
-  - The plugin registers a sample failing task `aiDoctorFail` to demo the flow.
+  - A demo task is provided in `composeApp/gradle/build-failure-demo-task.gradle.kts` as `:composeApp:composeAppBuildFailureDemo`.
   - Examples:
     ```bat
-    gradlew aiDoctorFail --no-configuration-cache -PaiDoctor=true -PaiMessage="Explain why this sample failed"
-    gradlew aiDoctorFail --no-configuration-cache -PaiDoctor=true -PaiDoctorModel=llama3.1:8b
-    gradlew aiDoctorFail --no-configuration-cache -PaiDoctor=true -PaiDoctorOllamaCmd="C:\\Program Files\\Ollama\\ollama.exe"
+    gradlew :composeApp:composeAppBuildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureMessage="Explain why this sample failed"
+    gradlew :composeApp:composeAppBuildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureModel=llama3.1:8b
+    gradlew :composeApp:composeAppBuildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureOllamaCmd="C:\\Program Files\\Ollama\\ollama.exe"
     ```
 
-Source: buildSrc/src/main/kotlin/dev/angussoftware/aidoctor/AiDoctorPlugin.kt
+Source: buildSrc/src/main/kotlin/dev/angussoftware/gradletools/AngusGradleToolsPlugin.kt
 
 
-### BranchCoverageDoctorTask — JaCoCo branch‑gaps reporter with optional AI guidance
+### BranchCoverageGapsReportTask — JaCoCo branch‑gaps reporter with optional AI guidance
 - What it does
   - Parses a JaCoCo XML report to collect lines with missed branches (`mb > 0`).
   - Locates the corresponding source lines using configured source roots and emits:
@@ -66,7 +66,7 @@ Source: buildSrc/src/main/kotlin/dev/angussoftware/aidoctor/AiDoctorPlugin.kt
 - Key inputs (set when registering the task)
   - xmlReport (RegularFileProperty) — path to the JaCoCo XML report.
   - sourceRoots (ListProperty<String>) — absolute paths to source directories (e.g., `src/commonMain/kotlin`, `src/androidMain/kotlin`).
-  - Feature flags: branchDoctorEnabled, aiEnabled, ciEnabled.
+  - Feature flags: branchCoverageEnabled, aiEnabled, ciEnabled.
   - Tuning: contextLines (default 5; `-1` includes whole file), optional topNFiles (limit output to top offenders).
   - Thresholds: optional failIfMissedBranches (global), failIfMissedBranchesPerFile.
   - AI: model, ollamaCmd, timeoutSec, maxPrompt, redact.
@@ -85,7 +85,7 @@ Source: buildSrc/src/main/kotlin/dev/angussoftware/aidoctor/AiDoctorPlugin.kt
 - XML parser safety
   - External DTD/entity resolution is disabled and an empty EntityResolver is installed to avoid network/filesystem lookups (prevents JaCoCo DTD errors and XXE risks).
 
-Source: buildSrc/src/main/kotlin/dev/angussoftware/aidoctor/BranchCoverageDoctorTask.kt
+Source: buildSrc/src/main/kotlin/dev/angussoftware/gradletools/BranchCoverageGapsReportTask.kt
 
 ---
 
@@ -99,8 +99,8 @@ This repo wires BranchCoverageDoctorTask for composeApp in composeApp/gradle/cov
 
 Convenience tasks in composeApp:
 - androidConnectedTestCoverageReport — runs connectedDebugAndroidTest and generates JaCoCo HTML/XML (XML at reports/jacoco/androidConnectedTest/report.xml).
-- androidCoverageBranchDoctor — runs BranchCoverageDoctorTask over that XML.
-- androidInstrumentedCoverageWithBranchDoctor — runs both in sequence.
+- androidBranchCoverageGaps — runs BranchCoverageGapsReportTask over that XML.
+- androidInstrumentedCoverageWithBranchGaps — runs both in sequence.
 
 Examples:
 ```bat

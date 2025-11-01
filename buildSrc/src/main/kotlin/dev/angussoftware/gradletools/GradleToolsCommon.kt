@@ -1,4 +1,4 @@
-package dev.angussoftware.aidoctor
+package dev.angussoftware.gradletools
 
 import org.gradle.api.GradleException
 import java.io.ByteArrayOutputStream
@@ -7,7 +7,7 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 /**
- * Shared utilities for AiDoctorPlugin and BranchCoverageDoctorTask.
+ * Shared utilities for AngusGradleToolsPlugin and BranchCoverageGapsReportTask.
  * Kept internal to the module and dependency-free.
  */
 internal object OllamaClient {
@@ -16,8 +16,8 @@ internal object OllamaClient {
         val model: String,
         val workingDir: File,
         val timeout: Duration,
-        /** Log prefix inside square brackets, e.g. "AI Doctor" or "BranchDoctor [AI]" */
-        val logTag: String = "AI Doctor",
+        /** Log prefix inside square brackets, e.g. "BuildFailure" or "BranchCoverage [AI]" */
+        val logTag: String = "BuildFailure",
     )
 
     /**
@@ -32,11 +32,12 @@ internal object OllamaClient {
     ): String {
         val cmd = listOf(config.command, "run", config.model)
         val pb = ProcessBuilder(cmd).directory(config.workingDir).redirectErrorStream(false)
-        val proc = try {
-            pb.start()
-        } catch (e: Exception) {
-            throw GradleException("Failed to start Ollama CLI ('${config.command}'). Is it installed and on PATH? ${e.message}")
-        }
+        val proc =
+            try {
+                pb.start()
+            } catch (e: Exception) {
+                throw GradleException("Failed to start Ollama CLI ('${config.command}'). Is it installed and on PATH? ${e.message}")
+            }
 
         val stdout = ByteArrayOutputStream()
         val stderr = ByteArrayOutputStream()
@@ -62,7 +63,7 @@ internal object OllamaClient {
             val finishedOneSec = proc.waitFor(1, TimeUnit.SECONDS)
             elapsedSec = (elapsedSec + 1).coerceAtMost(totalSec)
             val remaining = (totalSec - elapsedSec).coerceAtLeast(0)
-            logger.lifecycle("[${config.logTag}] ${elapsedSec} / ${totalSec}s , ${remaining}s until AI timeout")
+            logger.lifecycle("[${config.logTag}] $elapsedSec / ${totalSec}s , ${remaining}s until AI timeout")
             if (finishedOneSec) break
             if (elapsedSec >= totalSec) break
         }
@@ -77,7 +78,7 @@ internal object OllamaClient {
             return buildString {
                 append(partial)
                 if (partial.isNotBlank()) append("\n\n")
-                append("AI timed out after ${elapsedSec} seconds")
+                append("AI timed out after $elapsedSec seconds")
             }
         }
 
@@ -87,7 +88,7 @@ internal object OllamaClient {
         val code = proc.exitValue()
         val out = stdout.toString("UTF-8")
         val err = stderr.toString("UTF-8")
-        if (code != 0 && out.isBlank()) return "Ollama exited with code ${code}. Error: ${err.ifBlank { "<no stderr>" }}"
+        if (code != 0 && out.isBlank()) return "Ollama exited with code $code. Error: ${err.ifBlank { "<no stderr>" }}"
         return out.ifBlank { err.ifBlank { "<no output>" } }
     }
 }
@@ -121,6 +122,7 @@ internal object AiText {
 
 internal object Os {
     fun defaultOllamaCommand(): String = if (System.getProperty("os.name").lowercase().contains("win")) "ollama.exe" else "ollama"
+
     fun isCi(): Boolean = System.getenv("CI")?.equals("true", ignoreCase = true) == true
 }
 
