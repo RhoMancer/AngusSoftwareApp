@@ -8,11 +8,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.StringReader
 import java.time.Duration
-import java.util.concurrent.TimeUnit
 import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -144,7 +142,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                 branchDoctorEnabled.getOrElse(false),
                 aiEnabled.getOrElse(false),
                 ciEnabled.getOrElse(false),
-                System.getenv("CI")?.equals("true", ignoreCase = true) == true,
+                Os.isCi(),
                 ctx,
                 topNFiles.orNull,
                 failIfMissedBranches.orNull,
@@ -207,7 +205,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             val selected = selectedTriples.map { it.file to it.line }
             if (totalEligible > 0) {
                 logger.lifecycle(
-                    "[BranchDoctor] [AI] Eligible lines: ${'$'}totalEligible, selected: ${'$'}{selected.size} (maxAiAnalyses=${'$'}maxAi, ordering=coverage% desc)",
+                    "[BranchDoctor] [AI] Eligible lines: $totalEligible, selected: ${selected.size} (maxAiAnalyses=$maxAi, ordering=coverage% desc)",
                 )
             }
             val grouped: List<FileFindingsDetailed> =
@@ -285,7 +283,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
                 logger.lifecycle("[BranchDoctor] [AI] Suggestions written: ${outputAiMd.asFile.get().absolutePath}")
             }
         } else {
-            val isCi = System.getenv("CI")?.equals("true", ignoreCase = true) == true
+            val isCi = Os.isCi()
             val reason =
                 when {
                     !aiEnabled.getOrElse(false) -> "aiEnabled=false"
@@ -303,7 +301,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             branchDoctorEnabled.getOrElse(false),
             aiEnabled.getOrElse(false),
             ciEnabled.getOrElse(false),
-            System.getenv("CI")?.equals("true", ignoreCase = true) == true,
+            Os.isCi(),
             ctx,
             topNFiles.orNull,
             failIfMissedBranches.orNull,
@@ -486,11 +484,16 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
 
     // ---------------- Output writers ----------------
 
+    private val LINE_ORDER: Comparator<EnrichedLine> =
+        compareByDescending<EnrichedLine> { it.cb.toDouble() / (it.cb + it.mb).coerceAtLeast(1).toDouble() }
+            .thenByDescending { it.cb }
+            .thenBy { it.line }
+
     private fun writeJson(
         data: ReportDataDetailed,
         out: File,
     ) {
-        fun esc(s: String) = s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")
+        fun esc(s: String) = jsonEsc(s)
         val sb = StringBuilder()
         sb.append("{\n")
         sb.append("  \"totalMissedBranches\": ").append(data.totalMissed).append(",\n")
@@ -502,11 +505,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             sb.append("      \"sourceFile\": \"").append(esc(f.sourceFile)).append("\",\n")
             sb.append("      \"totalMissed\": ").append(f.totalMissed).append(",\n")
             sb.append("      \"lines\": [\n")
-            val sortedLines = f.lines.sortedWith(
-                compareByDescending<EnrichedLine> { it.cb.toDouble() / (it.cb + it.mb).coerceAtLeast(1).toDouble() }
-                    .thenByDescending { it.cb }
-                    .thenBy { it.line }
-            )
+            val sortedLines = f.lines.sortedWith(LINE_ORDER)
             sortedLines.forEachIndexed { j, l ->
                 if (j > 0) sb.append(",\n")
                 sb.append("        {\n")
@@ -549,23 +548,10 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
             sb.appendLine("### ${f.path}  (missed: ${f.totalMissed})")
             sb.appendLine("Source: ${f.sourceFile}")
             sb.appendLine()
-            val sortedLines = f.lines.sortedWith(
-                compareByDescending<EnrichedLine> { it.cb.toDouble() / (it.cb + it.mb).coerceAtLeast(1).toDouble() }
-                    .thenByDescending { it.cb }
-                    .thenBy { it.line }
-            )
+            val sortedLines = f.lines.sortedWith(LINE_ORDER)
             sortedLines.forEach { l ->
                 sb.appendLine("- Line ${l.line}: mb=${l.mb}, cb=${l.cb}, type=${l.classification}")
-                sb.appendLine()
-                sb.appendLine("```kotlin")
-                val start = l.window.start
-                l.window.lines.forEachIndexed { idx, t ->
-                    val no = start + idx
-                    val mark = if (no == l.line) "▶ " else "  "
-                    sb.appendLine("$mark${no.toString().padStart(4, ' ')} | $t")
-                }
-                sb.appendLine("```")
-                sb.appendLine()
+                sb.append(formatCodeBlockForLine(f, l))
             }
         }
         out.parentFile.mkdirs()
@@ -598,7 +584,7 @@ abstract class BranchCoverageDoctorTask : DefaultTask() {
         mdOut: File,
         aiMdOut: File,
     ) {
-        fun esc(s: String?): String = s?.replace("\\", "\\\\")?.replace("\"", "\\\"")?.replace("\n", "\\n") ?: ""
+        fun esc(s: String?): String = jsonEsc(s)
         val sb = StringBuilder()
         sb.append("{\n")
         sb

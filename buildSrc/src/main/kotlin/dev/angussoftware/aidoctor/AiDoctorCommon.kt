@@ -16,7 +16,7 @@ internal object OllamaClient {
         val model: String,
         val workingDir: File,
         val timeout: Duration,
-        /** Log prefix inside square brackets, e.g. "AI Doctor" or "BranchDoctor] [AI" */
+        /** Log prefix inside square brackets, e.g. "AI Doctor" or "BranchDoctor [AI]" */
         val logTag: String = "AI Doctor",
     )
 
