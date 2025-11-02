@@ -5,7 +5,9 @@ import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.register
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.io.File
 import javax.inject.Inject
 
@@ -38,6 +40,116 @@ class AngusCoveragePlugin : Plugin<Project> {
                 project.layout.projectDirectory.dir("src/androidMain/kotlin").asFile.absolutePath,
             ),
         )
+        ext.registerConvenienceTasks.convention(true)
+
+        // Register convenience coverage tasks (migrated from composeApp/gradle/coverage-tasks.gradle.kts)
+        if (ext.registerConvenienceTasks.orElse(true).get()) {
+            if (project.tasks.findByName("androidConnectedTestCoverageReport") == null) {
+                project.tasks.register<JacocoReport>("androidConnectedTestCoverageReport") {
+                    group = "verification"
+                    description = "Generates JaCoCo HTML/XML coverage report for connectedDebugAndroidTest (instrumented UI tests)."
+
+                    // Ensure device tests run first (can be skipped with -x :<module>:connectedDebugAndroidTest)
+                    dependsOn("connectedDebugAndroidTest")
+                    // Ensure debug compilation tasks that produce class outputs are complete
+                    dependsOn("compileDebugKotlinAndroid")
+                    dependsOn("compileDebugJavaWithJavac")
+                    // Provide an ordering constraint relative to tasks whose outputs we do NOT use
+                    mustRunAfter("compileDebugUnitTestKotlinAndroid", "compileReleaseKotlinAndroid")
+
+                    // Execution data produced by on-device JaCoCo agent
+                    val executionDataFiles = project.fileTree(project.buildDir) {
+                        include(
+                            "outputs/**/connected/**/*.ec",
+                            "outputs/**/coverage.ec",
+                            "outputs/code_coverage/**/**/*.ec",
+                            "outputs/connected_android_test_code_coverage/**/**/*.ec",
+                        )
+                    }
+                    executionData(executionDataFiles)
+
+                    // Class files to analyze (Kotlin/Compose + Java) — restrict to DEBUG variants
+                    val tmpKotlinDebug = project.fileTree("${'$'}{project.buildDir}/tmp/kotlin-classes/debug") { include("**/*.class") }
+                    val tmpKotlinAndroidDebug = project.fileTree("${'$'}{project.buildDir}/tmp/kotlin-classes/androidDebug") { include("**/*.class") }
+                    val javacDebug = project.fileTree("${'$'}{project.buildDir}/intermediates/javac/debug/classes") { include("**/*.class") }
+
+                    val allClassDirs = project.files(tmpKotlinDebug, tmpKotlinAndroidDebug, javacDebug)
+                        .asFileTree
+                        .matching {
+                            exclude(
+                                "**/R.class",
+                                "**/R${'$'}*.class",
+                                "**/*R*.class",
+                                "**/BuildConfig.*",
+                                "**/Manifest*.*",
+                                "**/*Test*.*",
+                                // Exclude generated Compose resources
+                                "**/composeapp/generated/**",
+                                "**/generated/**",
+                                "**/generated/resources/**",
+                                "**/generated/resources/*_commonMainKt*",
+                                // Exclude Compose singletons and previews
+                                "**/*ComposableSingletons*",
+                                "**/activity/ComposableSingletons*",
+                                "**/*Preview*",
+                            )
+                        }
+
+                    classDirectories.setFrom(allClassDirs)
+                    sourceDirectories.setFrom(project.files("src/commonMain/kotlin", "src/androidMain/kotlin"))
+
+                    reports {
+                        xml.required.set(true)
+                        html.required.set(true)
+                        csv.required.set(false)
+                        html.outputLocation.set(project.layout.buildDirectory.dir("reports/jacoco/androidConnectedTest/html"))
+                        xml.outputLocation.set(project.layout.buildDirectory.file("reports/jacoco/androidConnectedTest/report.xml"))
+                    }
+
+                    doLast {
+                        val htmlDir = reports.html.outputLocation.get().asFile
+                        val htmlIndex = htmlDir.resolve("index.html")
+                        val xmlFile = reports.xml.outputLocation.get().asFile
+                        if (htmlIndex.exists()) {
+                            println("Android instrumented coverage HTML: ${htmlIndex.absolutePath}")
+                        } else {
+                            println("Android instrumented coverage HTML expected at: ${htmlIndex.absolutePath} (file not found)")
+                        }
+                        if (xmlFile.exists()) {
+                            println("Android instrumented coverage XML: ${xmlFile.absolutePath}")
+                        } else {
+                            println("Android instrumented coverage XML expected at: ${xmlFile.absolutePath} (file not found)")
+                        }
+                    }
+                }
+            }
+
+            if (project.tasks.findByName("androidInstrumentedCoverage") == null) {
+                project.tasks.register("androidInstrumentedCoverage") {
+                    group = "verification"
+                    description = "Runs instrumented tests and generates the Android JaCoCo coverage report."
+                    dependsOn("androidConnectedTestCoverageReport")
+                }
+            }
+
+            if (project.tasks.findByName("fullCoverageReport") == null) {
+                project.tasks.register("fullCoverageReport") {
+                    group = "verification"
+                    description = "Generates unit (Kover) and Android instrumented coverage reports for this module."
+                    project.tasks.findByName("koverHtmlReport")?.let { dependsOn(it) }
+                    dependsOn("androidInstrumentedCoverage")
+                }
+            }
+
+            if (project.tasks.findByName("androidInstrumentedCoverageWithBranchGaps") == null) {
+                project.tasks.register("androidInstrumentedCoverageWithBranchGaps") {
+                    group = "verification"
+                    description = "Runs instrumented tests, generates JaCoCo, and runs Branch Coverage Analysis (branch gaps)."
+                    dependsOn("androidConnectedTestCoverageReport")
+                    dependsOn("androidBranchCoverageGaps")
+                }
+            }
+        }
 
         // Register the gaps report task with the same behavior as manual wiring in composeApp.
         project.tasks.register<BranchCoverageGapsReportTask>("androidBranchCoverageGaps") {
@@ -124,4 +236,7 @@ abstract class AngusCoverageExtension @Inject constructor(objects: ObjectFactory
 
     /** Absolute source roots to search for files referenced by the JaCoCo XML (package/sourcefile). */
     abstract val sourceRoots: ListProperty<String>
+
+    /** When true, the plugin registers convenience lifecycle tasks (instrumented coverage, full report, etc.). */
+    abstract val registerConvenienceTasks: Property<Boolean>
 }
