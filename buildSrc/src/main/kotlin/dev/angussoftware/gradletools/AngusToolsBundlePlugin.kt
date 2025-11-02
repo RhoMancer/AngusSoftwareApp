@@ -37,6 +37,7 @@ class AngusToolsBundlePlugin : Plugin<Project> {
         // Defaults
         ext._includeProjects.convention(listOf(":composeApp"))
         ext._autoWireCoverageDependsOn.convention(true)
+        ext._registerScreenshotTasks.convention(true)
 
         // Always apply the failure-analysis plugin to the root project
         val root = project.rootProject
@@ -52,7 +53,12 @@ class AngusToolsBundlePlugin : Plugin<Project> {
                 if (target == null) {
                     project.logger.lifecycle("[AngusTools] Bundle: includeProjects contains '$path' which was not found.")
                 } else {
+                    // Apply module-scoped coverage plugin
                     target.pluginManager.apply("dev.angussoftware.gradle-tools.coverage")
+                    // Optionally register screenshot tasks in the target module
+                    if (ext._registerScreenshotTasks.orNull != false) {
+                        ScreenshotTasks.register(target)
+                    }
                 }
             }
         }
@@ -67,6 +73,7 @@ abstract class AngusToolsBundleExtension
         // Backing properties so we can offer simple var-like DSL
         internal val _includeProjects: ListProperty<String> = objects.listProperty(String::class.java)
         internal val _autoWireCoverageDependsOn: Property<Boolean> = objects.property(Boolean::class.java)
+        internal val _registerScreenshotTasks: Property<Boolean> = objects.property(Boolean::class.java)
 
         /**
          * Subproject paths to apply the coverage plugin to. Example: listOf(":composeApp", ":feature:foo")
@@ -84,5 +91,14 @@ abstract class AngusToolsBundleExtension
             get() = _autoWireCoverageDependsOn.orNull ?: true
             set(value) {
                 _autoWireCoverageDependsOn.set(value)
+            }
+
+        /**
+         * If true, registers screenshot tasks (create/fetch/clear) in included projects.
+         */
+        var registerScreenshotTasks: Boolean
+            get() = _registerScreenshotTasks.orNull ?: true
+            set(value) {
+                _registerScreenshotTasks.set(value)
             }
     }
