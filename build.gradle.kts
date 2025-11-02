@@ -7,5 +7,5 @@ plugins {
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kover) apply false
-    id("dev.angussoftware.gradle-tools")
+    id("dev.angussoftware.gradle-tools.failure-analysis")
 }

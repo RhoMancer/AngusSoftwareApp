@@ -1,4 +1,3 @@
-import dev.angussoftware.gradletools.BranchCoverageGapsReportTask
 import org.gradle.testing.jacoco.tasks.JacocoReport
 
 // ==============================
@@ -122,72 +121,8 @@ val branchCoverageEnabledProvider =
 
 val androidJacocoTask = tasks.named<JacocoReport>("androidConnectedTestCoverageReport")
 
-tasks.register<BranchCoverageGapsReportTask>("androidBranchCoverageGaps") {
-    group = "verification"
-    description = "Parses JaCoCo XML to list exact lines with missed branches and suggests tests (optional AI)."
 
-    // Ensure the XML exists
-    dependsOn(androidJacocoTask)
-
-    // Inputs: point to the XML produced by the Jacoco task (use known path to avoid taskless output provider issues)
-    val jacocoReportXml = layout.buildDirectory.file("reports/jacoco/androidConnectedTest/report.xml")
-    xmlReport.set(jacocoReportXml)
-
-    // Where to find sources mapped by <package>/<sourcefile>
-    sourceRoots.set(
-        listOf(
-            layout.projectDirectory
-                .dir("src/commonMain/kotlin")
-                .asFile.absolutePath,
-            layout.projectDirectory
-                .dir("src/androidMain/kotlin")
-                .asFile.absolutePath,
-        ),
-    )
-
-    // Core toggles (defaults: disabled, AI off)
-    branchCoverageEnabled.set(branchCoverageEnabledProvider)
-    aiEnabled.set(providers.gradleProperty("branchCoverageAiEnabled").map { it.equals("true", true) }.orElse(false))
-    ciEnabled.set(providers.gradleProperty("branchCoverageCiEnabled").map { it.equals("true", true) }.orElse(false))
-
-    // Context lines (default 5; -1 = whole file)
-    contextLines.set(providers.gradleProperty("branchCoverageContextLines").map { it.toIntOrNull() ?: 5 }.orElse(5))
-
-    // Optional limits — set only if properties are provided
-    if (providers.gradleProperty("branchCoverageTopNFiles").isPresent) {
-        topNFiles.set(providers.gradleProperty("branchCoverageTopNFiles").map { it.toIntOrNull() ?: 0 })
-    }
-    if (providers.gradleProperty("branchCoverageFailIfMissedBranches").isPresent) {
-        failIfMissedBranches.set(providers.gradleProperty("branchCoverageFailIfMissedBranches").map { it.toIntOrNull() ?: 0 })
-    }
-    if (providers.gradleProperty("branchCoverageFailIfMissedBranchesPerFile").isPresent) {
-        failIfMissedBranchesPerFile.set(providers.gradleProperty("branchCoverageFailIfMissedBranchesPerFile").map { it.toIntOrNull() ?: 0 })
-    }
-
-    // AI config
-    model.set(providers.gradleProperty("branchCoverageModel").orElse("gemma3"))
-    val defaultOllama = if (System.getProperty("os.name").lowercase().contains("win")) "ollama.exe" else "ollama"
-    ollamaCmd.set(providers.gradleProperty("branchCoverageOllamaCmd").orElse(defaultOllama))
-    timeoutSec.set(providers.gradleProperty("branchCoverageTimeoutSec").map { (it.toIntOrNull() ?: 60).coerceIn(5, 120) }.orElse(60))
-    maxPrompt.set(providers.gradleProperty("branchCoverageMaxPrompt").map { (it.toIntOrNull() ?: 6000).coerceIn(1000, 30000) }.orElse(6000))
-    redact.set(providers.gradleProperty("branchCoverageRedact").map { it.equals("true", true) }.orElse(true))
-
-    // AI selection thresholds
-    minCoveredBranchesForAi.set(providers.gradleProperty("branchCoverageMinCoveredBranchesForAi").map { it.toIntOrNull() ?: 1 }.orElse(1))
-    maxAiAnalyses.set(providers.gradleProperty("branchCoverageMaxAiAnalyses").map { (it.toIntOrNull() ?: 20).coerceAtLeast(1) }.orElse(20))
-
-    // Outputs live next to the JaCoCo XML
-    val reportDirProvider = xmlReport.map { it.asFile.parentFile }
-    outputJson.set(layout.file(reportDirProvider.map { File(it, "branch-gaps.json") }))
-    outputMd.set(layout.file(reportDirProvider.map { File(it, "branch-gaps.md") }))
-    outputAiMd.set(layout.file(reportDirProvider.map { File(it, "branch-gaps-ai.md") }))
-    outputMeta.set(layout.file(reportDirProvider.map { File(it, "branch-gaps.meta.json") }))
-
-    // Global switch to skip the task entirely
-    onlyIf { branchCoverageEnabled.get() }
-}
-
-// Convenience lifecycle task: run tests + report + branch doctor
+// Convenience lifecycle task: run tests + report + branch coverage analysis (branch gaps)
 tasks.register("androidInstrumentedCoverageWithBranchGaps") {
     group = "verification"
     description = "Runs instrumented tests, generates JaCoCo, and runs Branch Coverage Analysis (branch gaps)."
