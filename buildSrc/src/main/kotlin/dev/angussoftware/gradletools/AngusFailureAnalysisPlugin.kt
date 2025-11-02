@@ -42,9 +42,10 @@ class AngusFailureAnalysisPlugin : Plugin<Project> {
         val maxPromptProvider = project.providers.gradleProperty("buildFailureMaxPrompt")
         val redactProvider = project.providers.gradleProperty("buildFailureRedact")
         val ciEnabledProvider = project.providers.gradleProperty("buildFailureCiEnabled")
+        val enforceNoCcProvider = project.providers.gradleProperty("buildFailureEnforceNoConfigCache")
 
-        // Hook once per build, at the end. Register only when explicitly branchCoverageEnabled and when
-        // configuration cache is NOT requested; otherwise, Gradle forbids listener registration.
+        // Hook once per build, at the end. Register only when explicitly enabled and when
+        // configuration cache policy allows it.
         val willEnable = (enabledProvider.orNull == "true")
         val ccRequested =
             try {
@@ -54,9 +55,18 @@ class AngusFailureAnalysisPlugin : Plugin<Project> {
             }
         if (willEnable) {
             if (ccRequested) {
-                project.logger.lifecycle(
-                    "[BuildFailure] Configuration cache requested; skipping build-failure analysis listener. Run with --no-configuration-cache to enable.",
-                )
+                val enforceNoCC = (enforceNoCcProvider.orNull ?: "true").equals("true", ignoreCase = true)
+                if (enforceNoCC) {
+                    throw org.gradle.api.GradleException(
+                        "Configuration cache requested but build-failure analysis is enabled. " +
+                            "Rerun with --no-configuration-cache, or override with -PbuildFailureEnforceNoConfigCache=false, " +
+                            "or disable analysis with -PbuildFailureEnabled=false. Note: under configuration cache Gradle skips end-of-build listeners, so analysis will not run.",
+                    )
+                } else {
+                    project.logger.lifecycle(
+                        "[BuildFailure] Configuration cache requested; skipping build-failure analysis listener (enforcement disabled).",
+                    )
+                }
             } else {
                 project.gradle.buildFinished(
                     object : Action<BuildResult> {

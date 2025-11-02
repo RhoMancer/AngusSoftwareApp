@@ -13,38 +13,6 @@ plugins {
     alias(libs.plugins.kover)
 }
 
-// --- Build Failure analysis policy for composeApp --------------------------------------------
-// This module can run build failure analysis by default and avoid the Gradle configuration cache
-// when the analysis is enabled. The analysis relies on an end-of-build listener that Gradle skips when
-// the configuration cache is requested, so diagnostics would not run under the cache.
-//
-// Defaults (see gradle.properties):
-// - buildFailureEnabled=true  -> enables analysis by default so failed builds print a diagnosis
-// - org.gradle.configuration-cache=false -> disables the configuration cache by default for reliability
-//
-// How to temporarily override per run:
-// - Disable analysis for this run:
-//     gradlew <tasks> -PbuildFailureEnabled=false
-// - OR allow configuration cache (diagnostics will be skipped):
-//     gradlew <tasks> --configuration-cache -PbuildFailureEnforceNoConfigCache=false
-//
-// Guard: fail fast if configuration cache is requested while enforcement is on.
-val buildFailureEnabledForRun = (providers.gradleProperty("buildFailureEnabled").orNull ?: "true").equals("true", ignoreCase = true)
-val buildFailureEnforceNoConfigCache =
-    (
-        providers
-            .gradleProperty(
-                "buildFailureEnforceNoConfigCache",
-            ).orNull ?: "true"
-    ).equals("true", ignoreCase = true)
-if (buildFailureEnabledForRun && buildFailureEnforceNoConfigCache && gradle.startParameter.isConfigurationCacheRequested) {
-    throw org.gradle.api.GradleException(
-        "composeApp: Configuration cache requested but build-failure analysis is enabled. Rerun with --no-configuration-cache, " +
-            "or override with -PbuildFailureEnforceNoConfigCache=false, or disable analysis with -PbuildFailureEnabled=false. " +
-            "Note: under configuration cache Gradle skips end-of-build listeners, so analysis will not run.",
-    )
-}
-// ------------------------------------------------------------------------------------------------
 
 kover {
     merge {
