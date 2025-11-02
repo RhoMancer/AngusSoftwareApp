@@ -14,11 +14,6 @@ plugins {
 }
 
 
-kover {
-    merge {
-        subprojects()
-    }
-}
 
 kotlin {
     androidTarget {
@@ -142,7 +137,6 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
     androidTestImplementation(libs.androidx.uiautomator)
-    kover(project(":composeApp"))
 }
 
 apply(from = "gradle/screenshot-tasks.gradle.kts")
