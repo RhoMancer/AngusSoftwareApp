@@ -22,5 +22,11 @@ gradlePlugin {
             displayName = "Angus Gradle Tools — Coverage"
             description = "Auto-registers a BranchCoverageGapsReportTask with sensible defaults for JaCoCo XML analysis."
         }
+        register("angusToolsBundle") {
+            id = "dev.angussoftware.gradle-tools"
+            implementationClass = "dev.angussoftware.gradletools.AngusToolsBundlePlugin"
+            displayName = "Angus Gradle Tools — Bundle"
+            description = "Applies failure-analysis at root and coverage to selected subprojects via a simple extension."
+        }
     }
 }
