@@ -116,6 +116,19 @@ class AngusFailureAnalysisPlugin : Plugin<Project> {
                 )
             }
         }
+
+        // Register a root-level demo task that intentionally fails to exercise the analysis
+        if (project.tasks.findByName("buildFailureDemo") == null) {
+            project.tasks.register("buildFailureDemo", BuildFailureDemoTask::class.java) {
+                group = "Help"
+                description = "Intentionally fails to demo build-failure analysis; customize with -PbuildFailureMessage."
+                message.convention(
+                    project.providers
+                        .gradleProperty("buildFailureMessage")
+                        .orElse("Sample failure triggered by buildFailureDemo"),
+                )
+            }
+        }
     }
 
     fun analyze(

@@ -140,4 +140,3 @@ dependencies {
 }
 
 apply(from = "gradle/screenshot-tasks.gradle.kts")
-apply(from = "gradle/build-failure-demo-task.gradle.kts")

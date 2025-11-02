@@ -194,18 +194,17 @@ Notes:
 ---
 
 ## Build-failure analysis demo in this repository
-- Demo task file: `composeApp/gradle/build-failure-demo-task.gradle.kts`
-- Task name: `:composeApp:composeAppBuildFailureDemo`
+- Demo task (registered by the failure-analysis plugin at the root): `:buildFailureDemo`
 - Examples:
 ```bat
 :: Demo the end-of-build diagnosis
-gradlew :composeApp:composeAppBuildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureMessage="Diagnose this sample failure"
+gradlew :buildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureMessage="Diagnose this sample failure"
 
 :: Use a specific model and Ollama path
-gradlew :composeApp:composeAppBuildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureModel=llama3.1:8b -PbuildFailureOllamaCmd="C:\\Program Files\\Ollama\\ollama.exe"
+gradlew :buildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureModel=llama3.1:8b -PbuildFailureOllamaCmd="C:\\Program Files\\Ollama\\ollama.exe"
 ```
 
-Tip: The analysis listener is skipped when the configuration cache is requested. Run with `--no-configuration-cache` or adjust your module’s policy.
+Tip: The analysis listener is skipped when the configuration cache is requested. Run with `--no-configuration-cache` or set `-PbuildFailureEnforceNoConfigCache=false` to allow CC (listener will be skipped).
 
 ---
 
