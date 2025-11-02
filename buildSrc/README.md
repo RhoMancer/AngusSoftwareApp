@@ -111,6 +111,30 @@ angusCoverage {
 }
 ```
 
+#### Bundle plugin (optional, one‑line setup)
+- Plugin ID: `dev.angussoftware.gradle-tools`
+- Class: `dev.angussoftware.gradletools.AngusToolsBundlePlugin`
+- What it does: when applied at the root, it applies the failure‑analysis plugin to the root project and the coverage plugin to selected subprojects.
+- Minimal extension (root build.gradle.kts):
+```
+plugins {
+    id("dev.angussoftware.gradle-tools")
+}
+
+angusToolsBundle {
+    includeProjects = listOf(":composeApp")
+    autoWireCoverageDependsOn = true
+}
+```
+- Notes:
+  - This is optional convenience; you can keep using the two plugins separately.
+  - `includeProjects` takes Gradle project paths. By default it includes `:composeApp`.
+  - The coverage plugin already depends on `androidConnectedTestCoverageReport` when present.
+
+Comparison with separate setup:
+- Separate: apply `dev.angussoftware.gradle-tools.failure-analysis` at root and `dev.angussoftware.gradle-tools.coverage` in each target module.
+- Bundle: apply `dev.angussoftware.gradle-tools` at root and list the modules in `includeProjects`. Both approaches are supported.
+
 ---
 
 ## Shared utilities

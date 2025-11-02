@@ -7,5 +7,12 @@ plugins {
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kover) apply false
-    id("dev.angussoftware.gradle-tools.failure-analysis")
+    id("dev.angussoftware.gradle-tools")
+}
+
+// Configure the bundle plugin to apply coverage to selected subprojects
+angusToolsBundle {
+    // Default to composeApp; add more modules here as needed
+    includeProjects = listOf(":composeApp")
+    autoWireCoverageDependsOn = true
 }
