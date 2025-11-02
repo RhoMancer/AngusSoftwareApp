@@ -1,7 +1,7 @@
 # Angus Gradle Tools — Build Failure Analysis and Branch Coverage Gaps
 
 This repository’s `buildSrc` module provides two reusable Gradle capabilities that leverage a local Ollama LLM:
-- AngusGradleToolsPlugin (plugin id `dev.angussoftware.gradle-tools`) — prints a build‑failure analysis to the Gradle console when a build fails (end‑of‑build listener; opt‑in per run).
+- AngusGradleToolsPlugin (plugin id `dev.angussoftware.gradle-tools.failure-analysis`) — prints a build‑failure analysis to the Gradle console when a build fails (end‑of‑build listener; opt‑in per run).
 - BranchCoverageGapsReportTask — parses a JaCoCo XML report to highlight missed branches, maps them back to source, emits JSON/Markdown reports, and can optionally include AI suggestions for improving test coverage.
 
 Both live under `buildSrc`, so they’re automatically available to all modules in this build (including `composeApp`).
@@ -185,9 +185,14 @@ Tip: The analysis listener is skipped when the configuration cache is requested.
 
 ---
 
+## Why two plugins?
+- Failure analysis is a root-scoped feature that registers an end-of-build listener, so it’s implemented as a root-applied plugin (`dev.angussoftware.gradle-tools.failure-analysis`).
+- Branch coverage gaps reporting is cacheable work with module-specific inputs/outputs, so it’s implemented as a task registered per module via a small plugin (`dev.angussoftware.gradle-tools.coverage`).
+- This split keeps configuration local and avoids surprising auto-behavior across subprojects. If you prefer a one-line setup later, we can add a tiny bundle plugin that simply applies both.
+
 ## Migration (old → new)
 This repository previously used the "AI Doctor" naming. It has been fully replaced:
-- Plugin ID: `dev.angussoftware.ai-doctor` → `dev.angussoftware.gradle-tools`
+- Plugin ID: `dev.angussoftware.ai-doctor` → `dev.angussoftware.gradle-tools.failure-analysis`
 - Plugin class: `AiDoctorPlugin` → `AngusGradleToolsPlugin`
 - Coverage task class: `BranchCoverageDoctorTask` → `BranchCoverageGapsReportTask`
 - Properties (plugin): `aiDoctor*` → `buildFailure*`
@@ -219,7 +224,7 @@ Since these live in `buildSrc`, they are automatically available to this build. 
 - Apply the plugin (for end‑of‑build analysis) in the root `build.gradle.kts`:
   ```kotlin
   plugins {
-      id("dev.angussoftware.gradle-tools")
+      id("dev.angussoftware.gradle-tools.failure-analysis")
   }
   ```
 - Register `BranchCoverageGapsReportTask` in the module(s) that produce JaCoCo XML, providing the inputs, flags, and outputs as shown above.
