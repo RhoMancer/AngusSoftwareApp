@@ -139,4 +139,3 @@ dependencies {
     androidTestImplementation(libs.androidx.uiautomator)
 }
 
-apply(from = "gradle/screenshot-tasks.gradle.kts")
