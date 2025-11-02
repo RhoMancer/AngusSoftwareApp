@@ -7,7 +7,7 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 /**
- * Shared utilities for AngusGradleToolsPlugin and BranchCoverageGapsReportTask.
+ * Shared utilities for AngusFailureAnalysisPlugin and BranchCoverageGapsReportTask.
  * Kept internal to the module and dependency-free.
  */
 internal object OllamaClient {

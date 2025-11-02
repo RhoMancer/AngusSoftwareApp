@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.kover)
-    id("dev.angussoftware.gradle-tools.coverage")
 }
 
 // --- Build Failure analysis policy for composeApp --------------------------------------------

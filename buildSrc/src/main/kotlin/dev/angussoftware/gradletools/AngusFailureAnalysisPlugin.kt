@@ -32,7 +32,7 @@ import org.gradle.api.Project
  * - Timeout default: 60 seconds (override with `-PbuildFailureTimeoutSec=<n>`, range 5–120).
  * - Prompt length clipping: default 6000 characters (override with `-PbuildFailureMaxPrompt=<n>`, range 1000–30000).
  */
-class AngusGradleToolsPlugin : Plugin<Project> {
+class AngusFailureAnalysisPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         // Read config providers lazily where practical (neutral naming)
         val enabledProvider = project.providers.gradleProperty("buildFailureEnabled")
@@ -106,5 +106,4 @@ class AngusGradleToolsPlugin : Plugin<Project> {
             }
         }
     }
-
 }

@@ -10,9 +10,9 @@ repositories {
 
 gradlePlugin {
     plugins {
-        register("angusGradleTools") {
+        register("angusFailureAnalysis") {
             id = "dev.angussoftware.gradle-tools.failure-analysis"
-            implementationClass = "dev.angussoftware.gradletools.AngusGradleToolsPlugin"
+            implementationClass = "dev.angussoftware.gradletools.AngusFailureAnalysisPlugin"
             displayName = "Angus Gradle Tools — Failure Analysis"
             description = "End-of-build failure analysis via local Ollama CLI (part of Angus Gradle Tools)."
         }
