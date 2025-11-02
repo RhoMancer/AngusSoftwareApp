@@ -4,8 +4,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Provider
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.register
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.io.File
@@ -26,18 +26,23 @@ import javax.inject.Inject
 class AngusCoveragePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         // Minimal extension for inputs that cannot be sensibly auto-detected everywhere.
-        val ext = project.extensions.create(
-            "angusCoverage",
-            AngusCoverageExtension::class.java,
-            project.objects,
-        )
+        val ext =
+            project.extensions.create(
+                "angusCoverage",
+                AngusCoverageExtension::class.java,
+                project.objects,
+            )
 
         // Defaults for extension
         ext.xmlReport.convention(project.layout.buildDirectory.file("reports/jacoco/androidConnectedTest/report.xml"))
         ext.sourceRoots.convention(
             listOf(
-                project.layout.projectDirectory.dir("src/commonMain/kotlin").asFile.absolutePath,
-                project.layout.projectDirectory.dir("src/androidMain/kotlin").asFile.absolutePath,
+                project.layout.projectDirectory
+                    .dir("src/commonMain/kotlin")
+                    .asFile.absolutePath,
+                project.layout.projectDirectory
+                    .dir("src/androidMain/kotlin")
+                    .asFile.absolutePath,
             ),
         )
         ext.registerConvenienceTasks.convention(true)
@@ -47,7 +52,8 @@ class AngusCoveragePlugin : Plugin<Project> {
             if (project.tasks.findByName("androidConnectedTestCoverageReport") == null) {
                 project.tasks.register<JacocoReport>("androidConnectedTestCoverageReport") {
                     group = "verification"
-                    description = "Generates JaCoCo HTML/XML coverage report for connectedDebugAndroidTest (instrumented UI tests)."
+                    description =
+                        "Generates JaCoCo HTML/XML coverage report for connectedDebugAndroidTest (instrumented UI tests)."
 
                     // Ensure device tests run first (can be skipped with -x :<module>:connectedDebugAndroidTest)
                     dependsOn("connectedDebugAndroidTest")
@@ -58,42 +64,48 @@ class AngusCoveragePlugin : Plugin<Project> {
                     mustRunAfter("compileDebugUnitTestKotlinAndroid", "compileReleaseKotlinAndroid")
 
                     // Execution data produced by on-device JaCoCo agent
-                    val executionDataFiles = project.fileTree(project.buildDir) {
-                        include(
-                            "outputs/**/connected/**/*.ec",
-                            "outputs/**/coverage.ec",
-                            "outputs/code_coverage/**/**/*.ec",
-                            "outputs/connected_android_test_code_coverage/**/**/*.ec",
-                        )
-                    }
+                    val executionDataFiles =
+                        project.fileTree(project.buildDir) {
+                            include(
+                                "outputs/**/connected/**/*.ec",
+                                "outputs/**/coverage.ec",
+                                "outputs/code_coverage/**/**/*.ec",
+                                "outputs/connected_android_test_code_coverage/**/**/*.ec",
+                            )
+                        }
                     executionData(executionDataFiles)
 
                     // Class files to analyze (Kotlin/Compose + Java) — restrict to DEBUG variants
-                    val tmpKotlinDebug = project.fileTree("${'$'}{project.buildDir}/tmp/kotlin-classes/debug") { include("**/*.class") }
-                    val tmpKotlinAndroidDebug = project.fileTree("${'$'}{project.buildDir}/tmp/kotlin-classes/androidDebug") { include("**/*.class") }
-                    val javacDebug = project.fileTree("${'$'}{project.buildDir}/intermediates/javac/debug/classes") { include("**/*.class") }
+                    val tmpKotlinDebug =
+                        project.fileTree("${'$'}{project.buildDir}/tmp/kotlin-classes/debug") { include("**/*.class") }
+                    val tmpKotlinAndroidDebug =
+                        project.fileTree("${'$'}{project.buildDir}/tmp/kotlin-classes/androidDebug") { include("**/*.class") }
+                    val javacDebug =
+                        project.fileTree("${'$'}{project.buildDir}/intermediates/javac/debug/classes") { include("**/*.class") }
 
-                    val allClassDirs = project.files(tmpKotlinDebug, tmpKotlinAndroidDebug, javacDebug)
-                        .asFileTree
-                        .matching {
-                            exclude(
-                                "**/R.class",
-                                "**/R${'$'}*.class",
-                                "**/*R*.class",
-                                "**/BuildConfig.*",
-                                "**/Manifest*.*",
-                                "**/*Test*.*",
-                                // Exclude generated Compose resources
-                                "**/composeapp/generated/**",
-                                "**/generated/**",
-                                "**/generated/resources/**",
-                                "**/generated/resources/*_commonMainKt*",
-                                // Exclude Compose singletons and previews
-                                "**/*ComposableSingletons*",
-                                "**/activity/ComposableSingletons*",
-                                "**/*Preview*",
-                            )
-                        }
+                    val allClassDirs =
+                        project
+                            .files(tmpKotlinDebug, tmpKotlinAndroidDebug, javacDebug)
+                            .asFileTree
+                            .matching {
+                                exclude(
+                                    "**/R.class",
+                                    "**/R${'$'}*.class",
+                                    "**/*R*.class",
+                                    "**/BuildConfig.*",
+                                    "**/Manifest*.*",
+                                    "**/*Test*.*",
+                                    // Exclude generated Compose resources
+                                    "**/composeapp/generated/**",
+                                    "**/generated/**",
+                                    "**/generated/resources/**",
+                                    "**/generated/resources/*_commonMainKt*",
+                                    // Exclude Compose singletons and previews
+                                    "**/*ComposableSingletons*",
+                                    "**/activity/ComposableSingletons*",
+                                    "**/*Preview*",
+                                )
+                            }
 
                     classDirectories.setFrom(allClassDirs)
                     sourceDirectories.setFrom(project.files("src/commonMain/kotlin", "src/androidMain/kotlin"))
@@ -107,9 +119,15 @@ class AngusCoveragePlugin : Plugin<Project> {
                     }
 
                     doLast {
-                        val htmlDir = reports.html.outputLocation.get().asFile
+                        val htmlDir =
+                            reports.html.outputLocation
+                                .get()
+                                .asFile
                         val htmlIndex = htmlDir.resolve("index.html")
-                        val xmlFile = reports.xml.outputLocation.get().asFile
+                        val xmlFile =
+                            reports.xml.outputLocation
+                                .get()
+                                .asFile
                         if (htmlIndex.exists()) {
                             println("Android instrumented coverage HTML: ${htmlIndex.absolutePath}")
                         } else {
@@ -144,7 +162,8 @@ class AngusCoveragePlugin : Plugin<Project> {
             if (project.tasks.findByName("androidInstrumentedCoverageWithBranchGaps") == null) {
                 project.tasks.register("androidInstrumentedCoverageWithBranchGaps") {
                     group = "verification"
-                    description = "Runs instrumented tests, generates JaCoCo, and runs Branch Coverage Analysis (branch gaps)."
+                    description =
+                        "Runs instrumented tests, generates JaCoCo, and runs Branch Coverage Analysis (branch gaps)."
                     dependsOn("androidConnectedTestCoverageReport")
                     dependsOn("androidBranchCoverageGaps")
                 }
@@ -167,18 +186,30 @@ class AngusCoveragePlugin : Plugin<Project> {
 
             // Flags
             branchCoverageEnabled.set(
-                project.providers.gradleProperty("branchCoverageEnabled").map { it.equals("true", true) }.orElse(false),
+                project.providers
+                    .gradleProperty("branchCoverageEnabled")
+                    .map { it.equals("true", true) }
+                    .orElse(false),
             )
             aiEnabled.set(
-                project.providers.gradleProperty("branchCoverageAiEnabled").map { it.equals("true", true) }.orElse(false),
+                project.providers
+                    .gradleProperty("branchCoverageAiEnabled")
+                    .map { it.equals("true", true) }
+                    .orElse(false),
             )
             ciEnabled.set(
-                project.providers.gradleProperty("branchCoverageCiEnabled").map { it.equals("true", true) }.orElse(false),
+                project.providers
+                    .gradleProperty("branchCoverageCiEnabled")
+                    .map { it.equals("true", true) }
+                    .orElse(false),
             )
 
             // Context lines (default 5; -1 = whole file)
             contextLines.set(
-                project.providers.gradleProperty("branchCoverageContextLines").map { it.toIntOrNull() ?: 5 }.orElse(5),
+                project.providers
+                    .gradleProperty("branchCoverageContextLines")
+                    .map { it.toIntOrNull() ?: 5 }
+                    .orElse(5),
             )
 
             // Optional limits — set only if properties are provided
@@ -187,12 +218,16 @@ class AngusCoveragePlugin : Plugin<Project> {
             }
             if (project.providers.gradleProperty("branchCoverageFailIfMissedBranches").isPresent) {
                 failIfMissedBranches.set(
-                    project.providers.gradleProperty("branchCoverageFailIfMissedBranches").map { it.toIntOrNull() ?: 0 },
+                    project.providers
+                        .gradleProperty("branchCoverageFailIfMissedBranches")
+                        .map { it.toIntOrNull() ?: 0 },
                 )
             }
             if (project.providers.gradleProperty("branchCoverageFailIfMissedBranchesPerFile").isPresent) {
                 failIfMissedBranchesPerFile.set(
-                    project.providers.gradleProperty("branchCoverageFailIfMissedBranchesPerFile").map { it.toIntOrNull() ?: 0 },
+                    project.providers
+                        .gradleProperty("branchCoverageFailIfMissedBranchesPerFile")
+                        .map { it.toIntOrNull() ?: 0 },
                 )
             }
 
@@ -202,19 +237,36 @@ class AngusCoveragePlugin : Plugin<Project> {
                 project.providers.gradleProperty("branchCoverageOllamaCmd").orElse(Os.defaultOllamaCommand()),
             )
             timeoutSec.set(
-                project.providers.gradleProperty("branchCoverageTimeoutSec").map { (it.toIntOrNull() ?: 60).coerceIn(5, 120) }.orElse(60),
+                project.providers
+                    .gradleProperty("branchCoverageTimeoutSec")
+                    .map { (it.toIntOrNull() ?: 60).coerceIn(5, 120) }
+                    .orElse(60),
             )
             maxPrompt.set(
-                project.providers.gradleProperty("branchCoverageMaxPrompt").map { (it.toIntOrNull() ?: 6000).coerceIn(1000, 30000) }.orElse(6000),
+                project.providers
+                    .gradleProperty("branchCoverageMaxPrompt")
+                    .map { (it.toIntOrNull() ?: 6000).coerceIn(1000, 30000) }
+                    .orElse(6000),
             )
-            redact.set(project.providers.gradleProperty("branchCoverageRedact").map { it.equals("true", true) }.orElse(true))
+            redact.set(
+                project.providers
+                    .gradleProperty("branchCoverageRedact")
+                    .map { it.equals("true", true) }
+                    .orElse(true),
+            )
 
             // AI selection thresholds
             minCoveredBranchesForAi.set(
-                project.providers.gradleProperty("branchCoverageMinCoveredBranchesForAi").map { it.toIntOrNull() ?: 1 }.orElse(1),
+                project.providers
+                    .gradleProperty("branchCoverageMinCoveredBranchesForAi")
+                    .map { it.toIntOrNull() ?: 1 }
+                    .orElse(1),
             )
             maxAiAnalyses.set(
-                project.providers.gradleProperty("branchCoverageMaxAiAnalyses").map { (it.toIntOrNull() ?: 20).coerceAtLeast(1) }.orElse(20),
+                project.providers
+                    .gradleProperty("branchCoverageMaxAiAnalyses")
+                    .map { (it.toIntOrNull() ?: 20).coerceAtLeast(1) }
+                    .orElse(20),
             )
 
             // Outputs live next to the JaCoCo XML
@@ -230,13 +282,17 @@ class AngusCoveragePlugin : Plugin<Project> {
     }
 }
 
-abstract class AngusCoverageExtension @Inject constructor(objects: ObjectFactory) {
-    /** JaCoCo XML report location used by the task. Default: build/reports/jacoco/androidConnectedTest/report.xml */
-    abstract val xmlReport: org.gradle.api.file.RegularFileProperty
+abstract class AngusCoverageExtension
+    @Inject
+    constructor(
+        objects: ObjectFactory,
+    ) {
+        /** JaCoCo XML report location used by the task. Default: build/reports/jacoco/androidConnectedTest/report.xml */
+        abstract val xmlReport: org.gradle.api.file.RegularFileProperty
 
-    /** Absolute source roots to search for files referenced by the JaCoCo XML (package/sourcefile). */
-    abstract val sourceRoots: ListProperty<String>
+        /** Absolute source roots to search for files referenced by the JaCoCo XML (package/sourcefile). */
+        abstract val sourceRoots: ListProperty<String>
 
-    /** When true, the plugin registers convenience lifecycle tasks (instrumented coverage, full report, etc.). */
-    abstract val registerConvenienceTasks: Property<Boolean>
-}
+        /** When true, the plugin registers convenience lifecycle tasks (instrumented coverage, full report, etc.). */
+        abstract val registerConvenienceTasks: Property<Boolean>
+    }

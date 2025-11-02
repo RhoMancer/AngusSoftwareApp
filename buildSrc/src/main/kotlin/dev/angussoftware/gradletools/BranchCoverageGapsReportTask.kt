@@ -130,7 +130,7 @@ abstract class BranchCoverageGapsReportTask : DefaultTask() {
             outputMd.asFile.get().writeText("No missed branches found. ✅")
             if (willRunAi) {
                 outputAiMd.asFile.get().writeText(
-                    "## Branch Coverage — AI Suggestions\n\nNo missed branches to analyze.\n", 
+                    "## Branch Coverage — AI Suggestions\n\nNo missed branches to analyze.\n",
                 )
             }
 
@@ -169,7 +169,8 @@ abstract class BranchCoverageGapsReportTask : DefaultTask() {
         // Attach source context and compute per-file totals
         val enriched = enrichWithSource(findings, sources, ctx)
         val sortedFiles = enriched.files.sortedByDescending { it.totalMissed }
-        val limited = if (topN != null) enriched.copy(files = sortedFiles.take(topN)) else enriched.copy(files = sortedFiles)
+        val limited =
+            if (topN != null) enriched.copy(files = sortedFiles.take(topN)) else enriched.copy(files = sortedFiles)
 
         // Write JSON/Markdown
         writeJson(limited, outputJson.asFile.get())
@@ -188,6 +189,7 @@ abstract class BranchCoverageGapsReportTask : DefaultTask() {
                 val line: EnrichedLine,
                 val pctCovered: Double,
             )
+
             val allEligible = mutableListOf<Eligible>()
             limited.files.forEach { f ->
                 f.lines.forEach { l ->
@@ -232,20 +234,27 @@ abstract class BranchCoverageGapsReportTask : DefaultTask() {
                 outputAiMd.asFile.get().writeText(
                     "## Branch Coverage — AI Suggestions\n\n" +
                         "Model: ${model.get()}\n\n" +
-                        "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(
-                            true,
-                        )}  | MinCoveredBranchesForAi: $minCbAi  | MaxAiAnalyses: ${maxAi}\n\n" +
+                        "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${
+                            redact.getOrElse(
+                                true,
+                            )
+                        }  | MinCoveredBranchesForAi: $minCbAi  | MaxAiAnalyses: ${maxAi}\n\n" +
                         "No lines eligible for AI analysis. Threshold minCoveredBranchesForAi=$minCbAi excluded lines with cb < $minCbAi.\n",
                 )
             } else {
                 val fileCount = aiData.files.size
                 val lineCount = aiData.files.sumOf { it.lines.size }
                 logger.lifecycle(
-                    "[BranchCoverage] [AI] Building prompt for $fileCount file(s), $lineCount line(s) (contextLines=$ctx, minCbAi=$minCbAi, maxAiAnalyses=$maxAi, redact=${redact.getOrElse(true)}).",
+                    "[BranchCoverage] [AI] Building prompt for $fileCount file(s), $lineCount line(s) (contextLines=$ctx, minCbAi=$minCbAi, maxAiAnalyses=$maxAi, redact=${
+                        redact.getOrElse(
+                            true,
+                        )
+                    }).",
                 )
                 val prompt = buildAiPrompt(aiData)
                 val clipped = AiText.clip(prompt, maxPrompt.get())
-                finalPromptUsed = if (redact.getOrElse(true)) AiText.redactSensitive(clipped, project.rootDir) else clipped
+                finalPromptUsed =
+                    if (redact.getOrElse(true)) AiText.redactSensitive(clipped, project.rootDir) else clipped
                 logger.lifecycle(
                     "[BranchCoverage] [AI] Prompt prepared (length=${finalPromptUsed!!.length} chars, maxPrompt=${maxPrompt.get()}).",
                 )
@@ -274,14 +283,17 @@ abstract class BranchCoverageGapsReportTask : DefaultTask() {
                 // Inject code windows next to the model's per-line recommendations where possible.
                 val (enhancedResponse, injectedCount) = injectCodeWindowsIntoResponse(aiResponse ?: "", aiData)
                 logger.lifecycle("[BranchCoverage] [AI] Injected $injectedCount code window(s) into AI response.")
-                val finalResponse = if (injectedCount > 0) enhancedResponse else enhancedResponse + buildCodeAppendix(aiData)
+                val finalResponse =
+                    if (injectedCount > 0) enhancedResponse else enhancedResponse + buildCodeAppendix(aiData)
 
                 outputAiMd.asFile.get().writeText(
                     "## Branch Coverage — AI Suggestions\n\n" +
                         "Model: ${model.get()}\n\n" +
-                        "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${redact.getOrElse(
-                            true,
-                        )}  | MinCoveredBranchesForAi: $minCbAi  | MaxAiAnalyses: ${maxAi}\n\n" +
+                        "Ollama: ${ollamaCmd.get()}  | Timeout: ${timeoutSec.get()}s  | MaxPrompt: ${maxPrompt.get()}  | Redact: ${
+                            redact.getOrElse(
+                                true,
+                            )
+                        }  | MinCoveredBranchesForAi: $minCbAi  | MaxAiAnalyses: ${maxAi}\n\n" +
                         finalResponse + "\n",
                 )
                 logger.lifecycle("[BranchCoverage] [AI] Suggestions written: ${outputAiMd.asFile.get().absolutePath}")
@@ -434,10 +446,24 @@ abstract class BranchCoverageGapsReportTask : DefaultTask() {
                             } else {
                                 val start = (l.line - context).coerceAtLeast(1)
                                 val end = (l.line + context).coerceAtMost(codeLines.size)
-                                val slice = if (codeLines.isNotEmpty() && start <= end) codeLines.subList(start - 1, end) else emptyList()
+                                val slice =
+                                    if (codeLines.isNotEmpty() && start <= end) {
+                                        codeLines.subList(
+                                            start - 1,
+                                            end,
+                                        )
+                                    } else {
+                                        emptyList()
+                                    }
                                 CodeWindow(start = start, end = end, lines = slice)
                             }
-                        EnrichedLine(line = l.line, mb = l.mb, cb = l.cb, classification = classify(window.lines), window = window)
+                        EnrichedLine(
+                            line = l.line,
+                            mb = l.mb,
+                            cb = l.cb,
+                            classification = classify(window.lines),
+                            window = window,
+                        )
                     }
                 val total = f.lines.sumOf { it.mb }
                 FileFindingsDetailed(
@@ -610,7 +636,10 @@ abstract class BranchCoverageGapsReportTask : DefaultTask() {
         sb.append("    \"contextLines\": ").append(contextLines).append(",\n")
         sb.append("    \"topNFiles\": ").append(topNFiles?.toString() ?: "null").append(",\n")
         sb.append("    \"failIfMissedBranches\": ").append(failIfMissedBranches?.toString() ?: "null").append(",\n")
-        sb.append("    \"failIfMissedBranchesPerFile\": ").append(failIfMissedBranchesPerFile?.toString() ?: "null").append(",\n")
+        sb
+            .append("    \"failIfMissedBranchesPerFile\": ")
+            .append(failIfMissedBranchesPerFile?.toString() ?: "null")
+            .append(",\n")
         sb.append("    \"minCoveredBranchesForAi\": ").append(minCoveredBranchesForAi).append(",\n")
         sb.append("    \"maxAiAnalyses\": ").append(maxAiAnalyses).append("\n")
         sb.append("  },\n")
