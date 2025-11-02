@@ -149,14 +149,14 @@ Source: `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/GradleToolsCommo
 ---
 
 ## Using these in this repository (composeApp)
-This repo wires the coverage task in `composeApp/gradle/coverage-tasks.gradle.kts`. It produces outputs next to the JaCoCo XML report:
+composeApp uses the coverage plugin (applied via the bundle at the root). The plugin auto-registers the coverage tasks and produces artifacts next to the JaCoCo XML report:
 - `composeApp/build/reports/jacoco/androidConnectedTest/branch-gaps.json`
 - `composeApp/build/reports/jacoco/androidConnectedTest/branch-gaps.md`
 - `composeApp/build/reports/jacoco/androidConnectedTest/branch-gaps-ai.md`
 - `composeApp/build/reports/jacoco/androidConnectedTest/branch-gaps.meta.json`
 - JaCoCo HTML: `composeApp/build/reports/jacoco/androidConnectedTest/html/index.html`
 
-Convenience tasks in `composeApp`:
+Convenience tasks (registered by the plugin):
 - `androidConnectedTestCoverageReport` — runs `connectedDebugAndroidTest` and generates JaCoCo HTML/XML (XML at `reports/jacoco/androidConnectedTest/report.xml`).
 - `androidBranchCoverageGaps` — runs `BranchCoverageGapsReportTask` over that XML.
 - `androidInstrumentedCoverageWithBranchGaps` — runs both in sequence.
