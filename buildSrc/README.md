@@ -1,7 +1,7 @@
 # Angus Gradle Tools — Build Failure Analysis and Branch Coverage Gaps
 
 This repository’s `buildSrc` module provides two reusable Gradle capabilities that leverage a local Ollama LLM:
-- AngusGradleToolsPlugin (plugin id `dev.angussoftware.gradle-tools.failure-analysis`) — prints a build‑failure analysis to the Gradle console when a build fails (end‑of‑build listener; opt‑in per run).
+- AngusFailureAnalysisPlugin (plugin id `dev.angussoftware.gradle-tools.failure-analysis`) — prints a build‑failure analysis to the Gradle console when a build fails (end‑of‑build listener; opt‑in per run).
 - BranchCoverageGapsReportTask — parses a JaCoCo XML report to highlight missed branches, maps them back to source, emits JSON/Markdown reports, and can optionally include AI suggestions for improving test coverage.
 
 Both live under `buildSrc`, so they’re automatically available to all modules in this build (including `composeApp`).
@@ -23,7 +23,7 @@ echo "Say hi" | ollama run gemma3
 
 ## Components
 
-### AngusGradleToolsPlugin — end‑of‑build failure analysis
+### AngusFailureAnalysisPlugin — end‑of‑build failure analysis
 - What it does
   - Registers a single `buildFinished` listener (only when explicitly enabled).
   - If the build failed, it builds a detailed prompt, sends it to Ollama via STDIN (`ollama run <model>`), and prints the model’s response under a banner in the Gradle output.
@@ -54,7 +54,7 @@ echo "Say hi" | ollama run gemma3
     ```
 
 Sources:
-- Plugin: `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/AngusGradleToolsPlugin.kt`
+- Plugin: `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/AngusFailureAnalysisPlugin.kt`
 - Failure analysis: `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/BuildFailureAnalysis.kt`
 
 ### BranchCoverageGapsReportTask — JaCoCo branch‑gaps reporter with optional AI guidance
@@ -217,7 +217,7 @@ Tip: The analysis listener is skipped when the configuration cache is requested.
 ## Migration (old → new)
 This repository previously used the "AI Doctor" naming. It has been fully replaced:
 - Plugin ID: `dev.angussoftware.ai-doctor` → `dev.angussoftware.gradle-tools.failure-analysis`
-- Plugin class: `AiDoctorPlugin` → `AngusGradleToolsPlugin`
+- Plugin class: `AiDoctorPlugin` → `AngusFailureAnalysisPlugin`
 - Coverage task class: `BranchCoverageDoctorTask` → `BranchCoverageGapsReportTask`
 - Properties (plugin): `aiDoctor*` → `buildFailure*`
 - Properties (coverage): `branchDoctor*` → `branchCoverage*`
@@ -256,7 +256,7 @@ Since these live in `buildSrc`, they are automatically available to this build. 
 ---
 
 ## Source files
-- `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/AngusGradleToolsPlugin.kt`
+- `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/AngusFailureAnalysisPlugin.kt`
 - `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/BuildFailureAnalysis.kt`
 - `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/BranchCoverageGapsReportTask.kt`
 - `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/GradleToolsCommon.kt`
