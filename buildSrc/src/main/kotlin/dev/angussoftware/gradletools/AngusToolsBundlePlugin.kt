@@ -28,11 +28,12 @@ import javax.inject.Inject
  */
 class AngusToolsBundlePlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val ext = project.extensions.create(
-            "angusToolsBundle",
-            AngusToolsBundleExtension::class.java,
-            project.objects,
-        )
+        val ext =
+            project.extensions.create(
+                "angusToolsBundle",
+                AngusToolsBundleExtension::class.java,
+                project.objects,
+            )
         // Defaults
         ext._includeProjects.convention(listOf(":composeApp"))
         ext._autoWireCoverageDependsOn.convention(true)
@@ -58,22 +59,30 @@ class AngusToolsBundlePlugin : Plugin<Project> {
     }
 }
 
-abstract class AngusToolsBundleExtension @Inject constructor(objects: ObjectFactory) {
-    // Backing properties so we can offer simple var-like DSL
-    internal val _includeProjects: ListProperty<String> = objects.listProperty(String::class.java)
-    internal val _autoWireCoverageDependsOn: Property<Boolean> = objects.property(Boolean::class.java)
+abstract class AngusToolsBundleExtension
+    @Inject
+    constructor(
+        objects: ObjectFactory,
+    ) {
+        // Backing properties so we can offer simple var-like DSL
+        internal val _includeProjects: ListProperty<String> = objects.listProperty(String::class.java)
+        internal val _autoWireCoverageDependsOn: Property<Boolean> = objects.property(Boolean::class.java)
 
-    /**
-     * Subproject paths to apply the coverage plugin to. Example: listOf(":composeApp", ":feature:foo")
-     */
-    var includeProjects: List<String>
-        get() = _includeProjects.orNull ?: emptyList()
-        set(value) { _includeProjects.set(value) }
+        /**
+         * Subproject paths to apply the coverage plugin to. Example: listOf(":composeApp", ":feature:foo")
+         */
+        var includeProjects: List<String>
+            get() = _includeProjects.orNull ?: emptyList()
+            set(value) {
+                _includeProjects.set(value)
+            }
 
-    /**
-     * If true, lets the coverage plugin auto-wire a dependency on a known JaCoCo task when present.
-     */
-    var autoWireCoverageDependsOn: Boolean
-        get() = _autoWireCoverageDependsOn.orNull ?: true
-        set(value) { _autoWireCoverageDependsOn.set(value) }
-}
+        /**
+         * If true, lets the coverage plugin auto-wire a dependency on a known JaCoCo task when present.
+         */
+        var autoWireCoverageDependsOn: Boolean
+            get() = _autoWireCoverageDependsOn.orNull ?: true
+            set(value) {
+                _autoWireCoverageDependsOn.set(value)
+            }
+    }
