@@ -7,15 +7,15 @@ plugins {
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kover)
-    id("dev.angussoftware.gradle-tools")
+    id("dev.angussoftware.gradle-tools") version "0.1.0"
 }
 
 // Configure the bundle plugin to apply coverage to selected subprojects
-angusToolsBundle {
-    // Default to composeApp; add more modules here as needed
-    includeProjects = listOf(":composeApp")
-    autoWireCoverageDependsOn = true
-}
+// angusToolsBundle {
+//    // Default to composeApp; add more modules here as needed
+//    includeProjects = listOf(":composeApp")
+//    autoWireCoverageDependsOn = true
+// }
 
 // Centralized Kover aggregation for the whole build
 kover {
