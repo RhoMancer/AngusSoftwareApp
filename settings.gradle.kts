@@ -10,7 +10,7 @@ pluginManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
-
+        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -30,7 +30,7 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
-//        mavenLocal()
+        mavenLocal()
         mavenCentral()
         maven {
             url = uri("https://maven.pkg.github.com/RhoMancer/Angus-Software-Theming")
