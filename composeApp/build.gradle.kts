@@ -13,8 +13,6 @@ plugins {
     alias(libs.plugins.kover)
 }
 
-
-
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -138,4 +136,3 @@ dependencies {
     debugImplementation(compose.uiTooling)
     androidTestImplementation(libs.androidx.uiautomator)
 }
-
