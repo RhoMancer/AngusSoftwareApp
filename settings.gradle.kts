@@ -1,6 +1,11 @@
 rootProject.name = "AngusSoftwareApp"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
+val githubUsername: String? =
+    System.getenv("GITHUB_USER")
+val githubPassword: String? =
+    System.getenv("GITHUB_TOKEN")
+
 pluginManagement {
     repositories {
         google {
@@ -10,16 +15,18 @@ pluginManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
-        mavenLocal()
+        // Resolve Angus Gradle Tools plugin markers from GitHub Packages instead of mavenLocal
+        maven {
+            url = uri("https://maven.pkg.github.com/RhoMancer/angus-gradle-tools")
+            credentials {
+                username = System.getenv("GITHUB_USER")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
         mavenCentral()
         gradlePluginPortal()
     }
 }
-
-val githubUsername: String? =
-    System.getenv("GITHUB_USER")
-val githubPassword: String? =
-    System.getenv("GITHUB_TOKEN")
 
 dependencyResolutionManagement {
     repositories {
@@ -30,7 +37,7 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
-        mavenLocal()
+//        mavenLocal()
         mavenCentral()
         maven {
             url = uri("https://maven.pkg.github.com/RhoMancer/Angus-Software-Theming")

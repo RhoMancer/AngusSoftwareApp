@@ -11,11 +11,11 @@ plugins {
 }
 
 // Configure the bundle plugin to apply coverage to selected subprojects
-// angusToolsBundle {
-//    // Default to composeApp; add more modules here as needed
-//    includeProjects = listOf(":composeApp")
-//    autoWireCoverageDependsOn = true
-// }
+angusToolsBundle {
+    // Default to composeApp; add more modules here as needed
+    includeProjects = listOf(":composeApp")
+    autoWireCoverageDependsOn = true
+}
 
 // Centralized Kover aggregation for the whole build
 kover {
