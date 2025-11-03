@@ -1,16 +1,30 @@
-# Angus Gradle Tools — Build Failure Analysis and Branch Coverage Gaps
+# Angus Gradle Tools — Failure Analysis, Coverage Gaps, and Screenshot Utilities
 
-This repository’s `buildSrc` module provides two reusable Gradle capabilities that leverage a local Ollama LLM:
-- AngusFailureAnalysisPlugin (plugin id `dev.angussoftware.gradle-tools.failure-analysis`) — prints a build‑failure analysis to the Gradle console when a build fails (end‑of‑build listener; opt‑in per run).
-- BranchCoverageGapsReportTask — parses a JaCoCo XML report to highlight missed branches, maps them back to source, emits JSON/Markdown reports, and can optionally include AI suggestions for improving test coverage.
+`buildSrc` provides three Gradle plugins and one cacheable task that help you diagnose failed builds and improve test coverage. AI features use a local Ollama CLI (no HTTP).
 
-Both live under `buildSrc`, so they’re automatically available to all modules in this build (including `composeApp`).
+At a glance
+- Plugins:
+  - `dev.angussoftware.gradle-tools.failure-analysis` → end‑of‑build failure analysis banner (root‑applied, opt‑in per run)
+  - `dev.angussoftware.gradle-tools.coverage` → wires JaCoCo XML and registers a branch‑gaps report task
+  - `dev.angussoftware.gradle-tools` → bundle (applies the above to selected modules and can register screenshot helpers)
+- Tasks (registered/available):
+  - `buildFailureDemo` → intentionally fails (root) to demo the failure analysis banner
+  - `androidConnectedTestCoverageReport` → generates JaCoCo HTML/XML for instrumented tests
+  - `androidInstrumentedCoverage` → convenience task; depends on `androidConnectedTestCoverageReport`
+  - `androidBranchCoverageGaps` → runs `BranchCoverageGapsReportTask` against the JaCoCo XML
+  - `androidInstrumentedCoverageWithBranchGaps` → runs instrumented coverage + branch gaps in sequence
+  - `fullCoverageReport` → unit (Kover) + instrumented coverage
+  - `createScreenshotDirectory` → adb: create `/sdcard/Download/<appId>/<buildType>/screenshots`
+  - `fetchScreenshots` → adb: pull from device to `<moduleDir>/screenshots`
+  - `clearScreenshots` → adb: remove device screenshots directory
+
+Note: Screenshot tasks are auto‑registered by the bundle plugin when `registerScreenshotTasks=true` (default).
 
 ---
 
 ## Requirements
-- A local Ollama CLI installation available on PATH, or pass the full path via properties.
-- A pulled model (examples: `gemma3`, `llama3.1:8b`, `qwen2.5-coder:7b`).
+- Local Ollama CLI on PATH or pass full path via properties.
+- A pulled model (e.g., `gemma3`, `llama3.1:8b`, `qwen2.5-coder:7b`).
 
 Quick check:
 ```bat
@@ -21,242 +35,224 @@ echo "Say hi" | ollama run gemma3
 
 ---
 
-## Components
-
-### AngusFailureAnalysisPlugin — end‑of‑build failure analysis
-- What it does
-  - Registers a single `buildFinished` listener (only when explicitly enabled).
-  - If the build failed, it builds a detailed prompt, sends it to Ollama via STDIN (`ollama run <model>`), and prints the model’s response under a banner in the Gradle output.
-- How it works (implementation details)
-  - Prompt composition is encapsulated in `BuildFailureAnalysis.analyze(...)`:
-    - Collects environment metadata (Gradle version, root project, OS/Java), the exception summary, and the full stack trace.
-    - Clips the stack trace and the final prompt to stay within `maxPrompt` (clamped to 1000–30000 chars).
-    - Optionally redacts the user HOME and project root paths with `<HOME>` and `<PROJECT_ROOT>`.
-    - Invokes `OllamaClient.run(...)` which streams STDOUT/STDERR, prints a 1‑second progress ticker, enforces a timeout, and returns partial output with a timeout note if time is exceeded.
-  - CI/configuration cache behavior:
-    - When `CI=true` the plugin is skipped unless `-PbuildFailureCiEnabled=true` is set.
-    - The listener is NOT registered when the configuration cache is requested; use `--no-configuration-cache` to enable diagnostics for that run.
-- Config flags and defaults
-  - `-PbuildFailureEnabled=true`        Enable build‑failure analysis for this build (required to activate)
-  - `-PbuildFailureModel=<name>`        Model (default `gemma3`)
-  - `-PbuildFailureOllamaCmd=<path>`    Ollama CLI (`ollama`/`ollama.exe`) — default auto‑detected
-  - `-PbuildFailureTimeoutSec=<n>`      Timeout seconds (default 60, range 5–120)
-  - `-PbuildFailureMaxPrompt=<n>`       Max prompt size (default 6000, range 1000–30000)
-  - `-PbuildFailureRedact=<true|false>` Redact HOME/PROJECT_ROOT (default true)
-  - `-PbuildFailureCiEnabled=<true|false>` Allow on CI when `CI=true` (default false)
-- Demo task (in this repo)
-  - `composeApp/gradle/build-failure-demo-task.gradle.kts` registers `:composeApp:composeAppBuildFailureDemo`.
-  - Examples:
-    ```bat
-    gradlew :composeApp:composeAppBuildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureMessage="Explain why this sample failed"
-    gradlew :composeApp:composeAppBuildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureModel=llama3.1:8b
-    gradlew :composeApp:composeAppBuildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureOllamaCmd="C:\\Program Files\\Ollama\\ollama.exe"
-    ```
-
-Sources:
-- Plugin: `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/AngusFailureAnalysisPlugin.kt`
-- Failure analysis: `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/BuildFailureAnalysis.kt`
-
-### BranchCoverageGapsReportTask — JaCoCo branch‑gaps reporter with optional AI guidance
-- What it does
-  - Parses a JaCoCo XML report to collect lines with missed branches (`mb > 0`).
-  - Locates the corresponding source lines using configured source roots and emits:
-    - `outputJson`: machine‑readable summary of files/lines, context windows, and classifications.
-    - `outputMd`: human‑readable Markdown with numbered code windows, highlighting the missed line (`▶`).
-    - `outputAiMd`: optional AI suggestions (includes the exact prompt sent and the model’s response).
-    - `outputMeta`: metadata JSON capturing all flags, prompt details, and output paths.
-  - Can enforce thresholds and fail the build if too many branches are missed (globally or per file).
-- How it works (implementation details)
-  - XML parsing disables external DTD/entity resolution and installs an empty entity resolver to avoid filesystem/network access.
-  - Source context windows are built per line; `contextLines=-1` includes the whole file.
-  - Lines eligible for AI require covered branches `cb >= branchCoverageMinCoveredBranchesForAi` (default 1). Selection prioritizes higher coverage ratio (`cb/(cb+mb)`), then `cb`, then file/line ordering.
-  - Prompts are clipped to `maxPrompt` (1000–30000 clamp) and optionally redacted. Ollama is invoked via `OllamaClient.run(...)` with a timeout and progress ticker.
-- Key inputs (set when registering the task)
-  - `xmlReport` (`RegularFileProperty`) — path to the JaCoCo XML report.
-  - `sourceRoots` (`ListProperty<String>`) — absolute paths to source directories (e.g., `src/commonMain/kotlin`, `src/androidMain/kotlin`).
-  - Feature flags: `branchCoverageEnabled`, `aiEnabled`, `ciEnabled`.
-  - Tuning: `contextLines` (default 5; `-1` includes whole file), optional `topNFiles` (limit output to top offenders).
-  - Thresholds: optional `failIfMissedBranches` (global), `failIfMissedBranchesPerFile`.
-  - AI: `model`, `ollamaCmd`, `timeoutSec`, `maxPrompt`, `redact`.
-- Outputs (you choose the file paths in your build script)
-  - `outputJson`, `outputMd`, `outputAiMd`, `outputMeta`.
-- Threshold enforcement
-  - If any file exceeds `failIfMissedBranchesPerFile`, the task throws a `GradleException`.
-  - If the global total exceeds `failIfMissedBranches`, the task throws a `GradleException`.
-
-Source: `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/BranchCoverageGapsReportTask.kt`
-
-#### Coverage plugin (optional, auto-registers the task)
-- Plugin ID: `dev.angussoftware.gradle-tools.coverage`
-- Class: `dev.angussoftware.gradletools.AngusCoveragePlugin`
-- What it does: when applied to a module, registers a task named `androidBranchCoverageGaps` and wires sensible defaults.
-- Defaults:
-  - `xmlReport`: `build/reports/jacoco/androidConnectedTest/report.xml`
-  - `sourceRoots`: `src/commonMain/kotlin`, `src/androidMain/kotlin`
-  - If a task named `androidConnectedTestCoverageReport` exists, the registered task depends on it.
-- Minimal extension:
-  - `angusCoverage.xmlReport` (RegularFile)
-  - `angusCoverage.sourceRoots` (List<String>)
-- It also respects all `branchCoverage*` `-P` properties documented below.
-- Usage per module:
-```
-plugins {
-    id("dev.angussoftware.gradle-tools.coverage")
-}
-
-angusCoverage {
-    // optional overrides
-    // xmlReport = layout.buildDirectory.file("reports/jacoco/androidConnectedTest/report.xml")
-    // sourceRoots.set(listOf("src/commonMain/kotlin", "src/androidMain/kotlin"))
-}
-```
-
-#### Bundle plugin (optional, one‑line setup)
-- Plugin ID: `dev.angussoftware.gradle-tools`
-- Class: `dev.angussoftware.gradletools.AngusToolsBundlePlugin`
-- What it does: when applied at the root, it applies the failure‑analysis plugin to the root project and the coverage plugin to selected subprojects.
-- Minimal extension (root build.gradle.kts):
-```
+## Quickstart
+1) Apply the bundle plugin at the root:
+```kotlin
 plugins {
     id("dev.angussoftware.gradle-tools")
 }
 
 angusToolsBundle {
-    includeProjects = listOf(":composeApp")
-    autoWireCoverageDependsOn = true
+    includeProjects = listOf(":composeApp")  // modules to wire
+    // registerScreenshotTasks = true        // default: true
 }
 ```
-- Notes:
-  - This is optional convenience; you can keep using the two plugins separately.
-  - `includeProjects` takes Gradle project paths. By default it includes `:composeApp`.
-  - The coverage plugin already depends on `androidConnectedTestCoverageReport` when present.
 
-Comparison with separate setup:
-- Separate: apply `dev.angussoftware.gradle-tools.failure-analysis` at root and `dev.angussoftware.gradle-tools.coverage` in each target module.
-- Bundle: apply `dev.angussoftware.gradle-tools` at root and list the modules in `includeProjects`. Both approaches are supported.
-
----
-
-## Shared utilities
-- `OllamaClient` — common process runner for `ollama run <model>` with STDIN prompt, stdout/stderr threads, progress ticker, timeout handling, and consistent return policy.
-- `AiText` — shared redaction (HOME/PROJECT_ROOT) and prompt clipping (`1000..30000` clamp).
-- `Os` — `defaultOllamaCommand()` and `isCi()`.
-- `AiGate` — central CI gating (`aiEnabled && (!CI || ciEnabled)`).
-- `jsonEsc` — simple JSON string escape used by report writers.
-
-Source: `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/GradleToolsCommon.kt`
-
----
-
-## Using these in this repository (composeApp)
-composeApp uses the coverage plugin (applied via the bundle at the root). The plugin auto-registers the coverage tasks and produces artifacts next to the JaCoCo XML report:
-- `composeApp/build/reports/jacoco/androidConnectedTest/branch-gaps.json`
-- `composeApp/build/reports/jacoco/androidConnectedTest/branch-gaps.md`
-- `composeApp/build/reports/jacoco/androidConnectedTest/branch-gaps-ai.md`
-- `composeApp/build/reports/jacoco/androidConnectedTest/branch-gaps.meta.json`
-- JaCoCo HTML: `composeApp/build/reports/jacoco/androidConnectedTest/html/index.html`
-
-Convenience tasks (registered by the plugin):
-- `androidConnectedTestCoverageReport` — runs `connectedDebugAndroidTest` and generates JaCoCo HTML/XML (XML at `reports/jacoco/androidConnectedTest/report.xml`).
-- `androidBranchCoverageGaps` — runs `BranchCoverageGapsReportTask` over that XML.
-- `androidInstrumentedCoverageWithBranchGaps` — runs both in sequence.
-- `fullCoverageReport` — runs unit (Kover) and instrumented coverage.
-
-Examples:
+2) Generate coverage + branch gaps for composeApp (no AI):
 ```bat
-:: Generate instrumented coverage + branch gaps report (no AI)
 gradlew :composeApp:androidInstrumentedCoverageWithBranchGaps -PbranchCoverageEnabled=true
+```
 
-:: Include AI suggestions too (allowed on CI only if branchCoverageCiEnabled=true)
+3) Include AI suggestions (opt‑in, allowed on CI only when explicitly enabled):
+```bat
 gradlew :composeApp:androidInstrumentedCoverageWithBranchGaps -PbranchCoverageEnabled=true -PbranchCoverageAiEnabled=true -PbranchCoverageCiEnabled=true
 ```
 
-AI configuration properties used by the composeApp wiring:
-- `-PbranchCoverageEnabled=true|false`           Master switch to run the task.
-- `-PbranchCoverageAiEnabled=true|false`        Turn on AI suggestions.
-- `-PbranchCoverageCiEnabled=true|false`        Allow AI on CI when `CI=true`.
-- `-PbranchCoverageContextLines=<int>`          Context lines around each missed line (default 5; `-1` = whole file).
-- `-PbranchCoverageTopNFiles=<int>`             Limit output to top N files by missed branches.
-- `-PbranchCoverageFailIfMissedBranches=<int>`  Fail build if total missed branches exceed this number.
-- `-PbranchCoverageFailIfMissedBranchesPerFile=<int>`  Per-file fail threshold.
-- `-PbranchCoverageModel=<name>`                Ollama model (default `gemma3`).
-- `-PbranchCoverageOllamaCmd=<path|name>`       Ollama CLI (default auto; `ollama` or `ollama.exe` on Windows).
-- `-PbranchCoverageTimeoutSec=<5..120>`         CLI timeout seconds (default 60).
-- `-PbranchCoverageMaxPrompt=<1000..30000>`     Max prompt characters (default 6000).
-- `-PbranchCoverageRedact=true|false`           Redact HOME/PROJECT_ROOT in prompt (default true).
-- `-PbranchCoverageMinCoveredBranchesForAi=<int>` Minimum covered branches (cb) to include a line in AI selection (default 1).
-- `-PbranchCoverageMaxAiAnalyses=<int>`         Cap the number of lines included in AI analysis across all files (default 20).
-
-Notes:
-- The XML is generated at `composeApp/build/reports/jacoco/androidConnectedTest/report.xml` by the provided task.
-- Source roots are configured to `src/commonMain/kotlin` and `src/androidMain/kotlin`.
-
----
-
-## Build-failure analysis demo in this repository
-- Demo task (registered by the failure-analysis plugin at the root): `:buildFailureDemo`
-- Examples:
+4) Try the failure‑analysis demo at the root:
 ```bat
-:: Demo the end-of-build diagnosis
 gradlew :buildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureMessage="Diagnose this sample failure"
-
-:: Use a specific model and Ollama path
-gradlew :buildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureModel=llama3.1:8b -PbuildFailureOllamaCmd="C:\\Program Files\\Ollama\\ollama.exe"
 ```
 
-Tip: The analysis listener is skipped when the configuration cache is requested. Run with `--no-configuration-cache` or set `-PbuildFailureEnforceNoConfigCache=false` to allow CC (listener will be skipped).
+---
+
+## Failure Analysis Plugin (`dev.angussoftware.gradle-tools.failure-analysis`)
+What it does
+- Registers a single `buildFinished` listener only when `-PbuildFailureEnabled=true`.
+- If the build failed, it builds a redacted, clipped prompt and calls `ollama run <model>` via STDIN. The model’s response prints under a clear banner.
+
+Key flags (with defaults)
+- `-PbuildFailureEnabled=true|false` → master switch (default false)
+- `-PbuildFailureModel=<name>` → model (default `gemma3`)
+- `-PbuildFailureOllamaCmd=<path|name>` → CLI (default auto; `ollama` or `ollama.exe` on Windows)
+- `-PbuildFailureTimeoutSec=<5..120>` → timeout seconds (default 60)
+- `-PbuildFailureMaxPrompt=<1000..30000>` → prompt clamp (default 6000)
+- `-PbuildFailureRedact=true|false` → redact HOME/PROJECT_ROOT (default true)
+- `-PbuildFailureCiEnabled=true|false` → allow on CI when `CI=true` (default false)
+- `-PbuildFailureEnforceNoConfigCache=true|false` → when CC is requested and this is true (default), the plugin throws with guidance; set false to keep CC (listener will be skipped)
+
+Notes
+- Uses `Logger.quiet` for the final banner. Progress logs include a 1‑second ticker while the model runs.
+- Demo task `:buildFailureDemo` is auto‑registered at the root.
 
 ---
 
-## Why two plugins?
-- Failure analysis is a root-scoped feature that registers an end-of-build listener, so it’s implemented as a root-applied plugin (`dev.angussoftware.gradle-tools.failure-analysis`).
-- Branch coverage gaps reporting is cacheable work with module-specific inputs/outputs, so it’s implemented as a task registered per module via a small plugin (`dev.angussoftware.gradle-tools.coverage`).
-- This split keeps configuration local and avoids surprising auto-behavior across subprojects. If you prefer a one-line setup later, we can add a tiny bundle plugin that simply applies both.
+## Branch Coverage Gaps Task (`BranchCoverageGapsReportTask`)
+What it does
+- Parses JaCoCo XML for lines with missed branches (`mb > 0`).
+- Resolves files via `sourceRoots`, builds per‑line context windows (or whole file with `contextLines=-1`).
+- Writes:
+  - JSON (`branch-gaps.json`) — machine‑readable summary (files, lines, windows, classifications)
+  - Markdown (`branch-gaps.md`) — human report with numbered code windows and `▶` marking the missed line
+  - AI Markdown (`branch-gaps-ai.md`) — optional AI guidance, including the exact prompt used
+  - Meta JSON (`branch-gaps.meta.json`) — flags, prompt details, output paths
+- Enforces thresholds and can fail the build (per file or global).
 
-## Migration (old → new)
-This repository previously used the "AI Doctor" naming. It has been fully replaced:
-- Plugin ID: `dev.angussoftware.ai-doctor` → `dev.angussoftware.gradle-tools.failure-analysis`
-- Plugin class: `AiDoctorPlugin` → `AngusFailureAnalysisPlugin`
-- Coverage task class: `BranchCoverageDoctorTask` → `BranchCoverageGapsReportTask`
-- Properties (plugin): `aiDoctor*` → `buildFailure*`
-- Properties (coverage): `branchDoctor*` → `branchCoverage*`
-Note: there is no back‑compat shim here; use the new names going forward.
+Security and robustness
+- XML parser disables external DTD/entity resolution and uses an empty `EntityResolver` (no FS/network access during parse).
+- Prompts are clipped to `maxPrompt` (clamped to `1000..30000`) and can be redacted.
+
+AI selection and response shaping
+- A line is eligible when `cb >= minCoveredBranchesForAi` (default 1).
+- Selection priority when trimming to `maxAiAnalyses` (default 20):
+  1) higher coverage ratio `cb / (cb + mb)`; 2) then higher `cb`; 3) then file/line order.
+- Response post‑processing injects matching code windows into the model output when headings/line anchors are detected; otherwise a code appendix is appended.
+
+Task inputs
+- `xmlReport` (RegularFile), `sourceRoots` (List<String>)
+- Flags: `branchCoverageEnabled`, `aiEnabled`, `ciEnabled`
+- Tuning: `contextLines` (default 5; `-1` = whole file), optional `topNFiles`
+- Thresholds: `failIfMissedBranches`, `failIfMissedBranchesPerFile`
+- AI: `model`, `ollamaCmd`, `timeoutSec (5..120)`, `maxPrompt (1000..30000)`, `redact`
+
+Outputs
+- `outputJson`, `outputMd`, `outputAiMd`, `outputMeta` — typically placed next to the JaCoCo XML.
 
 ---
 
-## Troubleshooting
-- No analysis banner printed
-  - The build likely did not fail, or the configuration cache was enabled (listener is skipped). Use `--no-configuration-cache` and ensure `-PbuildFailureEnabled=true`.
-- `ollama` not found
-  - Add Ollama to PATH or pass `-PbuildFailureOllamaCmd="C:\\Program Files\\Ollama\\ollama.exe"` (and for branch coverage via `-PbranchCoverageOllamaCmd=...`).
-- Timeout or empty output from Ollama
-  - Increase timeout (`-PbuildFailureTimeoutSec` / `-PbranchCoverageTimeoutSec`), try a smaller/faster model, or verify `ollama run <model>` works in your shell.
-- Prompt too long
-  - Adjust `-PbuildFailureMaxPrompt` or `-PbranchCoverageMaxPrompt`.
-- Privacy concerns
-  - Redaction is on by default. Disable with `-PbuildFailureRedact=false` / `-PbranchCoverageRedact=false` if needed.
-- Branch coverage: XML report not found
-  - Ensure the JaCoCo report task ran and the `xmlReport` path is correct (composeApp writes to `.../report.xml`).
-- Branch coverage: no source context shown
-  - Check that `sourceRoots` includes all source directories where files can be found.
+## Coverage Plugin (`dev.angussoftware.gradle-tools.coverage`)
+What it registers
+- `androidConnectedTestCoverageReport` (JaCoCo XML/HTML for instrumented tests). Depends on `connectedDebugAndroidTest` and ensures debug class outputs are produced. Prints report paths at the end.
+- `androidInstrumentedCoverage` → depends on `androidConnectedTestCoverageReport`.
+- `androidBranchCoverageGaps` → runs `BranchCoverageGapsReportTask` against that XML; `onlyIf { branchCoverageEnabled }`.
+- `androidInstrumentedCoverageWithBranchGaps` → runs both.
+- `fullCoverageReport` → runs unit (Kover) and instrumented coverage.
+
+Defaults and wiring
+- `angusCoverage.xmlReport` → `build/reports/jacoco/androidConnectedTest/report.xml`
+- `angusCoverage.sourceRoots` → `src/commonMain/kotlin`, `src/androidMain/kotlin` (absolute paths)
+- Class directories include typical debug outputs; excludes R/BuildConfig/Manifest/tests, generated artifacts, Compose singletons/previews.
+- Forwards all `-PbranchCoverage*` properties with sensible defaults and clamps.
+
+Common invocations
+```bat
+:: without AI
+gradlew :<module>:androidInstrumentedCoverageWithBranchGaps -PbranchCoverageEnabled=true
+
+:: with AI (allowed on CI only if explicitly enabled)
+gradlew :<module>:androidInstrumentedCoverageWithBranchGaps -PbranchCoverageEnabled=true -PbranchCoverageAiEnabled=true -PbranchCoverageCiEnabled=true
+```
+
+---
+
+## Bundle Plugin (`dev.angussoftware.gradle-tools`)
+- Applies the failure‑analysis plugin to the root and the coverage plugin to listed subprojects.
+- Extension (defaults):
+  - `includeProjects = listOf(":composeApp")`
+  - `registerScreenshotTasks = true` (registers Android screenshot helper tasks in included modules)
+  - `autoWireCoverageDependsOn = true` (reserved for future expansion)
+
+Example
+```kotlin
+plugins { id("dev.angussoftware.gradle-tools") }
+
+angusToolsBundle {
+    includeProjects = listOf(":composeApp")
+    registerScreenshotTasks = true
+}
+```
+
+---
+
+## Screenshot Tasks (Android convenience)
+Registered when the bundle plugin has `registerScreenshotTasks=true`.
+
+Tasks (idempotent)
+- `createScreenshotDirectory` → `adb shell mkdir -p /sdcard/Download/<appId>/<buildType>/screenshots`
+- `fetchScreenshots` → `adb pull <deviceDir> <moduleDir>/screenshots`
+- `clearScreenshots` → `adb shell rm -rf <deviceDir>`
+
+Orchestration
+- `connectedDebugAndroidTest` depends on `createScreenshotDirectory`, then is finalized by `fetchScreenshots`, which is finalized by `clearScreenshots`.
+
+Properties
+- `-PscreenshotAppId=<applicationId>` (default `dev.angussoftware.app`)
+- `-PscreenshotBuildType=<buildType>` (default `debug`)
+
+All three Exec tasks use `ignoreExitValue=true` to avoid failing the build if a device is absent or no screenshots exist.
+
+---
+
+## Operator’s Guide (for teammates)
+- Install and test Ollama:
+  ```bat
+  ollama pull gemma3
+  echo "Say hi" | ollama run gemma3
+  ```
+- Generate coverage + gaps (no AI):
+  ```bat
+  gradlew :composeApp:androidInstrumentedCoverageWithBranchGaps -PbranchCoverageEnabled=true
+  ```
+- Add AI suggestions (local or CI with opt‑in):
+  ```bat
+  gradlew :composeApp:androidInstrumentedCoverageWithBranchGaps -PbranchCoverageEnabled=true -PbranchCoverageAiEnabled=true -PbranchCoverageCiEnabled=true
+  ```
+- Failure analysis on any failing build:
+  ```bat
+  gradlew <your:task> --no-configuration-cache -PbuildFailureEnabled=true
+  :: or keep CC but skip listener registration
+  gradlew <your:task> -PbuildFailureEnabled=true -PbuildFailureEnforceNoConfigCache=false
+  ```
+- Use a specific model and path on Windows:
+  ```bat
+  gradlew :buildFailureDemo --no-configuration-cache -PbuildFailureEnabled=true -PbuildFailureModel=llama3.1:8b -PbuildFailureOllamaCmd="C:\\Program Files\\Ollama\\ollama.exe"
+  ```
+- Screenshot helpers (auto‑wired):
+  ```bat
+  gradlew :composeApp:connectedDebugAndroidTest -PscreenshotAppId=dev.angussoftware.app -PscreenshotBuildType=debug
+  ```
+
+---
+
+## Properties (reference)
+Failure analysis (`buildFailure*`)
+- `buildFailureEnabled`, `buildFailureModel`, `buildFailureOllamaCmd`, `buildFailureTimeoutSec (5..120)`, `buildFailureMaxPrompt (1000..30000)`, `buildFailureRedact`, `buildFailureCiEnabled`, `buildFailureEnforceNoConfigCache`
+
+Branch gaps (`branchCoverage*`)
+- `branchCoverageEnabled`, `branchCoverageAiEnabled`, `branchCoverageCiEnabled`, `branchCoverageContextLines`, `branchCoverageTopNFiles`, `branchCoverageFailIfMissedBranches`, `branchCoverageFailIfMissedBranchesPerFile`, `branchCoverageModel`, `branchCoverageOllamaCmd`, `branchCoverageTimeoutSec (5..120)`, `branchCoverageMaxPrompt (1000..30000)`, `branchCoverageRedact`, `branchCoverageMinCoveredBranchesForAi`, `branchCoverageMaxAiAnalyses`
+
+Screenshots (`screenshot*`)
+- `screenshotAppId`, `screenshotBuildType`
+
+---
+
+## Troubleshooting (quick)
+- No analysis banner: ensure the build actually failed and `-PbuildFailureEnabled=true`. With CC: use `--no-configuration-cache` or `-PbuildFailureEnforceNoConfigCache=false` (listener will be skipped).
+- `ollama` not found: add to PATH or pass `-PbuildFailureOllamaCmd="C:\\Program Files\\Ollama\\ollama.exe"` (and `-PbranchCoverageOllamaCmd=...`). Verify `ollama run <model>` works.
+- AI timeout/empty output: raise `*TimeoutSec`, try a smaller model, or check local model availability.
+- Branch coverage XML not found: run `androidConnectedTestCoverageReport` first or check `angusCoverage.xmlReport`.
+- No source context: ensure all source roots are listed.
+- Privacy: prompts redact HOME/PROJECT_ROOT by default. Disable with `*Redact=false` if needed.
 
 ---
 
 ## Reuse in other projects
-Since these live in `buildSrc`, they are automatically available to this build. To reuse elsewhere, copy the `buildSrc` directory into another Gradle project and:
-- Apply the plugin (for end‑of‑build analysis) in the root `build.gradle.kts`:
+- Copy `buildSrc` to another Gradle project.
+- At root, apply the failure analysis plugin or the bundle:
   ```kotlin
-  plugins {
-      id("dev.angussoftware.gradle-tools.failure-analysis")
-  }
+  plugins { id("dev.angussoftware.gradle-tools.failure-analysis") }
+  // or
+  plugins { id("dev.angussoftware.gradle-tools") }
   ```
-- Register `BranchCoverageGapsReportTask` in the module(s) that produce JaCoCo XML, providing the inputs, flags, and outputs as shown above.
+- In modules with JaCoCo XML, either apply `dev.angussoftware.gradle-tools.coverage` or keep the bundle and list modules in `includeProjects`.
 
 ---
 
 ## Source files
 - `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/AngusFailureAnalysisPlugin.kt`
-- `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/BuildFailureAnalysis.kt`
 - `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/BranchCoverageGapsReportTask.kt`
+- `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/AngusCoveragePlugin.kt`
+- `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/AngusToolsBundlePlugin.kt`
+- `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/ScreenshotTasks.kt`
+- `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/BuildFailureDemoTask.kt`
 - `buildSrc/src/main/kotlin/dev/angussoftware/gradletools/GradleToolsCommon.kt`
 - This README: `buildSrc/README.md`
