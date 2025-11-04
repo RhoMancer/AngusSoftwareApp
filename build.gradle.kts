@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kover)
-    id("dev.angussoftware.gradle-tools") version "0.1.0"
+    alias(libs.plugins.angusGradleTools)
 }
 
 // Configure the bundle plugin to apply coverage to selected subprojects
