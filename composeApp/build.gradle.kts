@@ -17,6 +17,10 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.angusGradleTools.coverage)
 }
+
+// Centralized App ID to avoid duplicated strings across android block
+val appId = "dev.angussoftware.app"
+
 angusCoverage {
     xmlReport.set(layout.buildDirectory.file("reports/jacoco/androidConnectedTest/report.xml"))
     sourceRoots.set(
@@ -37,9 +41,9 @@ angusCoverage {
 
         ai {
             enabled.set(true)
-            allowOnCi.set(true)
-            model.set("gemma3")
-            timeoutSec.set(60)
+            allowOnCi.set(false)
+            model.set("qwen3-coder:30b")
+            timeoutSec.set(120)
             maxPrompt.set(6000)
             redact.set(true)
 
@@ -119,14 +123,14 @@ kotlin {
 }
 
 android {
-    namespace = "dev.angussoftware.app"
+    namespace = appId
     compileSdk =
         libs.versions.android.compileSdk
             .get()
             .toInt()
 
     defaultConfig {
-        applicationId = "dev.angussoftware.app"
+        applicationId = appId
         minSdk =
             libs.versions.android.minSdk
                 .get()
