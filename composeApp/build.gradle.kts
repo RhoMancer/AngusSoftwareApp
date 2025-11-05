@@ -1,3 +1,7 @@
+import dev.angussoftware.gradletools.ai
+import dev.angussoftware.gradletools.gaps
+import dev.angussoftware.gradletools.selection
+import dev.angussoftware.gradletools.thresholds
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -11,6 +15,40 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.kover)
+    alias(libs.plugins.angusGradleTools.coverage)
+}
+angusCoverage {
+    xmlReport.set(layout.buildDirectory.file("reports/jacoco/androidConnectedTest/report.xml"))
+    sourceRoots.set(
+        listOf(
+            projectDir.resolve("src/commonMain/kotlin").absolutePath,
+            projectDir.resolve("src/androidMain/kotlin").absolutePath,
+        ),
+    )
+
+    gaps {
+        contextLines.set(5) // -1 = whole file
+        // topNFiles.set(20)
+
+        thresholds {
+//            maxTotalMissedBranches.set(0)
+//            maxMissedBranchesPerFile.set(0)
+        }
+
+        ai {
+            enabled.set(true)
+            allowOnCi.set(true)
+            model.set("gemma3")
+            timeoutSec.set(60)
+            maxPrompt.set(6000)
+            redact.set(true)
+
+            selection {
+                minCoveredBranches.set(1)
+                maxAnalyses.set(20)
+            }
+        }
+    }
 }
 
 kotlin {

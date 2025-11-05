@@ -11,7 +11,7 @@ composeMultiplatform = "1.9.0"
 kotlin = "2.2.10"
 kover = "0.9.3"
 angusSoftware-theming = "0.0.2.30"
-angusSoftware-gradle = "0.1.1"
+angusSoftware-gradle = "0.1.4"
 nav_version = "2.9.1"
 uiautomator = "2.3.0"
 uiTestJunit4Android = "1.9.4"
@@ -39,3 +39,4 @@ kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", versio
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 angusGradleTools = { id = "dev.angussoftware.gradle-tools", version.ref = "angusSoftware-gradle" }
+angusGradleTools-coverage = { id = "dev.angussoftware.gradle-tools.coverage"}
