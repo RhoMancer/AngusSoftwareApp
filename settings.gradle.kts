@@ -1,47 +1,54 @@
 rootProject.name = "AngusSoftwareApp"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-val githubUsername: String? =
-    System.getenv("GITHUB_USER")
-val githubPassword: String? =
-    System.getenv("GITHUB_TOKEN")
+fun MavenArtifactRepository.androidxAndGoogleOnly() {
+    mavenContent {
+        includeGroupAndSubgroups("androidx")
+        includeGroupAndSubgroups("com.android")
+        includeGroupAndSubgroups("com.google")
+    }
+}
 
 pluginManagement {
     repositories {
-        google {
-            mavenContent {
-                includeGroupAndSubgroups("androidx")
-                includeGroupAndSubgroups("com.android")
-                includeGroupAndSubgroups("com.google")
-            }
-        }
+        // Note: Plugin repositories do not support repository content filtering.
+        // Keep plain google() here; the helper applies only to dependency repositories.
+        google()
+
+        // Declare credentials/constants locally: resolve from gradle.properties first, then fall back to env.
+        val githubOwner: String = providers.gradleProperty("githubOwner").orNull ?: System.getenv("GITHUB_OWNER") ?: "RhoMancer"
+        val githubUsername: String? = providers.gradleProperty("githubUser").orNull ?: System.getenv("GITHUB_USER")
+        val githubPassword: String? = providers.gradleProperty("githubToken").orNull ?: System.getenv("GITHUB_TOKEN")
+
         // Resolve Angus Gradle Tools plugin markers from GitHub Packages instead of mavenLocal
         maven {
-            url = uri("https://maven.pkg.github.com/RhoMancer/angus-gradle-tools")
+            url = uri("https://maven.pkg.github.com/$githubOwner/angus-gradle-tools")
             credentials {
-                username = System.getenv("GITHUB_USER")
-                password = System.getenv("GITHUB_TOKEN")
+                username = githubUsername
+                password = githubPassword
             }
         }
-//        mavenLocal()
+        // mavenLocal()
         mavenCentral()
         gradlePluginPortal()
     }
 }
 
+// Resolve dependency artifacts from GitHub Packages; read owner/creds from gradle.properties with env fallback
+val githubOwner: String = providers.gradleProperty("githubOwner").orNull ?: System.getenv("GITHUB_OWNER") ?: "RhoMancer"
+val githubUsername: String? = providers.gradleProperty("githubUser").orNull ?: System.getenv("GITHUB_USER")
+val githubPassword: String? = providers.gradleProperty("githubToken").orNull ?: System.getenv("GITHUB_TOKEN")
+
 dependencyResolutionManagement {
     repositories {
         google {
-            mavenContent {
-                includeGroupAndSubgroups("androidx")
-                includeGroupAndSubgroups("com.android")
-                includeGroupAndSubgroups("com.google")
-            }
+            androidxAndGoogleOnly()
         }
-//        mavenLocal()
+        // mavenLocal()
         mavenCentral()
+
         maven {
-            url = uri("https://maven.pkg.github.com/RhoMancer/Angus-Software-Theming")
+            url = uri("https://maven.pkg.github.com/$githubOwner/Angus-Software-Theming")
             credentials {
                 username = githubUsername
                 password = githubPassword
