@@ -28,7 +28,7 @@ pluginManagement {
                 password = githubPassword
             }
         }
-        // mavenLocal()
+        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -44,7 +44,7 @@ dependencyResolutionManagement {
         google {
             androidxAndGoogleOnly()
         }
-        // mavenLocal()
+        mavenLocal()
         mavenCentral()
 
         maven {
