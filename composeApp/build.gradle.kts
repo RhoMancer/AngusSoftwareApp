@@ -1,7 +1,7 @@
-import dev.angussoftware.gradletools.ai
-import dev.angussoftware.gradletools.gaps
-import dev.angussoftware.gradletools.selection
-import dev.angussoftware.gradletools.thresholds
+import com.angussoftware.com.angussoftware.gradletools.coverage.ai
+import com.angussoftware.com.angussoftware.gradletools.coverage.gaps
+import com.angussoftware.com.angussoftware.gradletools.coverage.selection
+import com.angussoftware.com.angussoftware.gradletools.coverage.thresholds
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
