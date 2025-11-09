@@ -1,7 +1,7 @@
-import com.angussoftware.com.angussoftware.gradletools.coverage.ai
-import com.angussoftware.com.angussoftware.gradletools.coverage.gaps
-import com.angussoftware.com.angussoftware.gradletools.coverage.selection
-import com.angussoftware.com.angussoftware.gradletools.coverage.thresholds
+import com.angussoftware.gradletools.coverage.ai
+import com.angussoftware.gradletools.coverage.gaps
+import com.angussoftware.gradletools.coverage.selection
+import com.angussoftware.gradletools.coverage.thresholds
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -35,8 +35,8 @@ angusCoverage {
         // topNFiles.set(20)
 
         thresholds {
-//            maxTotalMissedBranches.set(0)
-//            maxMissedBranchesPerFile.set(0)
+            //            maxTotalMissedBranches.set(0)
+            //            maxMissedBranchesPerFile.set(0)
         }
 
         ai {
