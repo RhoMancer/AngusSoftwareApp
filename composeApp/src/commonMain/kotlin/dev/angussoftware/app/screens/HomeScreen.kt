@@ -402,15 +402,18 @@ private fun ContactItem(
  * SocialMediaButton displays a button for a social media platform.
  *
  * @param platform The name of the social media platform
+ * @param url The URL to open when the button is clicked
  */
 @Composable
-private fun SocialMediaButton(
+internal fun SocialMediaButton(
     platform: String,
     url: String,
 ) {
     val uriHandler = LocalUriHandler.current
     OutlinedCard(
-        modifier = Modifier.clickable { uriHandler.openUri(url) },
+        modifier = Modifier
+            .clickable { uriHandler.openUri(url) }
+            .testTag("social_media_button_$platform"),
         colors =
             CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
