@@ -266,39 +266,48 @@ private fun AboutMeProfessionalSection(alpha: Float) {
  * @param alpha The opacity value for the fade-in animation
  */
 @Composable
-private fun AboutMePersonalSection(alpha: Float) {
+internal fun AboutMePersonalSection(alpha: Float) {
     currentWindowAdaptiveInfo().isCompact
 
     SectionCard(alpha = alpha) {
         Column(
             modifier =
                 Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .testTag("about_me_personal_section"),
         ) {
             // Section Title
             Text(
                 text = stringResource(Res.string.home_about_per_title),
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .testTag("about_me_personal_title"),
             )
 
             // Personal Summary
             Text(
                 text = stringResource(Res.string.home_about_per_paragraph1),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .testTag("about_me_personal_paragraph1"),
             )
 
             Text(
                 text = stringResource(Res.string.home_about_per_paragraph2),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .testTag("about_me_personal_paragraph2"),
             )
 
             Text(
                 text = stringResource(Res.string.home_about_per_paragraph3),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .testTag("about_me_personal_paragraph3"),
             )
         }
     }
@@ -310,18 +319,21 @@ private fun AboutMePersonalSection(alpha: Float) {
  * @param alpha The opacity value for the fade-in animation
  */
 @Composable
-private fun ContactSection(alpha: Float) {
+internal fun ContactSection(alpha: Float) {
     SectionCard(alpha = alpha) {
         Column(
             modifier =
                 Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .testTag("contact_section"),
         ) {
             // Section Title
             Text(
                 text = stringResource(Res.string.home_contact_title),
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .testTag("contact_section_title"),
             )
 
             // Email
@@ -344,7 +356,9 @@ private fun ContactSection(alpha: Float) {
             Text(
                 text = stringResource(Res.string.home_connect_with_me),
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .testTag("contact_section_social_title"),
             )
 
             // Social Media Links
@@ -381,19 +395,23 @@ private fun ContactSection(alpha: Float) {
  * @param content The actual contact information value
  */
 @Composable
-private fun ContactItem(
+internal fun ContactItem(
     title: String,
     content: String,
 ) {
-    Column {
+    Column(
+        modifier = Modifier.testTag("contact_item_$title")
+    ) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.testTag("contact_item_title_$title")
         )
         Text(
             text = content,
             style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.testTag("contact_item_content_$title")
         )
     }
 }
