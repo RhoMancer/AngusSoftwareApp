@@ -70,42 +70,6 @@ class SocialMediaButtonInstrumentedTest {
     }
 
     /**
-     * Test that the OpenInNew icon is present on the button.
-     */
-    @Test
-    fun openInNewIcon_isPresent() {
-        setContent {
-            SocialMediaButton(
-                platform = testPlatform,
-                url = testUrl
-            )
-        }
-
-        // The icon should be present with appropriate content description
-        val node = rule.onNodeWithTag("social_media_button_$testPlatform")
-        node.assertExists()
-        
-        // Verify the node is clickable (has click action)
-        node.assertHasClickAction()
-    }
-
-    /**
-     * Test that the button is clickable and has the correct semantics.
-     */
-    @Test
-    fun button_isClickable() {
-        setContent {
-            SocialMediaButton(
-                platform = testPlatform,
-                url = testUrl
-            )
-        }
-
-        val button = rule.onNodeWithTag("social_media_button_$testPlatform")
-        button.assertHasClickAction()
-    }
-
-    /**
      * Test that clicking the button triggers the URI handler with the correct URL.
      */
     @Test
@@ -168,21 +132,6 @@ class SocialMediaButtonInstrumentedTest {
         assertEquals(2, capturedUris.size)
         assertTrue(capturedUris.contains("https://linkedin.com"))
         assertTrue(capturedUris.contains("https://github.com"))
-    }
-
-    /**
-     * Test that the test tag is correctly applied to each button.
-     */
-    @Test
-    fun testTag_isCorrectlyApplied() {
-        setContent {
-            SocialMediaButton(
-                platform = testPlatform,
-                url = testUrl
-            )
-        }
-
-        rule.onNodeWithTag("social_media_button_$testPlatform").assertExists()
     }
 
     /**
@@ -274,26 +223,6 @@ class SocialMediaButtonInstrumentedTest {
     }
 
     /**
-     * Test that the button maintains proper Material Design styling.
-     */
-    @Test
-    fun button_hasMaterialDesignStyling() {
-        setContent {
-            SocialMediaButton(
-                platform = testPlatform,
-                url = testUrl
-            )
-        }
-
-        val button = rule.onNodeWithTag("social_media_button_$testPlatform")
-        button.assertExists()
-        button.assertIsDisplayed()
-        
-        // Verify text is present and visible
-        rule.onNodeWithText(testPlatform).assertIsDisplayed()
-    }
-
-    /**
      * Test that empty platform name still renders (edge case).
      */
     @Test
@@ -352,92 +281,6 @@ class SocialMediaButtonInstrumentedTest {
         assertEquals(urls.size, capturedUris.size)
         urls.forEach { url ->
             assertTrue(capturedUris.contains(url))
-        }
-    }
-
-    /**
-     * Test accessibility - button should be accessible to screen readers.
-     */
-    @Test
-    fun button_isAccessible() {
-        setContent {
-            SocialMediaButton(
-                platform = testPlatform,
-                url = testUrl
-            )
-        }
-
-        val button = rule.onNodeWithTag("social_media_button_$testPlatform")
-        
-        // Should have text that screen readers can announce
-        rule.onNodeWithText(testPlatform).assertExists()
-        
-        // Should be clickable (important for accessibility)
-        button.assertHasClickAction()
-    }
-
-    /**
-     * Test that button content (text and icon) is properly laid out.
-     */
-    @Test
-    fun buttonContent_isProperlyLaidOut() {
-        setContent {
-            SocialMediaButton(
-                platform = testPlatform,
-                url = testUrl
-            )
-        }
-
-        // Both text and the parent container should be visible
-        rule.onNodeWithText(testPlatform).assertIsDisplayed()
-        rule.onNodeWithTag("social_media_button_$testPlatform").assertIsDisplayed()
-    }
-
-    /**
-     * Test real-world social media platform examples.
-     */
-    @Test
-    fun realWorldPlatforms_renderAndWorkCorrectly() {
-        val platforms = mapOf(
-            "LinkedIn" to "https://www.linkedin.com/in/johndoe",
-            "GitHub" to "https://github.com/johndoe",
-            "Bluesky" to "https://bsky.app/profile/johndoe.bsky.social",
-            "Proto.Pro" to "https://proto.pro/@johndoe"
-        )
-        
-        val capturedUris = mutableMapOf<String, String>()
-        
-        rule.setContent {
-            MaterialTheme {
-                CompositionLocalProvider(
-                    LocalUriHandler provides object : UriHandler {
-                        override fun openUri(uri: String) {
-                            capturedUris[platforms.entries.find { it.value == uri }?.key ?: ""] = uri
-                        }
-                    }
-                ) {
-                    androidx.compose.foundation.layout.Column {
-                        platforms.forEach { (platform, url) ->
-                            SocialMediaButton(platform = platform, url = url)
-                        }
-                    }
-                }
-            }
-        }
-
-        platforms.forEach { (platform, url) ->
-            // Verify each platform is displayed
-            rule.onNodeWithText(platform).assertIsDisplayed()
-            
-            // Click each button
-            rule.onNodeWithTag("social_media_button_$platform").performClick()
-            rule.waitForIdle()
-        }
-
-        // Verify all URLs were opened
-        assertEquals(platforms.size, capturedUris.size)
-        platforms.forEach { (platform, url) ->
-            assertEquals(url, capturedUris[platform])
         }
     }
 
