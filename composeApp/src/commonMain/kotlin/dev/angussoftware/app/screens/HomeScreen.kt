@@ -178,7 +178,7 @@ private fun HeroSection(alpha: Float) {
  * @param alpha The opacity value for the fade-in animation
  */
 @Composable
-private fun AboutMeProfessionalSection(alpha: Float) {
+internal fun AboutMeProfessionalSection(alpha: Float) {
     val isCompactScreen = currentWindowAdaptiveInfo().isCompact
 
     SectionCard(alpha = alpha) {
