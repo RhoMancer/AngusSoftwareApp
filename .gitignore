@@ -21,3 +21,8 @@ captures
 
 # Screenshot test artifacts
 /composeApp/screenshots/
+
+# Android signing
+keystore.properties
+*.jks
+*.keystore
