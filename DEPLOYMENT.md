@@ -44,7 +44,7 @@ You'll be prompted for:
 For local builds, copy the template:
 
 ```bash
-cp keystore.properties.template keystore.properties
+cp keystore.properties keystore.properties
 ```
 
 Edit `keystore.properties` and fill in:
