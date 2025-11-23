@@ -90,7 +90,7 @@ jobs:
           packageName: dev.angussoftware.app
           releaseFiles: composeApp/build/outputs/bundle/release/*.aab
           track: internal
-          status: completed
+          status: draft
 
   build-web:
     name: Build and Deploy Web
