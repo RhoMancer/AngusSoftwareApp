@@ -62,11 +62,15 @@ jobs:
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > ${{ github.workspace }}/release-keystore.jks
       
       - name: Create keystore.properties
+        env:
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           echo "storeFile=${{ github.workspace }}/release-keystore.jks" > keystore.properties
-          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> keystore.properties
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> keystore.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> keystore.properties
+          echo "storePassword=$STORE_PASSWORD" >> keystore.properties
+          echo "keyAlias=$KEY_ALIAS" >> keystore.properties
+          echo "keyPassword=$KEY_PASSWORD" >> keystore.properties
       
       - name: Build release APK and Bundle
         run: ./gradlew :composeApp:bundleRelease :composeApp:assembleRelease
