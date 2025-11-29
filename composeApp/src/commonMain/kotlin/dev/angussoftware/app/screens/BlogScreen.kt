@@ -12,8 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import angussoftwareapp.composeapp.generated.resources.*
@@ -132,52 +135,94 @@ internal fun BlogScreen(navController: NavHostController? = null) {
                                 navController?.navigate("${Screen.BlogPost.name}/$idx")
                             }
                         SectionCard(alpha = alpha, modifier = clickableModifier) {
-                            Box(modifier = Modifier.fillMaxWidth()) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth(),
-                                ) {
-                                    Text(
-                                        text = post.title,
-                                        style = MaterialTheme.typography.titleLarge,
-                                    )
-                                    post.pubDate?.let {
-                                        Text(
-                                            text = it,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier.padding(top = 4.dp),
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                val textMeasurer = rememberTextMeasurer()
+                                val titleStyle = MaterialTheme.typography.titleLarge
+                                val title = post.title
+
+                                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                                    val maxWidthPx = constraints.maxWidth
+                                    val iconSize = 24.dp
+                                    val padding = 8.dp
+                                    val density = LocalDensity.current
+                                    val iconWidthPx = with(density) { (iconSize + padding).toPx() }
+
+                                    val firstLineMaxWidth = (maxWidthPx - iconWidthPx).toInt().coerceAtLeast(0)
+
+                                    val textLayoutResult = remember(title, maxWidthPx) {
+                                        textMeasurer.measure(
+                                            text = title,
+                                            style = titleStyle,
+                                            constraints = Constraints(maxWidth = firstLineMaxWidth)
                                         )
                                     }
-                                    post.summary?.let {
-                                        Text(
-                                            text = it,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            modifier = Modifier.padding(top = 8.dp),
-                                        )
-                                    }
-                                    if (!post.imageUrl.isNullOrBlank()) {
-                                        Box(
-                                            modifier =
-                                                Modifier
-                                                    .fillMaxWidth()
-                                                    .height(160.dp)
-                                                    .padding(top = 8.dp)
-                                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                            contentAlignment = Alignment.Center,
-                                        ) {
+
+                                    val breakIndex = textLayoutResult.getLineEnd(0, visibleEnd = true)
+
+                                    val part1 = title.substring(0, minOf(title.length, breakIndex))
+                                    val part2 = if (breakIndex < title.length) title.substring(breakIndex).trimStart() else ""
+
+                                    Column {
+                                        Box(modifier = Modifier.fillMaxWidth()) {
                                             Text(
-                                                text = "Image placeholder",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                text = part1,
+                                                style = titleStyle,
+                                                modifier = Modifier
+                                                    .widthIn(max = with(density) { firstLineMaxWidth.toDp() })
+                                            )
+
+                                            Icon(
+                                                imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
+                                                contentDescription = "Open",
+                                                tint = MaterialTheme.colorScheme.onSurface,
+                                                modifier = Modifier
+                                                    .align(Alignment.TopEnd)
+                                                    .size(iconSize)
+                                            )
+                                        }
+
+                                        if (part2.isNotEmpty()) {
+                                            Text(
+                                                text = part2,
+                                                style = titleStyle,
+                                                modifier = Modifier.fillMaxWidth()
                                             )
                                         }
                                     }
                                 }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
-                                    contentDescription = "Open",
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.align(Alignment.TopEnd),
-                                )
+                                post.pubDate?.let {
+                                    Text(
+                                        text = it,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(top = 4.dp),
+                                    )
+                                }
+                                post.summary?.let {
+                                    Text(
+                                        text = it,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(top = 8.dp),
+                                    )
+                                }
+                                if (!post.imageUrl.isNullOrBlank()) {
+                                    Box(
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .height(160.dp)
+                                                .padding(top = 8.dp)
+                                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Text(
+                                            text = "Image placeholder",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
