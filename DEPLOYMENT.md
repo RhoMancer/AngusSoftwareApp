@@ -176,18 +176,31 @@ After adding all secrets, you should have:
 
 ## Step 5: First Deployment
 
-### 5.1 Update version information
+### 5.1 Update version information (automated)
 
-Before your first release, update the version in `composeApp/build.gradle.kts`:
+This project uses file-based versioning. The single source of truth is in `gradle.properties`:
 
-```kotlin
-versionCode = 1
-versionName = "1.0"
+```
+version=1.2.1           # human-readable SemVer → Android versionName, shown on Web/Wasm
+android.versionCode=12  # Play Store versionCode → MUST increment by exactly +1 per release
 ```
 
-For subsequent releases, increment these values:
-- `versionCode`: Must increase with each release (e.g., 1, 2, 3...)
-- `versionName`: Semantic version string (e.g., "1.0", "1.1", "2.0")
+You do NOT edit `composeApp/build.gradle.kts` for versions anymore. Android reads these values automatically.
+
+Use the Gradle tasks below to bump versions:
+
+```
+# Patch release (x.y.z → x.y.(z+1)) and versionCode +1
+gradlew releasePatch
+
+# Minor release (x.y.z → x.(y+1).0) and versionCode +1
+gradlew releaseMinor
+
+# Major release ((x+1).0.0) and versionCode +1
+gradlew releaseMajor
+```
+
+After running one of the above, commit the updated `gradle.properties` and proceed.
 
 ### 5.2 Create a release branch
 
@@ -209,6 +222,24 @@ The workflow will:
 - ✅ Upload to Google Play Internal Testing
 - ✅ Build Web/Wasm distribution
 - ✅ Deploy to GitHub Pages
+
+Versions during deployment
+- The GitHub Actions workflow can optionally perform the bump for you prior to build and commit it back to the branch. Example snippet:
+
+```yaml
+- name: Bump version for release
+  run: ./gradlew releasePatch
+
+- name: Commit version bump
+  run: |
+    git config user.name "github-actions"
+    git config user.email "github-actions@users.noreply.github.com"
+    git add gradle.properties
+    git commit -m "chore: release $(grep ^version= gradle.properties | cut -d= -f2) (code $(grep ^android.versionCode= gradle.properties | cut -d= -f2))" || echo "No changes"
+    git push
+```
+
+Note: If your repository policy disallows CI commits, run the bump task locally and push the change in a PR before triggering the release workflow.
 
 ### 5.4 Verify deployments
 

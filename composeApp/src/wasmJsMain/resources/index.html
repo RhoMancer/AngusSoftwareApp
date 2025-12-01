@@ -26,5 +26,25 @@
         <div class="spinner"></div>
         <p>Loading Angus Software...</p>
     </div>
+
+    <!-- Version badge (populated at runtime from version.txt) -->
+    <div id="version-badge" style="position:fixed;right:12px;bottom:12px;padding:6px 10px;border-radius:12px;background:rgba(0,0,0,0.6);color:#fff;font:12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;">
+        <span>Version:</span>
+        <code id="version-text">loading…</code>
+    </div>
+
+    <script>
+        // Fetch human-readable version generated during build
+        fetch('version.txt', { cache: 'no-store' })
+            .then(r => r.ok ? r.text() : Promise.reject(r.status))
+            .then(t => {
+                document.getElementById('version-text').textContent = (t || '').trim();
+            })
+            .catch(() => {
+                // Hide badge if not available (e.g., local dev before build runs)
+                const badge = document.getElementById('version-badge');
+                if (badge) badge.style.display = 'none';
+            });
+    </script>
 </body>
 </html>
