@@ -147,8 +147,12 @@ android {
             libs.versions.android.targetSdk
                 .get()
                 .toInt()
-        versionCode = 12
-        versionName = "1.2.1"
+        // Versioning is sourced from gradle.properties
+        versionName = project.version.toString()
+        versionCode =
+            providers.gradleProperty("android.versionCode")
+                .map(String::toInt)
+                .get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -191,6 +195,22 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+// --- Web/Wasm: write human-readable version into resources for display ---
+val writeWebVersion by tasks.registering {
+    val outFile = project.layout.projectDirectory.file("src/wasmJsMain/resources/version.txt").asFile
+    inputs.property("version", project.version.toString())
+    outputs.file(outFile)
+    doLast { outFile.writeText(project.version.toString()) }
+}
+
+// Some Gradle/KMP versions don't expose `processWasmJsMainResources`; hook into the
+// target-level resources task instead when it is realized.
+tasks.configureEach {
+    if (name == "wasmJsProcessResources") {
+        dependsOn(writeWebVersion)
     }
 }
 

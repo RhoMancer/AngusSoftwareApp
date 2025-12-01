@@ -50,11 +50,37 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for complete step-by-step guide including:
 
 **Quick deployment:**
 ```bash
-# Update version in composeApp/build.gradle.kts first
-git checkout -b release/v1.0
-git push origin release/v1.0
+# Bump version for a patch release and versionCode (+1) in gradle.properties
+gradlew releasePatch
+
+# Commit the bump and push a release branch (if your workflow triggers on release/*)
+git add gradle.properties
+git commit -m "chore: release $(grep ^version= gradle.properties | cut -d= -f2)"
+git checkout -b release/v$(grep ^version= gradle.properties | cut -d= -f2)
+git push origin HEAD
+
 # Monitor deployment at: https://github.com/RhoMancer/AngusSoftwareApp/actions
 ```
+
+## Automated versioning
+
+This project uses file-based versioning. The single source of truth lives in `gradle.properties`:
+- `version` — human-readable SemVer (e.g., `1.2.1`), used as Android `versionName` and shown on the Web/Wasm build.
+- `android.versionCode` — integer for Google Play; must increase by exactly +1 on every Play release.
+
+Gradle tasks:
+- `bumpPatch` — increment `version` patch (x.y.z → x.y.(z+1)).
+- `bumpMinor` — increment minor (x.y.z → x.(y+1).0).
+- `bumpMajor` — increment major ((x+1).0.0).
+- `bumpVersionCode` — increment Play `versionCode` by +1.
+- Composite convenience tasks:
+  - `releasePatch` = `bumpPatch` + `bumpVersionCode`
+  - `releaseMinor` = `bumpMinor` + `bumpVersionCode`
+  - `releaseMajor` = `bumpMajor` + `bumpVersionCode`
+
+Android reads `versionName` and `versionCode` from these properties at build time, so you no longer need to edit `composeApp/build.gradle.kts` for version bumps.
+
+Web/Wasm displays the same `version` in a small badge (sourced from a generated `version.txt`).
 
 ## Tech stack
 - Kotlin Multiplatform (KMP)
