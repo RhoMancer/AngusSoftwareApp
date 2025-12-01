@@ -151,6 +151,7 @@ android {
         versionName = project.version.toString()
         versionCode =
             providers.gradleProperty("android.versionCode")
+                .orElse("1")
                 .map(String::toInt)
                 .get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
