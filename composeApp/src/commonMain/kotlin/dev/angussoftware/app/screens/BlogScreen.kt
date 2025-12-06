@@ -31,25 +31,32 @@ private const val PAGE_SIZE = 20
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BlogScreen(navController: NavHostController? = null) {
+internal fun BlogScreen(
+    navController: NavHostController? = null,
+    initialPosts: List<BlogPost>? = null,
+    initialIsLoading: Boolean? = null,
+) {
     val feedUrl = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
-    var isLoading by remember { mutableStateOf(true) }
-    var allPosts by remember { mutableStateOf<List<BlogPost>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(initialIsLoading ?: true) }
+    var allPosts by remember { mutableStateOf(initialPosts ?: emptyList()) }
     val pageSize = PAGE_SIZE
-    var visibleCount by remember { mutableStateOf(pageSize) }
+    var visibleCount by remember { mutableStateOf(if (initialPosts != null) minOf(pageSize, initialPosts.size) else pageSize) }
 
     println("Fetching initial posts 0")
 
-    LaunchedEffect(feedUrl) {
-        val repository = BlogRepository(feedUrl)
-        // Fetch all posts once, then paginate locally
-        println("Fetching initial posts 1")
+    // Skip network fetch if test data is provided
+    if (initialPosts == null) {
+        LaunchedEffect(feedUrl) {
+            val repository = BlogRepository(feedUrl)
+            // Fetch all posts once, then paginate locally
+            println("Fetching initial posts 1")
 
-        allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
-        // Ensure initial visible count doesn't exceed size
-        visibleCount = minOf(pageSize, allPosts.size)
-        isLoading = false
+            allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
+            // Ensure initial visible count doesn't exceed size
+            visibleCount = minOf(pageSize, allPosts.size)
+            isLoading = false
+        }
     }
 
     val common = rememberCommonScreenState()
@@ -77,6 +84,7 @@ internal fun BlogScreen(navController: NavHostController? = null) {
                     top = statusBarHeightDp + tilePadding,
                     bottom = bottomInset + tilePadding,
                 ),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // Title
             item {
@@ -130,11 +138,13 @@ internal fun BlogScreen(navController: NavHostController? = null) {
                     items(allPosts.take(visibleCount).size) { idx ->
                         val visiblePosts = allPosts.take(visibleCount)
                         val post = visiblePosts[idx]
-                        val clickableModifier =
-                            Modifier.clickable {
-                                navController?.navigate("${Screen.BlogPost.name}/$idx")
-                            }
-                        SectionCard(alpha = alpha, modifier = clickableModifier) {
+                        val itemModifier =
+                            Modifier
+                                .testTag("${BLOG_POST_ITEM_TEST_TAG}_$idx")
+                                .clickable {
+                                    navController?.navigate("${Screen.BlogPost.name}/$idx")
+                                }
+                        SectionCard(alpha = alpha, modifier = itemModifier) {
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
