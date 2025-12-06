@@ -29,8 +29,13 @@ kover {
 
 // --- Version bump utilities (file-driven) ---
 // Source of truth: gradle.properties
-// - version (SemVer string)
+// - version (SemVer string) → used as Android versionName and Web/Wasm display version
 // - android.versionCode (int; must increment by +1 for every Play release)
+//
+// NOTE: These tasks only update `gradle.properties`. The Web/Wasm `version.txt` file
+// (in composeApp/src/wasmJsMain/resources/) is regenerated at BUILD TIME, not here.
+// When CI (GitHub Actions) runs the build, `version.txt` will automatically reflect
+// the new version from gradle.properties.
 
 fun readRootProps(): java.util.Properties {
     val f = rootProject.file("gradle.properties")

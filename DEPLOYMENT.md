@@ -25,6 +25,8 @@ Choose the appropriate bump level and run the Gradle task:
 
 Each task updates **both** `version` (human-readable) and `android.versionCode` (+1) in `gradle.properties`.
 
+> **Note:** The Web/Wasm `version.txt` file (shown in the version badge) is **auto-generated at build time**, not when you run these bump tasks. When CI (GitHub Actions) builds your release, it automatically regenerates `version.txt` with the new version from `gradle.properties`.
+
 ### 2. Commit the version bump
 
 ```powershell
