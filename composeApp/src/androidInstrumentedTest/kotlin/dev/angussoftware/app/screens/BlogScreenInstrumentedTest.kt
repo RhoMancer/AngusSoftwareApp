@@ -1,0 +1,167 @@
+package dev.angussoftware.app.screens
+
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.dp
+import dev.angussoftware.app.blog.BlogPost
+import dev.angussoftware.app.ui.utils.LocalWindowAdaptiveInfoOverride
+import dev.angussoftware.app.ui.utils.WindowAdaptiveInfo
+import dev.angussoftware.app.ui.utils.WindowWidthSizeClass
+import org.junit.Rule
+import org.junit.Test
+
+class BlogScreenInstrumentedTest {
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val testPosts = listOf(
+        BlogPost(
+            id = "1",
+            title = "First Blog Post",
+            url = "https://example.com/post1",
+            pubDate = "2025-01-01",
+            summary = "Summary of first post",
+            imageUrl = null,
+            content = null,
+        ),
+        BlogPost(
+            id = "2",
+            title = "Second Blog Post",
+            url = "https://example.com/post2",
+            pubDate = "2025-01-02",
+            summary = "Summary of second post",
+            imageUrl = null,
+            content = null,
+        ),
+        BlogPost(
+            id = "3",
+            title = "Third Blog Post",
+            url = "https://example.com/post3",
+            pubDate = "2025-01-03",
+            summary = "Summary of third post",
+            imageUrl = null,
+            content = null,
+        ),
+    )
+
+    /**
+     * Verifies that blog post items have vertical margin between them.
+     * The LazyColumn uses verticalArrangement = Arrangement.spacedBy(12.dp),
+     * so there should be a 12dp gap between consecutive items.
+     */
+    @Test
+    fun blogPostItems_haveVerticalMarginBetweenThem() {
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                BlogScreen(
+                    initialPosts = testPosts,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        // Verify blog screen is displayed
+        composeTestRule.onNodeWithTag(BLOG_SCREEN_TEST_TAG).assertIsDisplayed()
+
+        // Verify first two blog post items exist and are displayed
+        val firstItem = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0")
+        val secondItem = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1")
+
+        firstItem.assertIsDisplayed()
+        secondItem.assertIsDisplayed()
+
+        // Get bounds of both items
+        val firstBounds = firstItem.getBoundsInRoot()
+        val secondBounds = secondItem.getBoundsInRoot()
+
+        // Calculate the gap between first item's bottom and second item's top
+        val gap = secondBounds.top - firstBounds.bottom
+
+        // The expected gap is 12.dp (from verticalArrangement = Arrangement.spacedBy(12.dp))
+        val expectedGap = 12.dp
+
+        // Allow a small tolerance for rounding (1dp)
+        val tolerance = 1.dp
+
+        assert(gap >= expectedGap - tolerance && gap <= expectedGap + tolerance) {
+            "Expected vertical gap of $expectedGap between blog post items, but got $gap"
+        }
+    }
+
+    /**
+     * Verifies that multiple blog post items are rendered when posts are provided.
+     */
+    @Test
+    fun blogScreen_displaysMultipleBlogPostItems() {
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                BlogScreen(
+                    initialPosts = testPosts,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        // Verify all three blog post items are displayed
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").assertIsDisplayed()
+    }
+
+    /**
+     * Verifies that vertical margin is consistent between all consecutive blog post items.
+     */
+    @Test
+    fun blogPostItems_haveConsistentVerticalMargin() {
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                BlogScreen(
+                    initialPosts = testPosts,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        // Get bounds of all three items
+        val firstBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0").getBoundsInRoot()
+        val secondBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").getBoundsInRoot()
+        val thirdBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").getBoundsInRoot()
+
+        // Calculate gaps
+        val gap1 = secondBounds.top - firstBounds.bottom
+        val gap2 = thirdBounds.top - secondBounds.bottom
+
+        // The expected gap is 12.dp
+        val expectedGap = 12.dp
+        val tolerance = 1.dp
+
+        // Verify first gap
+        assert(gap1 >= expectedGap - tolerance && gap1 <= expectedGap + tolerance) {
+            "Expected vertical gap of $expectedGap between items 0 and 1, but got $gap1"
+        }
+
+        // Verify second gap
+        assert(gap2 >= expectedGap - tolerance && gap2 <= expectedGap + tolerance) {
+            "Expected vertical gap of $expectedGap between items 1 and 2, but got $gap2"
+        }
+
+        // Verify gaps are consistent with each other (within tolerance)
+        val gapDifference = if (gap1 > gap2) gap1 - gap2 else gap2 - gap1
+        assert(gapDifference <= tolerance) {
+            "Vertical gaps should be consistent. Gap1: $gap1, Gap2: $gap2"
+        }
+    }
+}
