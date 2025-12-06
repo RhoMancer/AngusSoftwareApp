@@ -1,6 +1,67 @@
 # Deployment Guide
 
-This guide walks you through setting up automatic deployment for the Angus Software App to both Google Play Store (Android) and GitHub Pages (Web/Wasm).
+This guide covers both **day-to-day releases** (if you already have everything set up) and **first-time setup** for deploying the Angus Software App to Google Play Store (Android) and GitHub Pages (Web/Wasm).
+
+---
+
+## Quick Release (Day-to-Day)
+
+> **Already have GitHub Actions, Pages, and Google Play configured?** Follow these steps to push a new release.
+
+### 1. Bump the version
+
+Choose the appropriate bump level and run the Gradle task:
+
+```powershell
+# Patch release (x.y.z → x.y.(z+1)) — most common for bug fixes/small updates
+./gradlew releasePatch
+
+# Minor release (x.y.z → x.(y+1).0) — new features, backward compatible
+./gradlew releaseMinor
+
+# Major release ((x+1).0.0) — breaking changes
+./gradlew releaseMajor
+```
+
+Each task updates **both** `version` (human-readable) and `android.versionCode` (+1) in `gradle.properties`.
+
+### 2. Commit the version bump
+
+```powershell
+git add gradle.properties
+$ver = (Select-String '^version=' .\gradle.properties).ToString().Split('=')[1].Trim()
+git commit -m "chore: release $ver"
+```
+
+### 3. Push a release branch to trigger CI
+
+```powershell
+git checkout -b release/v$ver
+git push origin HEAD
+```
+
+### 4. Monitor and verify
+
+- **GitHub Actions**: Watch the workflow at https://github.com/RhoMancer/AngusSoftwareApp/actions
+- **Google Play Console**: Confirm the new build appears in **Internal Testing** with the correct `versionName` and `versionCode`
+- **GitHub Pages**: Visit https://rhomancer.github.io/AngusSoftwareApp/ and check the version badge
+
+### 5. Merge back to main
+
+After CI passes, open a PR from `release/v<version>` → `main` and merge to keep `gradle.properties` updated on main.
+
+### 6. (Optional) Tag the release
+
+```powershell
+git tag v$ver
+git push origin v$ver
+```
+
+---
+
+## First-Time Setup
+
+> **New to this project or setting up deployment for the first time?** Follow the sections below.
 
 ## Overview
 
