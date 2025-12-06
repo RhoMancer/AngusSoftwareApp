@@ -200,11 +200,23 @@ android {
 }
 
 // --- Web/Wasm: write human-readable version into resources for display ---
+// This task generates `src/wasmJsMain/resources/version.txt` at BUILD TIME (not when bump tasks run).
+// The file is regenerated automatically whenever the Wasm build runs, including during CI (GitHub Actions).
+// When you run `releasePatch/Minor/Major`, only `gradle.properties` is updated immediately;
+// `version.txt` will reflect the new version once the build executes (locally or in CI).
 val writeWebVersion by tasks.registering {
     val outFile = project.layout.projectDirectory.file("src/wasmJsMain/resources/version.txt").asFile
     inputs.property("version", project.version.toString())
     outputs.file(outFile)
-    doLast { outFile.writeText(project.version.toString()) }
+    doLast {
+        val content = buildString {
+            appendLine("# AUTO-GENERATED at build time from gradle.properties")
+            appendLine("# Do not edit manually — changes will be overwritten by CI/local builds.")
+            appendLine("# To bump the version, run: ./gradlew releasePatch (or releaseMinor/releaseMajor)")
+            append(project.version.toString())
+        }
+        outFile.writeText(content)
+    }
 }
 
 // Some Gradle/KMP versions don't expose `processWasmJsMainResources`; hook into the
