@@ -134,4 +134,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: composeApp/build/dist/wasmJs/productionExecutable
           publish_branch: gh-pages
-          cname: false
+          cname: angussoftware.com

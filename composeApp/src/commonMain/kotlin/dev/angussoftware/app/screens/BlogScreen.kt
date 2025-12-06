@@ -12,8 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import angussoftwareapp.composeapp.generated.resources.*
@@ -28,25 +31,32 @@ private const val PAGE_SIZE = 20
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BlogScreen(navController: NavHostController? = null) {
+internal fun BlogScreen(
+    navController: NavHostController? = null,
+    initialPosts: List<BlogPost>? = null,
+    initialIsLoading: Boolean? = null,
+) {
     val feedUrl = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
-    var isLoading by remember { mutableStateOf(true) }
-    var allPosts by remember { mutableStateOf<List<BlogPost>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(initialIsLoading ?: true) }
+    var allPosts by remember { mutableStateOf(initialPosts ?: emptyList()) }
     val pageSize = PAGE_SIZE
-    var visibleCount by remember { mutableStateOf(pageSize) }
+    var visibleCount by remember { mutableStateOf(if (initialPosts != null) minOf(pageSize, initialPosts.size) else pageSize) }
 
     println("Fetching initial posts 0")
 
-    LaunchedEffect(feedUrl) {
-        val repository = BlogRepository(feedUrl)
-        // Fetch all posts once, then paginate locally
-        println("Fetching initial posts 1")
+    // Skip network fetch if test data is provided
+    if (initialPosts == null) {
+        LaunchedEffect(feedUrl) {
+            val repository = BlogRepository(feedUrl)
+            // Fetch all posts once, then paginate locally
+            println("Fetching initial posts 1")
 
-        allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
-        // Ensure initial visible count doesn't exceed size
-        visibleCount = minOf(pageSize, allPosts.size)
-        isLoading = false
+            allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
+            // Ensure initial visible count doesn't exceed size
+            visibleCount = minOf(pageSize, allPosts.size)
+            isLoading = false
+        }
     }
 
     val common = rememberCommonScreenState()
@@ -74,6 +84,7 @@ internal fun BlogScreen(navController: NavHostController? = null) {
                     top = statusBarHeightDp + tilePadding,
                     bottom = bottomInset + tilePadding,
                 ),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // Title
             item {
@@ -127,57 +138,101 @@ internal fun BlogScreen(navController: NavHostController? = null) {
                     items(allPosts.take(visibleCount).size) { idx ->
                         val visiblePosts = allPosts.take(visibleCount)
                         val post = visiblePosts[idx]
-                        val clickableModifier =
-                            Modifier.clickable {
-                                navController?.navigate("${Screen.BlogPost.name}/$idx")
-                            }
-                        SectionCard(alpha = alpha, modifier = clickableModifier) {
-                            Box(modifier = Modifier.fillMaxWidth()) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth(),
-                                ) {
-                                    Text(
-                                        text = post.title,
-                                        style = MaterialTheme.typography.titleLarge,
-                                    )
-                                    post.pubDate?.let {
-                                        Text(
-                                            text = it,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier.padding(top = 4.dp),
+                        val itemModifier =
+                            Modifier
+                                .testTag("${BLOG_POST_ITEM_TEST_TAG}_$idx")
+                                .clickable {
+                                    navController?.navigate("${Screen.BlogPost.name}/$idx")
+                                }
+                        SectionCard(alpha = alpha, modifier = itemModifier) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                val textMeasurer = rememberTextMeasurer()
+                                val titleStyle = MaterialTheme.typography.titleLarge
+                                val title = post.title
+
+                                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                                    val maxWidthPx = constraints.maxWidth
+                                    val iconSize = 24.dp
+                                    val padding = 8.dp
+                                    val density = LocalDensity.current
+                                    val iconWidthPx = with(density) { (iconSize + padding).toPx() }
+
+                                    val firstLineMaxWidth = (maxWidthPx - iconWidthPx).toInt().coerceAtLeast(0)
+
+                                    val textLayoutResult = remember(title, maxWidthPx) {
+                                        textMeasurer.measure(
+                                            text = title,
+                                            style = titleStyle,
+                                            constraints = Constraints(maxWidth = firstLineMaxWidth)
                                         )
                                     }
-                                    post.summary?.let {
-                                        Text(
-                                            text = it,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            modifier = Modifier.padding(top = 8.dp),
-                                        )
-                                    }
-                                    if (!post.imageUrl.isNullOrBlank()) {
-                                        Box(
-                                            modifier =
-                                                Modifier
-                                                    .fillMaxWidth()
-                                                    .height(160.dp)
-                                                    .padding(top = 8.dp)
-                                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                            contentAlignment = Alignment.Center,
-                                        ) {
+
+                                    val breakIndex = textLayoutResult.getLineEnd(0, visibleEnd = true)
+
+                                    val part1 = title.substring(0, minOf(title.length, breakIndex))
+                                    val part2 = if (breakIndex < title.length) title.substring(breakIndex).trimStart() else ""
+
+                                    Column {
+                                        Box(modifier = Modifier.fillMaxWidth()) {
                                             Text(
-                                                text = "Image placeholder",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                text = part1,
+                                                style = titleStyle,
+                                                modifier = Modifier
+                                                    .widthIn(max = with(density) { firstLineMaxWidth.toDp() })
+                                            )
+
+                                            Icon(
+                                                imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
+                                                contentDescription = "Open",
+                                                tint = MaterialTheme.colorScheme.onSurface,
+                                                modifier = Modifier
+                                                    .align(Alignment.TopEnd)
+                                                    .size(iconSize)
+                                            )
+                                        }
+
+                                        if (part2.isNotEmpty()) {
+                                            Text(
+                                                text = part2,
+                                                style = titleStyle,
+                                                modifier = Modifier.fillMaxWidth()
                                             )
                                         }
                                     }
                                 }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
-                                    contentDescription = "Open",
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.align(Alignment.TopEnd),
-                                )
+                                post.pubDate?.let {
+                                    Text(
+                                        text = it,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(top = 4.dp),
+                                    )
+                                }
+                                post.summary?.let {
+                                    Text(
+                                        text = it,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(top = 8.dp),
+                                    )
+                                }
+                                if (!post.imageUrl.isNullOrBlank()) {
+                                    Box(
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .height(160.dp)
+                                                .padding(top = 8.dp)
+                                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Text(
+                                            text = "Image placeholder",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

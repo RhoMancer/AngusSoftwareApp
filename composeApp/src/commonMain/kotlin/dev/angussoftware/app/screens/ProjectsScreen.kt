@@ -350,7 +350,7 @@ internal fun ProjectsScreen() {
             isCompactScreen = isCompactScreen,
             titleAlpha = titleAlpha,
             bgAlpha = bgAlpha,
-            icon = painterResource(getAngusSimpleLogoSystem()),
+            icon = painterResource(getAngusSimpleNoBackgroundLogoSystem()),
         )
     }
 }
