@@ -1,6 +1,67 @@
 # Deployment Guide
 
-This guide walks you through setting up automatic deployment for the Angus Software App to both Google Play Store (Android) and GitHub Pages (Web/Wasm).
+This guide covers both **day-to-day releases** (if you already have everything set up) and **first-time setup** for deploying the Angus Software App to Google Play Store (Android) and GitHub Pages (Web/Wasm).
+
+---
+
+## Quick Release (Day-to-Day)
+
+> **Already have GitHub Actions, Pages, and Google Play configured?** Follow these steps to push a new release.
+
+### 1. Bump the version
+
+Choose the appropriate bump level and run the Gradle task:
+
+```powershell
+# Patch release (x.y.z → x.y.(z+1)) — most common for bug fixes/small updates
+./gradlew releasePatch
+
+# Minor release (x.y.z → x.(y+1).0) — new features, backward compatible
+./gradlew releaseMinor
+
+# Major release ((x+1).0.0) — breaking changes
+./gradlew releaseMajor
+```
+
+Each task updates **both** `version` (human-readable) and `android.versionCode` (+1) in `gradle.properties`.
+
+### 2. Commit the version bump
+
+```powershell
+git add gradle.properties
+$ver = (Select-String '^version=' .\gradle.properties).ToString().Split('=')[1].Trim()
+git commit -m "chore: release $ver"
+```
+
+### 3. Push a release branch to trigger CI
+
+```powershell
+git checkout -b release/v$ver
+git push origin HEAD
+```
+
+### 4. Monitor and verify
+
+- **GitHub Actions**: Watch the workflow at https://github.com/RhoMancer/AngusSoftwareApp/actions
+- **Google Play Console**: Confirm the new build appears in **Internal Testing** with the correct `versionName` and `versionCode`
+- **GitHub Pages**: Visit https://rhomancer.github.io/AngusSoftwareApp/ and check the version badge
+
+### 5. Merge back to main
+
+After CI passes, open a PR from `release/v<version>` → `main` and merge to keep `gradle.properties` updated on main.
+
+### 6. (Optional) Tag the release
+
+```powershell
+git tag v$ver
+git push origin v$ver
+```
+
+---
+
+## First-Time Setup
+
+> **New to this project or setting up deployment for the first time?** Follow the sections below.
 
 ## Overview
 
@@ -176,18 +237,31 @@ After adding all secrets, you should have:
 
 ## Step 5: First Deployment
 
-### 5.1 Update version information
+### 5.1 Update version information (automated)
 
-Before your first release, update the version in `composeApp/build.gradle.kts`:
+This project uses file-based versioning. The single source of truth is in `gradle.properties`:
 
-```kotlin
-versionCode = 1
-versionName = "1.0"
+```
+version=1.2.1           # human-readable SemVer → Android versionName, shown on Web/Wasm
+android.versionCode=12  # Play Store versionCode → MUST increment by exactly +1 per release
 ```
 
-For subsequent releases, increment these values:
-- `versionCode`: Must increase with each release (e.g., 1, 2, 3...)
-- `versionName`: Semantic version string (e.g., "1.0", "1.1", "2.0")
+You do NOT edit `composeApp/build.gradle.kts` for versions anymore. Android reads these values automatically.
+
+Use the Gradle tasks below to bump versions:
+
+```
+# Patch release (x.y.z → x.y.(z+1)) and versionCode +1
+gradlew releasePatch
+
+# Minor release (x.y.z → x.(y+1).0) and versionCode +1
+gradlew releaseMinor
+
+# Major release ((x+1).0.0) and versionCode +1
+gradlew releaseMajor
+```
+
+After running one of the above, commit the updated `gradle.properties` and proceed.
 
 ### 5.2 Create a release branch
 
@@ -209,6 +283,24 @@ The workflow will:
 - ✅ Upload to Google Play Internal Testing
 - ✅ Build Web/Wasm distribution
 - ✅ Deploy to GitHub Pages
+
+Versions during deployment
+- The GitHub Actions workflow can optionally perform the bump for you prior to build and commit it back to the branch. Example snippet:
+
+```yaml
+- name: Bump version for release
+  run: ./gradlew releasePatch
+
+- name: Commit version bump
+  run: |
+    git config user.name "github-actions"
+    git config user.email "github-actions@users.noreply.github.com"
+    git add gradle.properties
+    git commit -m "chore: release $(grep ^version= gradle.properties | cut -d= -f2) (code $(grep ^android.versionCode= gradle.properties | cut -d= -f2))" || echo "No changes"
+    git push
+```
+
+Note: If your repository policy disallows CI commits, run the bump task locally and push the change in a PR before triggering the release workflow.
 
 ### 5.4 Verify deployments
 

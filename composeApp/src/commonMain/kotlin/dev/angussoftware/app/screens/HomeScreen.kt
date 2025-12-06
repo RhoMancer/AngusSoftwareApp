@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
 import com.angussoftware.theming.compose.resources.getAngusLogoSystem
-import com.angussoftware.theming.compose.resources.getAngusSimpleLogoSystem
+import com.angussoftware.theming.compose.resources.getAngusSimpleNoBackgroundLogoSystem
 import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.components.SkillChip
@@ -111,7 +111,7 @@ internal fun HomeScreen() {
             isCompactScreen = isCompactScreen,
             titleAlpha = titleAlpha,
             bgAlpha = bgAlpha,
-            icon = painterResource(getAngusSimpleLogoSystem()),
+            icon = painterResource(getAngusSimpleNoBackgroundLogoSystem()),
         )
     }
 }
@@ -280,34 +280,38 @@ internal fun AboutMePersonalSection(alpha: Float) {
             Text(
                 text = stringResource(Res.string.home_about_per_title),
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .testTag("about_me_personal_title"),
+                modifier =
+                    Modifier
+                        .padding(bottom = 16.dp)
+                        .testTag("about_me_personal_title"),
             )
 
             // Personal Summary
             Text(
                 text = stringResource(Res.string.home_about_per_paragraph1),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .testTag("about_me_personal_paragraph1"),
+                modifier =
+                    Modifier
+                        .padding(bottom = 16.dp)
+                        .testTag("about_me_personal_paragraph1"),
             )
 
             Text(
                 text = stringResource(Res.string.home_about_per_paragraph2),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .testTag("about_me_personal_paragraph2"),
+                modifier =
+                    Modifier
+                        .padding(bottom = 16.dp)
+                        .testTag("about_me_personal_paragraph2"),
             )
 
             Text(
                 text = stringResource(Res.string.home_about_per_paragraph3),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .testTag("about_me_personal_paragraph3"),
+                modifier =
+                    Modifier
+                        .padding(bottom = 16.dp)
+                        .testTag("about_me_personal_paragraph3"),
             )
         }
     }
@@ -331,9 +335,10 @@ internal fun ContactSection(alpha: Float) {
             Text(
                 text = stringResource(Res.string.home_contact_title),
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .testTag("contact_section_title"),
+                modifier =
+                    Modifier
+                        .padding(bottom = 16.dp)
+                        .testTag("contact_section_title"),
             )
 
             // Email
@@ -356,9 +361,10 @@ internal fun ContactSection(alpha: Float) {
             Text(
                 text = stringResource(Res.string.home_connect_with_me),
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .testTag("contact_section_social_title"),
+                modifier =
+                    Modifier
+                        .padding(vertical = 8.dp)
+                        .testTag("contact_section_social_title"),
             )
 
             // Social Media Links
@@ -400,18 +406,18 @@ internal fun ContactItem(
     content: String,
 ) {
     Column(
-        modifier = Modifier.testTag("contact_item_$title")
+        modifier = Modifier.testTag("contact_item_$title"),
     ) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.testTag("contact_item_title_$title")
+            modifier = Modifier.testTag("contact_item_title_$title"),
         )
         Text(
             text = content,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.testTag("contact_item_content_$title")
+            modifier = Modifier.testTag("contact_item_content_$title"),
         )
     }
 }
@@ -429,9 +435,10 @@ internal fun SocialMediaButton(
 ) {
     val uriHandler = LocalUriHandler.current
     OutlinedCard(
-        modifier = Modifier
-            .clickable { uriHandler.openUri(url) }
-            .testTag("social_media_button_$platform"),
+        modifier =
+            Modifier
+                .clickable { uriHandler.openUri(url) }
+                .testTag("social_media_button_$platform"),
         colors =
             CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,

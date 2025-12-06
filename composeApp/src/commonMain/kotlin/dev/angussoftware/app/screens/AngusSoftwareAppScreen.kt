@@ -46,6 +46,7 @@ internal const val NAV_ITEM_BLOG_TAG = "NavItem_Blog"
 internal const val HOME_SCREEN_TEST_TAG = "HomeScreen"
 internal const val PROJECTS_SCREEN_TEST_TAG = "ProjectsScreen"
 internal const val BLOG_SCREEN_TEST_TAG = "BlogScreen"
+internal const val BLOG_POST_ITEM_TEST_TAG = "BlogPostItem"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
