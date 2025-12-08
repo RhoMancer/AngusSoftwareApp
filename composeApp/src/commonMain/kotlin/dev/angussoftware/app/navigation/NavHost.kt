@@ -96,7 +96,7 @@ internal fun displayCurrentScreen(navController: NavHostController) {
                 route = "${Screen.BlogPost.name}/{postIndex}",
                 arguments = listOf(navArgument("postIndex") { type = NavType.StringType }),
             ) { backStackEntry ->
-                val postIndex = parsePostIndex(backStackEntry.destination.route)
+                val postIndex = backStackEntry.savedStateHandle.get<String>("postIndex")?.toIntOrNull() ?: 0
                 val feedUrl = RSS_FEED_URL
 
                 var blogPost by remember { mutableStateOf<dev.angussoftware.app.blog.BlogPost?>(null) }

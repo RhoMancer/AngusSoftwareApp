@@ -6,11 +6,14 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.ui.utils.LocalWindowAdaptiveInfoOverride
 import dev.angussoftware.app.ui.utils.WindowAdaptiveInfo
 import dev.angussoftware.app.ui.utils.WindowWidthSizeClass
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
@@ -163,5 +166,88 @@ class BlogScreenInstrumentedTest {
         assert(gapDifference <= tolerance) {
             "Vertical gaps should be consistent. Gap1: $gap1, Gap2: $gap2"
         }
+    }
+
+    /**
+     * Verifies that clicking on different blog post items navigates to the correct index.
+     * This test ensures that each item's click handler passes the correct index to navigation,
+     * fixing the bug where all items were navigating to index 0.
+     */
+    @Test
+    fun blogPostItems_navigateToCorrectIndex() {
+        var navigatedRoute: String? = null
+        
+        composeTestRule.setContent {
+            val navController = rememberNavController()
+            
+            // Listen to navigation changes
+            navController.addOnDestinationChangedListener { _, destination, arguments ->
+                navigatedRoute = destination.route
+                // Also capture the actual argument if present
+                arguments?.getString("postIndex")?.let { idx ->
+                    navigatedRoute = "${Screen.BlogPost.name}/$idx"
+                }
+            }
+            
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                BlogScreen(
+                    navController = navController,
+                    initialPosts = testPosts,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        // Click on the first blog post item (index 0)
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0").performClick()
+        composeTestRule.waitForIdle()
+        
+        // Verify the navigation route contains the correct index
+        assertEquals(
+            "Clicking first item should navigate to BlogPost/0",
+            "${Screen.BlogPost.name}/0",
+            navigatedRoute
+        )
+
+        // Reset for next test
+        navigatedRoute = null
+        
+        // Go back and click on second item
+        composeTestRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeTestRule.waitForIdle()
+
+        // Click on the second blog post item (index 1)
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").performClick()
+        composeTestRule.waitForIdle()
+        
+        assertEquals(
+            "Clicking second item should navigate to BlogPost/1",
+            "${Screen.BlogPost.name}/1",
+            navigatedRoute
+        )
+
+        // Reset for next test
+        navigatedRoute = null
+
+        // Go back and click on third item
+        composeTestRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeTestRule.waitForIdle()
+
+        // Click on the third blog post item (index 2)
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").performClick()
+        composeTestRule.waitForIdle()
+        
+        assertEquals(
+            "Clicking third item should navigate to BlogPost/2",
+            "${Screen.BlogPost.name}/2",
+            navigatedRoute
+        )
     }
 }
