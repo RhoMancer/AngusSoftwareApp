@@ -8,7 +8,11 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.ui.utils.LocalWindowAdaptiveInfoOverride
 import dev.angussoftware.app.ui.utils.WindowAdaptiveInfo
@@ -21,35 +25,36 @@ class BlogScreenInstrumentedTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val testPosts = listOf(
-        BlogPost(
-            id = "1",
-            title = "First Blog Post",
-            url = "https://example.com/post1",
-            pubDate = "2025-01-01",
-            summary = "Summary of first post",
-            imageUrl = null,
-            content = null,
-        ),
-        BlogPost(
-            id = "2",
-            title = "Second Blog Post",
-            url = "https://example.com/post2",
-            pubDate = "2025-01-02",
-            summary = "Summary of second post",
-            imageUrl = null,
-            content = null,
-        ),
-        BlogPost(
-            id = "3",
-            title = "Third Blog Post",
-            url = "https://example.com/post3",
-            pubDate = "2025-01-03",
-            summary = "Summary of third post",
-            imageUrl = null,
-            content = null,
-        ),
-    )
+    private val testPosts =
+        listOf(
+            BlogPost(
+                id = "1",
+                title = "First Blog Post",
+                url = "https://example.com/post1",
+                pubDate = "2025-01-01",
+                summary = "Summary of first post",
+                imageUrl = null,
+                content = null,
+            ),
+            BlogPost(
+                id = "2",
+                title = "Second Blog Post",
+                url = "https://example.com/post2",
+                pubDate = "2025-01-02",
+                summary = "Summary of second post",
+                imageUrl = null,
+                content = null,
+            ),
+            BlogPost(
+                id = "3",
+                title = "Third Blog Post",
+                url = "https://example.com/post3",
+                pubDate = "2025-01-03",
+                summary = "Summary of third post",
+                imageUrl = null,
+                content = null,
+            ),
+        )
 
     /**
      * Verifies that blog post items have vertical margin between them.
@@ -176,10 +181,10 @@ class BlogScreenInstrumentedTest {
     @Test
     fun blogPostItems_navigateToCorrectIndex() {
         var navigatedRoute: String? = null
-        
+
         composeTestRule.setContent {
             val navController = rememberNavController()
-            
+
             // Listen to navigation changes
             navController.addOnDestinationChangedListener { _, destination, arguments ->
                 navigatedRoute = destination.route
@@ -188,15 +193,24 @@ class BlogScreenInstrumentedTest {
                     navigatedRoute = "${Screen.BlogPost.name}/$idx"
                 }
             }
-            
+
             CompositionLocalProvider(
                 LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
             ) {
-                BlogScreen(
-                    navController = navController,
-                    initialPosts = testPosts,
-                    initialIsLoading = false,
-                )
+                // Wrap in a NavHost so that navController.navigate() has a valid graph
+                NavHost(navController = navController, startDestination = Screen.Blog.name) {
+                    composable(Screen.Blog.name) {
+                        BlogScreen(
+                            navController = navController,
+                            initialPosts = testPosts,
+                            initialIsLoading = false,
+                        )
+                    }
+                    composable(
+                        route = "${Screen.BlogPost.name}/{postIndex}",
+                        arguments = listOf(navArgument("postIndex") { type = NavType.StringType }),
+                    ) { }
+                }
             }
         }
         composeTestRule.waitForIdle()
@@ -204,17 +218,17 @@ class BlogScreenInstrumentedTest {
         // Click on the first blog post item (index 0)
         composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0").performClick()
         composeTestRule.waitForIdle()
-        
+
         // Verify the navigation route contains the correct index
         assertEquals(
             "Clicking first item should navigate to BlogPost/0",
             "${Screen.BlogPost.name}/0",
-            navigatedRoute
+            navigatedRoute,
         )
 
         // Reset for next test
         navigatedRoute = null
-        
+
         // Go back and click on second item
         composeTestRule.activityRule.scenario.onActivity { activity ->
             activity.onBackPressedDispatcher.onBackPressed()
@@ -224,11 +238,11 @@ class BlogScreenInstrumentedTest {
         // Click on the second blog post item (index 1)
         composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").performClick()
         composeTestRule.waitForIdle()
-        
+
         assertEquals(
             "Clicking second item should navigate to BlogPost/1",
             "${Screen.BlogPost.name}/1",
-            navigatedRoute
+            navigatedRoute,
         )
 
         // Reset for next test
@@ -243,11 +257,11 @@ class BlogScreenInstrumentedTest {
         // Click on the third blog post item (index 2)
         composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").performClick()
         composeTestRule.waitForIdle()
-        
+
         assertEquals(
             "Clicking third item should navigate to BlogPost/2",
             "${Screen.BlogPost.name}/2",
-            navigatedRoute
+            navigatedRoute,
         )
     }
 }
