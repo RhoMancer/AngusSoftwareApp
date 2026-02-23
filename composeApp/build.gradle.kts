@@ -61,6 +61,28 @@ angusCoverage {
             }
         }
     }
+
+    this.unifiedReport.enabled.set(true)
+    this.unifiedReport.koverExclusions.set(listOf<String>())
+    this.unifiedReport.jacocoExclusions.set(
+        listOf(
+            "**/R.class",
+            "**/R\$*.class",
+            "**/*R*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/*Test*.*",
+            "**/generated/**",
+            "**/*ComposableSingletons*",
+            "**/androidx/**",
+            "**/android/**",
+            "**/kotlin/**",
+            "**/kotlinx/**",
+            "**/org/koin/**",
+            "**/com/arkivanov/**",
+            "**/app/cash/turbine/**",
+        ),
+    )
 }
 
 kotlin {
@@ -230,44 +252,6 @@ tasks.configureEach {
     if (name == "wasmJsProcessResources") {
         dependsOn(writeWebVersion)
     }
-}
-
-tasks.register<com.angussoftware.app.buildsrc.UnifiedCoverageReportTask>("unifiedCoverageReport") {
-    group = "verification"
-    description = "Generate unified coverage report combining Kover and JaCoCo."
-
-    koverReportDir.set(layout.buildDirectory.dir("reports/kover"))
-    buildDirPath.set(
-        layout.buildDirectory
-            .get()
-            .asFile.absolutePath,
-    )
-    outputFile.set(layout.buildDirectory.file("reports/coverage/UNIFIED_COVERAGE.md"))
-
-    koverExclusions.set(listOf<String>())
-
-    jacocoExclusions.set(
-        listOf(
-            "**/R.class",
-            "**/R$*.class",
-            "**/*R*.class",
-            "**/BuildConfig.*",
-            "**/Manifest*.*",
-            "**/*Test*.*",
-            "**/generated/**",
-            "**/*ComposableSingletons*",
-            "**/androidx/**",
-            "**/android/**",
-            "**/kotlin/**",
-            "**/kotlinx/**",
-            "**/org/koin/**",
-            "**/com/arkivanov/**",
-            "**/app/cash/turbine/**",
-        ),
-    )
-
-    dependsOn("koverXmlReport")
-    dependsOn("koverHtmlReport")
 }
 
 dependencies {

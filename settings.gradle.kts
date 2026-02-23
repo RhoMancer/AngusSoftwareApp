@@ -20,7 +20,7 @@ pluginManagement {
         val githubUsername: String? = providers.gradleProperty("githubUser").orNull ?: System.getenv("GITHUB_USER")
         val githubPassword: String? = providers.gradleProperty("githubToken").orNull ?: System.getenv("GITHUB_TOKEN")
 
-        // Resolve Angus Gradle Tools plugin markers from GitHub Packages instead of mavenLocal
+        // Resolve Angus Gradle Tools plugin markers from GitHub Packages
         maven {
             url = uri("https://maven.pkg.github.com/$githubOwner/angus-gradle-tools")
             credentials {
@@ -28,7 +28,6 @@ pluginManagement {
                 password = githubPassword
             }
         }
-//        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -44,7 +43,6 @@ dependencyResolutionManagement {
         google {
             androidxAndGoogleOnly()
         }
-//        mavenLocal()
         mavenCentral()
 
         maven {
