@@ -18,6 +18,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import dev.angussoftware.app.navigation.RSS_FEED_URL
 import androidx.navigation.NavHostController
 import angussoftwareapp.composeapp.generated.resources.*
 import dev.angussoftware.app.blog.BlogPost
@@ -36,21 +37,18 @@ internal fun BlogScreen(
     initialPosts: List<BlogPost>? = null,
     initialIsLoading: Boolean? = null,
 ) {
-    val feedUrl = "https://rhomancer.github.io/angus-blog-content/rss.xml"
+    val feedUrl = RSS_FEED_URL
 
     var isLoading by remember { mutableStateOf(initialIsLoading ?: true) }
     var allPosts by remember { mutableStateOf(initialPosts ?: emptyList()) }
     val pageSize = PAGE_SIZE
     var visibleCount by remember { mutableStateOf(if (initialPosts != null) minOf(pageSize, initialPosts.size) else pageSize) }
 
-    println("Fetching initial posts 0")
-
     // Skip network fetch if test data is provided
     if (initialPosts == null) {
         LaunchedEffect(feedUrl) {
             val repository = BlogRepository(feedUrl)
             // Fetch all posts once, then paginate locally
-            println("Fetching initial posts 1")
 
             allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
             // Ensure initial visible count doesn't exceed size
