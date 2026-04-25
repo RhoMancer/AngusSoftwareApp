@@ -29,16 +29,22 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
+        run: >-
+          ./gradlew :composeApp:compileKotlinDesktop :composeApp:compileKotlinAndroid
+          -PgithubUser=${{ github.actor }}
+          -PgithubToken=${{ secrets.GH_PACKAGES_TOKEN }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew :composeApp:compileKotlinDesktop :composeApp:compileKotlinAndroid
 
       - name: Run unit tests
+        run: >-
+          ./gradlew :composeApp:testDebugUnitTest
+          -PgithubUser=${{ github.actor }}
+          -PgithubToken=${{ secrets.GH_PACKAGES_TOKEN }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew :composeApp:testDebugUnitTest
 
       - name: Upload test results
         if: always()
@@ -67,10 +73,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Android Lint
+        run: >-
+          ./gradlew :composeApp:lintDebug
+          -PgithubUser=${{ github.actor }}
+          -PgithubToken=${{ secrets.GH_PACKAGES_TOKEN }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew :composeApp:lintDebug
 
       - name: Upload lint results
         if: always()
