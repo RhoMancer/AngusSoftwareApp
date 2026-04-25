@@ -13,9 +13,7 @@ import androidx.navigation.navArgument
 import angussoftwareapp.composeapp.generated.resources.Res
 import angussoftwareapp.composeapp.generated.resources.blog_post_not_found
 import angussoftwareapp.composeapp.generated.resources.ui_loading
-import androidx.lifecycle.viewmodel.compose.viewModel
-import dev.angussoftware.app.blog.BlogUiState
-import dev.angussoftware.app.blog.BlogViewModel
+import dev.angussoftware.app.blog.BlogRepository
 import dev.angussoftware.app.screens.*
 import org.jetbrains.compose.resources.stringResource
 
@@ -24,19 +22,14 @@ internal const val BLOG_POST_ERROR_ID = "error"
 internal const val RSS_FEED_URL = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
 /**
- * Parses the post index from a navigation route string.
- * Extracts the numeric index from the end of the route path.
+ * Parses the post ID from a navigation route string.
+ * Extracts the ID (everything after the last slash) from the route path.
  *
- * @param route The navigation route string (e.g., "BlogPost/5")
- * @return The parsed post index as Int, or 0 if parsing fails or route is invalid
+ * @param route The navigation route string (e.g., "BlogPost/post1")
+ * @return The parsed post ID, or empty string if route is null/blank
  */
-internal fun parsePostIndex(route: String?): Int =
-    try {
-        val indexStr = route?.substringAfterLast("/") ?: ""
-        indexStr.toIntOrNull() ?: 0
-    } catch (e: Exception) {
-        0
-    }
+internal fun parsePostId(route: String?): String =
+    route?.substringAfterLast("/").orEmpty()
 
 /**
  * Creates a BlogPost object for loading state display.
@@ -95,35 +88,39 @@ internal fun displayCurrentScreen(navController: NavHostController) {
                 BlogScreen(navController)
             }
             composable(
-                route = "${Screen.BlogPost.name}/{postIndex}",
-                arguments = listOf(navArgument("postIndex") { type = NavType.StringType }),
+                route = "${Screen.BlogPost.name}/{postId}",
+                arguments = listOf(navArgument("postId") { type = NavType.StringType }),
             ) { backStackEntry ->
-                val postIndex = backStackEntry.savedStateHandle.get<String>("postIndex")?.toIntOrNull() ?: 0
-                val blogViewModel: BlogViewModel = viewModel()
-                val uiState by blogViewModel.uiState.collectAsState()
+                val postId = backStackEntry.savedStateHandle.get<String>("postId").orEmpty()
+                val feedUrl = RSS_FEED_URL
 
-                when (val state = uiState) {
-                    is BlogUiState.Loading -> {
+                var blogPost by remember { mutableStateOf<dev.angussoftware.app.blog.BlogPost?>(null) }
+                var isLoading by remember { mutableStateOf(true) }
+
+                LaunchedEffect(postId) {
+                    try {
+                        val repository = BlogRepository(feedUrl)
+                        val allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
+                        blogPost = allPosts.find { it.id == postId }
+                        isLoading = false
+                    } catch (e: Exception) {
+                        // todo: proper error handling
+                        isLoading = false
+                    }
+                }
+
+                if (isLoading) {
+                    BlogPostScreen(
+                        blogPost = createLoadingBlogPost(stringResource(Res.string.ui_loading)),
+                        onBackClick = { navController.popBackStack() },
+                    )
+                } else {
+                    blogPost?.let { post ->
                         BlogPostScreen(
-                            blogPost = createLoadingBlogPost(stringResource(Res.string.ui_loading)),
+                            blogPost = post,
                             onBackClick = { navController.popBackStack() },
                         )
-                    }
-                    is BlogUiState.Success -> {
-                        val post = state.posts.getOrNull(postIndex)
-                        if (post != null) {
-                            BlogPostScreen(
-                                blogPost = post,
-                                onBackClick = { navController.popBackStack() },
-                            )
-                        } else {
-                            BlogPostScreen(
-                                blogPost = createErrorBlogPost(stringResource(Res.string.blog_post_not_found)),
-                                onBackClick = { navController.popBackStack() },
-                            )
-                        }
-                    }
-                    is BlogUiState.Error -> {
+                    } ?: run {
                         BlogPostScreen(
                             blogPost = createErrorBlogPost(stringResource(Res.string.blog_post_not_found)),
                             onBackClick = { navController.popBackStack() },
