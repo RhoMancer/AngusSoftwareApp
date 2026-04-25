@@ -31,7 +31,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew :composeApp:compileKotlinDesktop :composeApp:compileKotlinAndroid
+        run: ./gradlew :composeApp:compileKotlinWasmJs :composeApp:compileDebugKotlinAndroid
 
       - name: Run unit tests
         run: ./gradlew :composeApp:testDebugUnitTest
