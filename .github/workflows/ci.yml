@@ -27,12 +27,14 @@ jobs:
           echo "githubUser=${{ github.actor }}" >> ~/.gradle/gradle.properties
           echo "githubToken=${{ secrets.GH_PACKAGES_TOKEN }}" >> ~/.gradle/gradle.properties
           echo "githubOwner=RhoMancer" >> ~/.gradle/gradle.properties
+          echo "=== gradle.properties contents ==="
+          cat ~/.gradle/gradle.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build
-        run: ./gradlew :composeApp:compileKotlinDesktop :composeApp:compileKotlinAndroid
+      - name: Build (with debug)
+        run: ./gradlew :composeApp:compileKotlinDesktop :composeApp:compileKotlinAndroid --info 2>&1 | head -100
 
       - name: Run unit tests
         run: ./gradlew :composeApp:testDebugUnitTest
