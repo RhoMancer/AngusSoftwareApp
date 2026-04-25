@@ -6,14 +6,13 @@ on:
   push:
     branches: [develop, master]
 
-env:
-  GITHUB_USER: ${{ github.actor }}
-  GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-
 jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
+    env:
+      GITHUB_USER: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -48,6 +47,9 @@ jobs:
   android-lint:
     name: Android Lint
     runs-on: ubuntu-latest
+    env:
+      GITHUB_USER: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
