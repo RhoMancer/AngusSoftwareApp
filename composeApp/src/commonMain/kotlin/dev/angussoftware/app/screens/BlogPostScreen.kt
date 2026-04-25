@@ -11,11 +11,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
+import coil3.compose.AsyncImage
+import com.mikepenz.markdown.compose.Markdown
+import com.mikepenz.markdown.model.markdownColor
 import dev.angussoftware.app.blog.BlogPost
+import dev.angussoftware.app.blog.HtmlToMarkdown
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.ui.utils.currentWindowAdaptiveInfo
 import org.jetbrains.compose.resources.stringResource
@@ -91,23 +96,28 @@ internal fun BlogPostScreen(
                 )
             }
             if (!blogPost.imageUrl.isNullOrBlank()) {
-                Box(
+                AsyncImage(
+                    model = blogPost.imageUrl,
+                    contentDescription = blogPost.title,
                     modifier =
                         Modifier
                             .fillMaxWidth()
                             .height(200.dp)
                             .padding(top = 12.dp)
                             .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(Res.string.ui_image_placeholder),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+                    contentScale = ContentScale.Crop,
+                )
             }
-            if (!blogPost.content.isNullOrBlank()) {
+            if (!blogPost.contentHtml.isNullOrBlank()) {
+                val markdownText = HtmlToMarkdown.convert(blogPost.contentHtml!!)
+                Markdown(
+                    content = markdownText,
+                    colors = markdownColor(
+                        text = MaterialTheme.colorScheme.onSurface,
+                    ),
+                    modifier = Modifier.padding(top = 12.dp),
+                )
+            } else if (!blogPost.content.isNullOrBlank()) {
                 Text(
                     text = blogPost.content!!,
                     style = MaterialTheme.typography.bodyLarge,

@@ -22,6 +22,7 @@ internal object RssParser {
             // Full content: prefer content:encoded, then <content> if present
             val contentRaw = extractTag(itemXml, "content:encoded") ?: extractTag(itemXml, "content")
             val contentPlain = contentRaw?.let { stripHtml(decodeXmlEntities(stripCdata(it))).trim() }
+            val contentHtml = contentRaw?.let { decodeXmlEntities(stripCdata(it)).trim() }
 
             // Summary: prefer <description>, else derive from content
             val descriptionRaw = extractTag(itemXml, "description")
@@ -41,6 +42,7 @@ internal object RssParser {
                     summary = summary,
                     imageUrl = imageUrl,
                     content = contentPlain,
+                    contentHtml = contentHtml,
                 )
         }
         return posts

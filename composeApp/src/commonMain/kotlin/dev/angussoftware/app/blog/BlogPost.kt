@@ -8,4 +8,5 @@ internal data class BlogPost(
     val summary: String?,
     val imageUrl: String?,
     val content: String?,
+    val contentHtml: String? = null,
 )

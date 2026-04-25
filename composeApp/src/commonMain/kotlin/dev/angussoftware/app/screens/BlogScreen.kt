@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import angussoftwareapp.composeapp.generated.resources.*
+import coil3.compose.AsyncImage
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.blog.BlogUiState
 import dev.angussoftware.app.blog.BlogViewModel
@@ -469,21 +471,17 @@ private fun BlogScreenWithTestData(
                                     )
                                 }
                                 if (!post.imageUrl.isNullOrBlank()) {
-                                    Box(
+                                    AsyncImage(
+                                        model = post.imageUrl,
+                                        contentDescription = post.title,
                                         modifier =
                                             Modifier
                                                 .fillMaxWidth()
                                                 .height(160.dp)
                                                 .padding(top = 8.dp)
                                                 .background(MaterialTheme.colorScheme.surfaceVariant),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        Text(
-                                            text = "Image placeholder",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                    }
+                                        contentScale = ContentScale.Crop,
+                                    )
                                 }
                             }
                         }

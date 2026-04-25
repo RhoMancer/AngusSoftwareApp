@@ -142,6 +142,10 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.angusSoftware.theming.compose)
+            implementation(libs.markdown.renderer)
+            implementation(libs.markdown.renderer.m3)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
