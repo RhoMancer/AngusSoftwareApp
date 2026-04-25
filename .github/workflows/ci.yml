@@ -19,7 +19,6 @@ jobs:
         with:
           java-version: '17'
           distribution: temurin
-          cache: gradle
 
       - name: Configure GPR credentials
         run: |
@@ -27,6 +26,8 @@ jobs:
           echo "githubUser=${{ github.actor }}" >> ~/.gradle/gradle.properties
           echo "githubToken=${{ secrets.GH_PACKAGES_TOKEN }}" >> ~/.gradle/gradle.properties
           echo "githubOwner=RhoMancer" >> ~/.gradle/gradle.properties
+          echo "=== Verifying GPR access ==="
+          curl -s -o /dev/null -w "HTTP %{http_code}" -u "${{ github.actor }}:${{ secrets.GH_PACKAGES_TOKEN }}" https://maven.pkg.github.com/RhoMancer/angus-gradle-tools/com/angussoftware/gradle/tools/gradle-tools/0.0.9/gradle-tools-0.0.9.pom
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -56,7 +57,6 @@ jobs:
         with:
           java-version: '17'
           distribution: temurin
-          cache: gradle
 
       - name: Configure GPR credentials
         run: |
