@@ -10,9 +10,6 @@ jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
-    env:
-      GITHUB_USER: ${{ github.actor }}
-      GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -32,9 +29,15 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
+        env:
+          GITHUB_USER: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./gradlew :composeApp:compileKotlinDesktop :composeApp:compileKotlinAndroid
 
       - name: Run unit tests
+        env:
+          GITHUB_USER: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./gradlew :composeApp:testDebugUnitTest
 
       - name: Upload test results
@@ -47,9 +50,6 @@ jobs:
   android-lint:
     name: Android Lint
     runs-on: ubuntu-latest
-    env:
-      GITHUB_USER: ${{ github.actor }}
-      GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -67,6 +67,9 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Android Lint
+        env:
+          GITHUB_USER: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./gradlew :composeApp:lintDebug
 
       - name: Upload lint results
