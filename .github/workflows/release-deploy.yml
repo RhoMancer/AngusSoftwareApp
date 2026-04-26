@@ -5,6 +5,9 @@ on:
     branches:
       - 'release/**'
 
+permissions:
+  contents: read
+
 env:
   GITHUB_USER: ${{ github.actor }}
   GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
