@@ -79,8 +79,8 @@ class BlogScreenInstrumentedTest {
         composeTestRule.onNodeWithTag(BLOG_SCREEN_TEST_TAG).assertIsDisplayed()
 
         // Verify first two blog post items exist and are displayed
-        val firstItem = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0")
-        val secondItem = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1")
+        val firstItem = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1")
+        val secondItem = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2")
 
         firstItem.assertIsDisplayed()
         secondItem.assertIsDisplayed()
@@ -121,9 +121,9 @@ class BlogScreenInstrumentedTest {
         composeTestRule.waitForIdle()
 
         // Verify all three blog post items are displayed
-        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0").assertIsDisplayed()
         composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").assertIsDisplayed()
         composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_3").assertIsDisplayed()
     }
 
     /**
@@ -144,9 +144,9 @@ class BlogScreenInstrumentedTest {
         composeTestRule.waitForIdle()
 
         // Get bounds of all three items
-        val firstBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0").getBoundsInRoot()
-        val secondBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").getBoundsInRoot()
-        val thirdBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").getBoundsInRoot()
+        val firstBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").getBoundsInRoot()
+        val secondBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").getBoundsInRoot()
+        val thirdBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_3").getBoundsInRoot()
 
         // Calculate gaps
         val gap1 = secondBounds.top - firstBounds.bottom
@@ -189,8 +189,8 @@ class BlogScreenInstrumentedTest {
             navController.addOnDestinationChangedListener { _, destination, arguments ->
                 navigatedRoute = destination.route
                 // Also capture the actual argument if present
-                arguments?.getString("postIndex")?.let { idx ->
-                    navigatedRoute = "${Screen.BlogPost.name}/$idx"
+                arguments?.getString("postId")?.let { id ->
+                    navigatedRoute = "${Screen.BlogPost.name}/$id"
                 }
             }
 
@@ -207,22 +207,22 @@ class BlogScreenInstrumentedTest {
                         )
                     }
                     composable(
-                        route = "${Screen.BlogPost.name}/{postIndex}",
-                        arguments = listOf(navArgument("postIndex") { type = NavType.StringType }),
+                        route = "${Screen.BlogPost.name}/{postId}",
+                        arguments = listOf(navArgument("postId") { type = NavType.StringType }),
                     ) { }
                 }
             }
         }
         composeTestRule.waitForIdle()
 
-        // Click on the first blog post item (index 0)
-        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0").performClick()
+        // Click on the first blog post item (id "1")
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").performClick()
         composeTestRule.waitForIdle()
 
-        // Verify the navigation route contains the correct index
+        // Verify the navigation route contains the correct post ID
         assertEquals(
-            "Clicking first item should navigate to BlogPost/0",
-            "${Screen.BlogPost.name}/0",
+            "Clicking first item should navigate to BlogPost/1",
+            "${Screen.BlogPost.name}/1",
             navigatedRoute,
         )
 
@@ -235,13 +235,13 @@ class BlogScreenInstrumentedTest {
         }
         composeTestRule.waitForIdle()
 
-        // Click on the second blog post item (index 1)
-        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").performClick()
+        // Click on the second blog post item (id "2")
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").performClick()
         composeTestRule.waitForIdle()
 
         assertEquals(
-            "Clicking second item should navigate to BlogPost/1",
-            "${Screen.BlogPost.name}/1",
+            "Clicking second item should navigate to BlogPost/2",
+            "${Screen.BlogPost.name}/2",
             navigatedRoute,
         )
 
@@ -254,13 +254,13 @@ class BlogScreenInstrumentedTest {
         }
         composeTestRule.waitForIdle()
 
-        // Click on the third blog post item (index 2)
-        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").performClick()
+        // Click on the third blog post item (id "3")
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_3").performClick()
         composeTestRule.waitForIdle()
 
         assertEquals(
-            "Clicking third item should navigate to BlogPost/2",
-            "${Screen.BlogPost.name}/2",
+            "Clicking third item should navigate to BlogPost/3",
+            "${Screen.BlogPost.name}/3",
             navigatedRoute,
         )
     }
