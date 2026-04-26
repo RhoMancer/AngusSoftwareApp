@@ -29,7 +29,7 @@ internal const val RSS_FEED_URL = "https://rhomancer.github.io/angus-blog-conten
  * @return The parsed post ID, or empty string if route is null/blank
  */
 internal fun parsePostId(route: String?): String =
-    route?.substringAfterLast("/").orEmpty()
+    route?.substringAfter("BlogPost/").orEmpty()
 
 /**
  * Creates a BlogPost object for loading state display.

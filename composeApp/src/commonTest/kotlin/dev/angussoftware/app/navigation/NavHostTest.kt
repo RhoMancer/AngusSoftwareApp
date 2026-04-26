@@ -56,9 +56,9 @@ internal class NavHostTest {
 
     @Test
     fun parsePostIdWithMultipleSlashes() {
-        val route = "Blog/Post/Category/42"
+        val route = "BlogPost/Category/42"
         val result = parsePostId(route)
-        assertEquals("42", result, "Should extract ID after last slash")
+        assertEquals("Category/42", result, "Should extract everything after BlogPost/")
     }
 
     @Test
