@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import angussoftwareapp.composeapp.generated.resources.*
 import coil3.compose.AsyncImage
 import com.mikepenz.markdown.compose.Markdown
-import com.mikepenz.markdown.model.markdownColor
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.blog.HtmlToMarkdown
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
@@ -112,9 +111,6 @@ internal fun BlogPostScreen(
                 val markdownText = HtmlToMarkdown.convert(blogPost.contentHtml!!)
                 Markdown(
                     content = markdownText,
-                    colors = markdownColor(
-                        text = MaterialTheme.colorScheme.onSurface,
-                    ),
                     modifier = Modifier.padding(top = 12.dp),
                 )
             } else if (!blogPost.content.isNullOrBlank()) {
