@@ -44,14 +44,11 @@ internal fun BlogScreen(
     val pageSize = PAGE_SIZE
     var visibleCount by remember { mutableStateOf(if (initialPosts != null) minOf(pageSize, initialPosts.size) else pageSize) }
 
-    println("Fetching initial posts 0")
-
     // Skip network fetch if test data is provided
     if (initialPosts == null) {
         LaunchedEffect(feedUrl) {
             val repository = BlogRepository(feedUrl)
             // Fetch all posts once, then paginate locally
-            println("Fetching initial posts 1")
 
             allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
             // Ensure initial visible count doesn't exceed size
