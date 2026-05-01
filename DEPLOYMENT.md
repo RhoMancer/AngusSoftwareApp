@@ -42,9 +42,9 @@ git push origin HEAD
 
 ### 4. Monitor and verify
 
-- **GitHub Actions**: Watch the workflow at https://github.com/RhoMancer/AngusSoftwareApp/actions
+- **GitHub Actions**: Watch the workflow at <https://github.com/RhoMancer/AngusSoftwareApp/actions>
 - **Google Play Console**: Confirm the new build appears in **Internal Testing** with the correct `versionName` and `versionCode`
-- **GitHub Pages**: Visit https://rhomancer.github.io/AngusSoftwareApp/ and check the version badge
+- **GitHub Pages**: Visit <https://rhomancer.github.io/AngusSoftwareApp/> and check the version badge
 
 ### 5. Merge back to main
 
@@ -72,7 +72,7 @@ The deployment pipeline automatically triggers when you push to `release/**` bra
 
 ## Prerequisites
 
-- GitHub repository: https://github.com/RhoMancer/AngusSoftwareApp
+- GitHub repository: <https://github.com/RhoMancer/AngusSoftwareApp
 - Google Play Developer account
 - Access to repository settings (for adding secrets)
 
@@ -165,7 +165,7 @@ GitHub secrets store sensitive information securely for use in GitHub Actions.
 
 ### 3.1 Navigate to repository secrets
 
-1. Go to https://github.com/RhoMancer/AngusSoftwareApp
+1. Go to <https://github.com/RhoMancer/AngusSoftwareApp>
 2. Click **Settings** tab
 3. In left sidebar, go to **Secrets and variables** → **Actions**
 4. Click **New repository secret**
@@ -311,7 +311,7 @@ Note: If your repository policy disallows CI commits, run the bump task locally 
 4. Install and verify the app works
 
 **Web (GitHub Pages):**
-1. Go to https://rhomancer.github.io/AngusSoftwareApp/
+1. Go to <https://rhomancer.github.io/AngusSoftwareApp/>
 2. Your web app should be live
 3. Test the functionality
 
