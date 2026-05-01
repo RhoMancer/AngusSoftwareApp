@@ -42,63 +42,51 @@ fun writeRootProps(p: java.util.Properties) {
     f.writer().use { w -> p.store(w, null) }
 }
 
+data class SemVer(val current: String, val maj: Int, val min: Int, val pat: Int)
+
+fun readVersion(): SemVer {
+    val p = readRootProps()
+    val currentVersion = (
+        p.getProperty("version")
+            ?: (project.findProperty("version") as String?)
+            ?: project.version.toString().takeIf { it.isNotBlank() && it != "unspecified" }
+        ) ?: throw GradleException(
+        "Missing 'version'. Add 'version=x.y.z' to root gradle.properties."
+    )
+    val parts = currentVersion.split('.')
+    return SemVer(
+        currentVersion,
+        parts.getOrNull(0)?.toIntOrNull() ?: 0,
+        parts.getOrNull(1)?.toIntOrNull() ?: 0,
+        parts.getOrNull(2)?.toIntOrNull() ?: 0,
+    )
+}
+
+fun bumpAndWrite(newVer: String, currentVersion: String) {
+    val p = readRootProps()
+    p.setProperty("version", newVer)
+    writeRootProps(p)
+    println("[version] $currentVersion -> $newVer")
+}
+
 tasks.register("bumpPatch") {
     doLast {
-        val p = readRootProps()
-        val currentVersion = (
-            p.getProperty("version")
-                ?: (project.findProperty("version") as String?)
-                ?: project.version.toString().takeIf { it.isNotBlank() && it != "unspecified" }
-            ) ?: throw GradleException(
-            "Missing 'version'. Add 'version=x.y.z' to root gradle.properties."
-        )
-        val parts = currentVersion.split('.')
-        val maj = parts.getOrNull(0)?.toIntOrNull() ?: 0
-        val min = parts.getOrNull(1)?.toIntOrNull() ?: 0
-        val pat = parts.getOrNull(2)?.toIntOrNull() ?: 0
-        val newVer = "$maj.$min.${pat + 1}"
-        p.setProperty("version", newVer)
-        writeRootProps(p)
-        println("[version] $currentVersion -> $newVer")
+        val v = readVersion()
+        bumpAndWrite("${v.maj}.${v.min}.${v.pat + 1}", v.current)
     }
 }
 
 tasks.register("bumpMinor") {
     doLast {
-        val p = readRootProps()
-        val currentVersion = (
-            p.getProperty("version")
-                ?: (project.findProperty("version") as String?)
-                ?: project.version.toString().takeIf { it.isNotBlank() && it != "unspecified" }
-            ) ?: throw GradleException(
-            "Missing 'version'. Add 'version=x.y.z' to root gradle.properties."
-        )
-        val parts = currentVersion.split('.')
-        val maj = parts.getOrNull(0)?.toIntOrNull() ?: 0
-        val min = parts.getOrNull(1)?.toIntOrNull() ?: 0
-        val newVer = "$maj.${min + 1}.0"
-        p.setProperty("version", newVer)
-        writeRootProps(p)
-        println("[version] $currentVersion -> $newVer")
+        val v = readVersion()
+        bumpAndWrite("${v.maj}.${v.min + 1}.0", v.current)
     }
 }
 
 tasks.register("bumpMajor") {
     doLast {
-        val p = readRootProps()
-        val currentVersion = (
-            p.getProperty("version")
-                ?: (project.findProperty("version") as String?)
-                ?: project.version.toString().takeIf { it.isNotBlank() && it != "unspecified" }
-            ) ?: throw GradleException(
-            "Missing 'version'. Add 'version=x.y.z' to root gradle.properties."
-        )
-        val parts = currentVersion.split('.')
-        val maj = parts.getOrNull(0)?.toIntOrNull() ?: 0
-        val newVer = "${maj + 1}.0.0"
-        p.setProperty("version", newVer)
-        writeRootProps(p)
-        println("[version] $currentVersion -> $newVer")
+        val v = readVersion()
+        bumpAndWrite("${v.maj + 1}.0.0", v.current)
     }
 }
 
