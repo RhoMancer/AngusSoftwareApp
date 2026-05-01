@@ -33,7 +33,7 @@ gradlew help
 Please run tests locally before opening a PR.
 
 Reference: Compose Multiplatform testing guide
-https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html
+<https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html>
 
 Commands
 ```bash

@@ -4,7 +4,7 @@ Angus Software application for showcasing my portfolio and hosting my blog.
 
 - Current targets: Android, Web/Wasm
 - Future: iOS planned; Desktop not planned
-- Live demo: https://rhomancer.github.io/AngusSoftwareApp/
+- Live demo: <https://rhomancer.github.io/AngusSoftwareApp/>
 - Google Play listing: Available on Internal Testing track
 
 ## Quick start
@@ -38,7 +38,7 @@ This project includes automatic deployment for both Android and Web/Wasm platfor
 **Automatic deployment triggers:**
 - Push to `release/**` branches automatically deploys to:
   - Google Play Store (Internal Testing track)
-  - GitHub Pages (https://rhomancer.github.io/AngusSoftwareApp/)
+  - GitHub Pages (<https://rhomancer.github.io/AngusSoftwareApp/>)
 
 **Setup instructions:**
 See [DEPLOYMENT.md](DEPLOYMENT.md) for complete step-by-step guide including:
@@ -59,7 +59,7 @@ git commit -m "chore: release $(grep ^version= gradle.properties | cut -d= -f2)"
 git checkout -b release/v$(grep ^version= gradle.properties | cut -d= -f2)
 git push origin HEAD
 
-# Monitor deployment at: https://github.com/RhoMancer/AngusSoftwareApp/actions
+# Monitor deployment at: <https://github.com/RhoMancer/AngusSoftwareApp/actions>
 ```
 
 ## Automated versioning
@@ -143,7 +143,7 @@ Key files
 
 ## Testing
 Reference: Compose Multiplatform testing guide
-https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html
+<https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html>
 
 Run all unit tests (JVM, includes commonTest via Android unit test task)
 ```bash
