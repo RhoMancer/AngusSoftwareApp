@@ -6,6 +6,9 @@ on:
   push:
     branches: [develop, master]
 
+permissions:
+  contents: read
+
 jobs:
   instrumented-test:
     name: Android Instrumented Tests
