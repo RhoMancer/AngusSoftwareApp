@@ -48,6 +48,20 @@ internal const val PROJECTS_SCREEN_TEST_TAG = "ProjectsScreen"
 internal const val BLOG_SCREEN_TEST_TAG = "BlogScreen"
 internal const val BLOG_POST_ITEM_TEST_TAG = "BlogPostItem"
 
+/** Navigation destination descriptor — eliminates duplicated NavigationBarItem/RailItem blocks. */
+private data class NavDestination(
+    val screen: Screen,
+    val labelRes: org.jetbrains.compose.resources.StringResource,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val testTag: String,
+)
+
+private val NAV_DESTINATIONS = listOf(
+    NavDestination(Screen.Home, Res.string.nav_home, Icons.Default.Home, NAV_ITEM_HOME_TAG),
+    NavDestination(Screen.Projects, Res.string.nav_projects, Icons.AutoMirrored.Filled.List, NAV_ITEM_PROJECTS_TAG),
+    NavDestination(Screen.Blog, Res.string.nav_blog, Icons.Default.Create, NAV_ITEM_BLOG_TAG),
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
@@ -84,54 +98,24 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                                     }
                                 }.testTag(NAV_BAR_TEST_TAG),
                     ) {
-                        NavigationBarItem(
-                            selected = currentRoute == Screen.Home.name,
-                            onClick = {
-                                navController.navigate(Screen.Home.name) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            label = { Text(stringResource(Res.string.nav_home)) },
-                            icon = {
-                                Icon(
-                                    Icons.Default.Home,
-                                    contentDescription = stringResource(Res.string.nav_home),
-                                )
-                            },
-                            modifier = Modifier.testTag(NAV_ITEM_HOME_TAG),
-                        )
-                        NavigationBarItem(
-                            selected = currentRoute == Screen.Projects.name,
-                            onClick = {
-                                navController.navigate(Screen.Projects.name) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            label = { Text(stringResource(Res.string.nav_projects)) },
-                            icon = {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.List,
-                                    contentDescription = stringResource(Res.string.nav_projects),
-                                )
-                            },
-                            modifier = Modifier.testTag(NAV_ITEM_PROJECTS_TAG),
-                        )
-                        NavigationBarItem(
-                            selected = currentRoute == Screen.Blog.name,
-                            onClick = {
-                                navController.navigate(Screen.Blog.name) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            label = { Text(stringResource(Res.string.nav_blog)) },
-                            icon = {
-                                Icon(
-                                    Icons.Default.Create,
-                                    contentDescription = stringResource(Res.string.nav_blog),
-                                )
-                            },
-                            modifier = Modifier.testTag(NAV_ITEM_BLOG_TAG),
-                        )
+                        NAV_DESTINATIONS.forEach { dest ->
+                            NavigationBarItem(
+                                selected = currentRoute == dest.screen.name,
+                                onClick = {
+                                    navController.navigate(dest.screen.name) {
+                                        launchSingleTop = true
+                                    }
+                                },
+                                label = { Text(stringResource(dest.labelRes)) },
+                                icon = {
+                                    Icon(
+                                        dest.icon,
+                                        contentDescription = stringResource(dest.labelRes),
+                                    )
+                                },
+                                modifier = Modifier.testTag(dest.testTag),
+                            )
+                        }
                     }
                 },
                 modifier =
@@ -175,54 +159,24 @@ internal fun AngusSoftwareAppScreen(navController: NavHostController = rememberN
                             ).testTag(NAV_RAIL_TEST_TAG),
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                     ) {
-                        NavigationRailItem(
-                            selected = currentRoute == Screen.Home.name,
-                            onClick = {
-                                navController.navigate(Screen.Home.name) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            label = { Text(stringResource(Res.string.nav_home)) },
-                            icon = {
-                                Icon(
-                                    Icons.Default.Home,
-                                    contentDescription = stringResource(Res.string.nav_home),
-                                )
-                            },
-                            modifier = Modifier.padding(horizontal = 16.dp).testTag(NAV_ITEM_HOME_TAG),
-                        )
-                        NavigationRailItem(
-                            selected = currentRoute == Screen.Projects.name,
-                            onClick = {
-                                navController.navigate(Screen.Projects.name) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            label = { Text(stringResource(Res.string.nav_projects)) },
-                            icon = {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.List,
-                                    contentDescription = stringResource(Res.string.nav_projects),
-                                )
-                            },
-                            modifier = Modifier.padding(horizontal = 16.dp).testTag(NAV_ITEM_PROJECTS_TAG),
-                        )
-                        NavigationRailItem(
-                            selected = currentRoute == Screen.Blog.name,
-                            onClick = {
-                                navController.navigate(Screen.Blog.name) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            label = { Text(stringResource(Res.string.nav_blog)) },
-                            icon = {
-                                Icon(
-                                    Icons.Default.Create,
-                                    contentDescription = stringResource(Res.string.nav_blog),
-                                )
-                            },
-                            modifier = Modifier.padding(horizontal = 16.dp).testTag(NAV_ITEM_BLOG_TAG),
-                        )
+                        NAV_DESTINATIONS.forEach { dest ->
+                            NavigationRailItem(
+                                selected = currentRoute == dest.screen.name,
+                                onClick = {
+                                    navController.navigate(dest.screen.name) {
+                                        launchSingleTop = true
+                                    }
+                                },
+                                label = { Text(stringResource(dest.labelRes)) },
+                                icon = {
+                                    Icon(
+                                        dest.icon,
+                                        contentDescription = stringResource(dest.labelRes),
+                                    )
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp).testTag(dest.testTag),
+                            )
+                        }
                     }
                 }
                 displayCurrentScreen(navController)
