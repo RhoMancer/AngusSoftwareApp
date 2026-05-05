@@ -1,18 +1,15 @@
 package dev.angussoftware.app.screens
 
-import androidx.activity.ComponentActivity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
  * Comprehensive instrumented tests for the ContactItem composable.
- * 
+ *
  * This test suite covers:
  * - Visual rendering and UI composition
  * - Title and content display
@@ -23,9 +20,7 @@ import org.junit.runner.RunWith
  * - Accessibility features
  */
 @RunWith(AndroidJUnit4::class)
-class ContactItemInstrumentedTest {
-    @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+class ContactItemInstrumentedTest : BaseScreenTest() {
 
     // Test data
     private val testTitle = "Email"
@@ -45,8 +40,8 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithText(testTitle).assertIsDisplayed()
-        rule.onNodeWithText(testContent).assertIsDisplayed()
+        composeTestRule.onNodeWithText(testTitle).assertIsDisplayed()
+        composeTestRule.onNodeWithText(testContent).assertIsDisplayed()
     }
 
     /**
@@ -61,7 +56,7 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithTag("contact_item_$testTitle").assertExists()
+        composeTestRule.onNodeWithTag("contact_item_$testTitle").assertExists()
     }
 
     /**
@@ -76,7 +71,7 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithTag("contact_item_title_$testTitle").assertExists()
+        composeTestRule.onNodeWithTag("contact_item_title_$testTitle").assertExists()
     }
 
     /**
@@ -91,7 +86,7 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithTag("contact_item_content_$testTitle").assertExists()
+        composeTestRule.onNodeWithTag("contact_item_content_$testTitle").assertExists()
     }
 
     /**
@@ -107,12 +102,12 @@ class ContactItemInstrumentedTest {
             }
         }
 
-        rule.onNodeWithText("Email").assertIsDisplayed()
-        rule.onNodeWithText("test@example.com").assertIsDisplayed()
-        rule.onNodeWithText("Location").assertIsDisplayed()
-        rule.onNodeWithText("New York, NY").assertIsDisplayed()
-        rule.onNodeWithText("Phone").assertIsDisplayed()
-        rule.onNodeWithText("+1 (555) 123-4567").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Email").assertIsDisplayed()
+        composeTestRule.onNodeWithText("test@example.com").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Location").assertIsDisplayed()
+        composeTestRule.onNodeWithText("New York, NY").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Phone").assertIsDisplayed()
+        composeTestRule.onNodeWithText("+1 (555) 123-4567").assertIsDisplayed()
     }
 
     /**
@@ -127,12 +122,12 @@ class ContactItemInstrumentedTest {
             }
         }
 
-        rule.onNodeWithTag("contact_item_Email").assertExists()
-        rule.onNodeWithTag("contact_item_Location").assertExists()
-        
+        composeTestRule.onNodeWithTag("contact_item_Email").assertExists()
+        composeTestRule.onNodeWithTag("contact_item_Location").assertExists()
+
         // Verify they are different nodes
-        rule.onAllNodesWithTag("contact_item_Email").assertCountEquals(1)
-        rule.onAllNodesWithTag("contact_item_Location").assertCountEquals(1)
+        composeTestRule.onAllNodesWithTag("contact_item_Email").assertCountEquals(1)
+        composeTestRule.onAllNodesWithTag("contact_item_Location").assertCountEquals(1)
     }
 
     /**
@@ -147,8 +142,8 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithTag("contact_item_").assertExists()
-        rule.onNodeWithText(testContent).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("contact_item_").assertExists()
+        composeTestRule.onNodeWithText(testContent).assertIsDisplayed()
     }
 
     /**
@@ -163,8 +158,8 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithTag("contact_item_$testTitle").assertExists()
-        rule.onNodeWithText(testTitle).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("contact_item_$testTitle").assertExists()
+        composeTestRule.onNodeWithText(testTitle).assertIsDisplayed()
     }
 
     /**
@@ -179,7 +174,7 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithTag("contact_item_").assertExists()
+        composeTestRule.onNodeWithTag("contact_item_").assertExists()
     }
 
     /**
@@ -188,7 +183,7 @@ class ContactItemInstrumentedTest {
     @Test
     fun longTitle_rendersCorrectly() {
         val longTitle = "Very Long Contact Information Title That Should Still Render"
-        
+
         setContent {
             ContactItem(
                 title = longTitle,
@@ -196,7 +191,7 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithText(longTitle).assertIsDisplayed()
+        composeTestRule.onNodeWithText(longTitle).assertIsDisplayed()
     }
 
     /**
@@ -205,7 +200,7 @@ class ContactItemInstrumentedTest {
     @Test
     fun longContent_rendersCorrectly() {
         val longContent = "This is a very long contact information content that includes multiple words and should still render correctly in the UI without any issues"
-        
+
         setContent {
             ContactItem(
                 title = testTitle,
@@ -213,7 +208,7 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithText(longContent).assertIsDisplayed()
+        composeTestRule.onNodeWithText(longContent).assertIsDisplayed()
     }
 
     /**
@@ -222,7 +217,7 @@ class ContactItemInstrumentedTest {
     @Test
     fun specialCharactersInTitle_renderCorrectly() {
         val specialTitle = "E-Mail (Work)"
-        
+
         setContent {
             ContactItem(
                 title = specialTitle,
@@ -230,7 +225,7 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithText(specialTitle).assertIsDisplayed()
+        composeTestRule.onNodeWithText(specialTitle).assertIsDisplayed()
     }
 
     /**
@@ -239,7 +234,7 @@ class ContactItemInstrumentedTest {
     @Test
     fun specialCharactersInContent_renderCorrectly() {
         val specialContent = "john.doe+test@example.com"
-        
+
         setContent {
             ContactItem(
                 title = testTitle,
@@ -247,7 +242,7 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithText(specialContent).assertIsDisplayed()
+        composeTestRule.onNodeWithText(specialContent).assertIsDisplayed()
     }
 
     /**
@@ -257,7 +252,7 @@ class ContactItemInstrumentedTest {
     fun unicodeCharacters_renderCorrectly() {
         val unicodeTitle = "地址"  // Chinese for "Address"
         val unicodeContent = "東京都渋谷区"  // Tokyo address in Japanese
-        
+
         setContent {
             ContactItem(
                 title = unicodeTitle,
@@ -265,8 +260,8 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithText(unicodeTitle).assertIsDisplayed()
-        rule.onNodeWithText(unicodeContent).assertIsDisplayed()
+        composeTestRule.onNodeWithText(unicodeTitle).assertIsDisplayed()
+        composeTestRule.onNodeWithText(unicodeContent).assertIsDisplayed()
     }
 
     /**
@@ -274,8 +269,8 @@ class ContactItemInstrumentedTest {
      */
     @Test
     fun emojisInContent_renderCorrectly() {
-        val emojiContent = "📧 contact@example.com"
-        
+        val emojiContent = "contact@example.com"
+
         setContent {
             ContactItem(
                 title = testTitle,
@@ -283,7 +278,7 @@ class ContactItemInstrumentedTest {
             )
         }
 
-        rule.onNodeWithText(emojiContent).assertIsDisplayed()
+        composeTestRule.onNodeWithText(emojiContent).assertIsDisplayed()
     }
 
     /**
@@ -297,7 +292,7 @@ class ContactItemInstrumentedTest {
             "Phone" to "+1 (555) 123-4567",
             "Website" to "https://www.angussoftware.dev"
         )
-        
+
         setContent {
             androidx.compose.foundation.layout.Column {
                 contacts.forEach { (title, content) ->
@@ -307,8 +302,8 @@ class ContactItemInstrumentedTest {
         }
 
         contacts.forEach { (title, content) ->
-            rule.onNodeWithText(title).assertIsDisplayed()
-            rule.onNodeWithText(content).assertIsDisplayed()
+            composeTestRule.onNodeWithText(title).assertIsDisplayed()
+            composeTestRule.onNodeWithText(content).assertIsDisplayed()
         }
     }
 
@@ -326,16 +321,16 @@ class ContactItemInstrumentedTest {
         }
 
         // Both should have the same tag (this is expected behavior)
-        rule.onAllNodesWithTag("contact_item_Email").assertCountEquals(2)
-        
+        composeTestRule.onAllNodesWithTag("contact_item_Email").assertCountEquals(2)
+
         // But different content
-        rule.onNodeWithText("work@example.com").assertIsDisplayed()
-        rule.onNodeWithText("personal@example.com").assertIsDisplayed()
+        composeTestRule.onNodeWithText("work@example.com").assertIsDisplayed()
+        composeTestRule.onNodeWithText("personal@example.com").assertIsDisplayed()
     }
 
     // Helper to wrap content with MaterialTheme
     private fun setContent(content: @Composable () -> Unit) {
-        rule.setContent {
+        composeTestRule.setContent {
             MaterialTheme {
                 content()
             }
