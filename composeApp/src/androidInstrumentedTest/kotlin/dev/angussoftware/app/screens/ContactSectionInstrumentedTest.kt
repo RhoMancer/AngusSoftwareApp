@@ -1,18 +1,15 @@
 package dev.angussoftware.app.screens
 
-import androidx.activity.ComponentActivity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
  * Comprehensive instrumented tests for the ContactSection composable.
- * 
+ *
  * This test suite covers:
  * - Visual rendering and UI composition
  * - Section title display and test tags
@@ -28,9 +25,7 @@ import org.junit.runner.RunWith
  * - Edge cases
  */
 @RunWith(AndroidJUnit4::class)
-class ContactSectionInstrumentedTest {
-    @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+class ContactSectionInstrumentedTest : BaseScreenTest() {
 
     /**
      * Test that the ContactSection container is displayed.
@@ -41,7 +36,7 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithTag("contact_section").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("contact_section").assertIsDisplayed()
     }
 
     /**
@@ -53,7 +48,7 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithText("Contact Information").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Contact Information").assertIsDisplayed()
     }
 
     /**
@@ -65,7 +60,7 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithTag("contact_section_title").assertExists()
+        composeTestRule.onNodeWithTag("contact_section_title").assertExists()
     }
 
     /**
@@ -77,8 +72,8 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithText("Email").assertIsDisplayed()
-        rule.onNodeWithText("rhomancer@proton.me").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Email").assertIsDisplayed()
+        composeTestRule.onNodeWithText("rhomancer@proton.me").assertIsDisplayed()
     }
 
     /**
@@ -90,8 +85,8 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithText("Location").assertIsDisplayed()
-        rule.onNodeWithText("Chicago IL").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Location").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Chicago IL").assertIsDisplayed()
     }
 
     /**
@@ -103,8 +98,8 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithTag("contact_item_Email").assertExists()
-        rule.onNodeWithTag("contact_item_Location").assertExists()
+        composeTestRule.onNodeWithTag("contact_item_Email").assertExists()
+        composeTestRule.onNodeWithTag("contact_item_Location").assertExists()
     }
 
     /**
@@ -116,7 +111,7 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithText("Connect with me").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Connect with me").assertIsDisplayed()
     }
 
     /**
@@ -128,7 +123,7 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithTag("contact_section_social_title").assertExists()
+        composeTestRule.onNodeWithTag("contact_section_social_title").assertExists()
     }
 
 
@@ -141,10 +136,10 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithText("LinkedIn").assertExists()
-        rule.onNodeWithText("GitHub").assertExists()
-        rule.onNodeWithText("BlueSky").assertExists()
-        rule.onNodeWithText("ProtoPro").assertExists()
+        composeTestRule.onNodeWithText("LinkedIn").assertExists()
+        composeTestRule.onNodeWithText("GitHub").assertExists()
+        composeTestRule.onNodeWithText("BlueSky").assertExists()
+        composeTestRule.onNodeWithText("ProtoPro").assertExists()
     }
 
     /**
@@ -156,8 +151,8 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 0.5f)
         }
 
-        rule.onNodeWithTag("contact_section").assertExists()
-        rule.onNodeWithText("Contact Information").assertExists()
+        composeTestRule.onNodeWithTag("contact_section").assertExists()
+        composeTestRule.onNodeWithText("Contact Information").assertExists()
     }
 
     /**
@@ -169,7 +164,7 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 0f)
         }
 
-        rule.onNodeWithTag("contact_section").assertExists()
+        composeTestRule.onNodeWithTag("contact_section").assertExists()
     }
 
     /**
@@ -182,23 +177,23 @@ class ContactSectionInstrumentedTest {
         }
 
         // Container
-        rule.onNodeWithTag("contact_section").assertExists()
-        
+        composeTestRule.onNodeWithTag("contact_section").assertExists()
+
         // Title
-        rule.onNodeWithTag("contact_section_title").assertExists()
-        
+        composeTestRule.onNodeWithTag("contact_section_title").assertExists()
+
         // Contact items
-        rule.onNodeWithTag("contact_item_Email").assertExists()
-        rule.onNodeWithTag("contact_item_Location").assertExists()
-        
+        composeTestRule.onNodeWithTag("contact_item_Email").assertExists()
+        composeTestRule.onNodeWithTag("contact_item_Location").assertExists()
+
         // Social media subtitle
-        rule.onNodeWithTag("contact_section_social_title").assertExists()
-        
+        composeTestRule.onNodeWithTag("contact_section_social_title").assertExists()
+
         // Social media buttons
-        rule.onNodeWithTag("social_media_button_LinkedIn").assertExists()
-        rule.onNodeWithTag("social_media_button_GitHub").assertExists()
-        rule.onNodeWithTag("social_media_button_BlueSky").assertExists()
-        rule.onNodeWithTag("social_media_button_ProtoPro").assertExists()
+        composeTestRule.onNodeWithTag("social_media_button_LinkedIn").assertExists()
+        composeTestRule.onNodeWithTag("social_media_button_GitHub").assertExists()
+        composeTestRule.onNodeWithTag("social_media_button_BlueSky").assertExists()
+        composeTestRule.onNodeWithTag("social_media_button_ProtoPro").assertExists()
     }
 
     /**
@@ -210,10 +205,10 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithTag("social_media_button_LinkedIn").assertHasClickAction()
-        rule.onNodeWithTag("social_media_button_GitHub").assertHasClickAction()
-        rule.onNodeWithTag("social_media_button_BlueSky").assertHasClickAction()
-        rule.onNodeWithTag("social_media_button_ProtoPro").assertHasClickAction()
+        composeTestRule.onNodeWithTag("social_media_button_LinkedIn").assertHasClickAction()
+        composeTestRule.onNodeWithTag("social_media_button_GitHub").assertHasClickAction()
+        composeTestRule.onNodeWithTag("social_media_button_BlueSky").assertHasClickAction()
+        composeTestRule.onNodeWithTag("social_media_button_ProtoPro").assertHasClickAction()
     }
 
     /**
@@ -229,7 +224,7 @@ class ContactSectionInstrumentedTest {
         }
 
         // Both sections should exist
-        rule.onAllNodesWithTag("contact_section").assertCountEquals(2)
+        composeTestRule.onAllNodesWithTag("contact_section").assertCountEquals(2)
     }
 
     /**
@@ -242,8 +237,8 @@ class ContactSectionInstrumentedTest {
         }
 
         // The section should be wrapped in a card
-        rule.onNodeWithTag("contact_section").assertExists()
-        rule.onNodeWithTag("contact_section").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("contact_section").assertExists()
+        composeTestRule.onNodeWithTag("contact_section").assertIsDisplayed()
     }
 
     /**
@@ -255,14 +250,14 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onNodeWithTag("contact_section").assertIsDisplayed()
-        
+        composeTestRule.onNodeWithTag("contact_section").assertIsDisplayed()
+
         // Force recomposition
-        rule.waitForIdle()
-        
+        composeTestRule.waitForIdle()
+
         // Verify everything is still present
-        rule.onNodeWithTag("contact_section").assertIsDisplayed()
-        rule.onNodeWithText("Contact Information").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("contact_section").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Contact Information").assertIsDisplayed()
     }
 
     /**
@@ -274,7 +269,7 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 0.01f)
         }
 
-        rule.onNodeWithTag("contact_section").assertExists()
+        composeTestRule.onNodeWithTag("contact_section").assertExists()
     }
 
     /**
@@ -286,15 +281,15 @@ class ContactSectionInstrumentedTest {
             ContactSection(alpha = 1f)
         }
 
-        rule.onAllNodesWithTag("social_media_button_LinkedIn").assertCountEquals(1)
-        rule.onAllNodesWithTag("social_media_button_GitHub").assertCountEquals(1)
-        rule.onAllNodesWithTag("social_media_button_BlueSky").assertCountEquals(1)
-        rule.onAllNodesWithTag("social_media_button_ProtoPro").assertCountEquals(1)
+        composeTestRule.onAllNodesWithTag("social_media_button_LinkedIn").assertCountEquals(1)
+        composeTestRule.onAllNodesWithTag("social_media_button_GitHub").assertCountEquals(1)
+        composeTestRule.onAllNodesWithTag("social_media_button_BlueSky").assertCountEquals(1)
+        composeTestRule.onAllNodesWithTag("social_media_button_ProtoPro").assertCountEquals(1)
     }
 
     // Helper to wrap content with MaterialTheme
     private fun setContent(content: @Composable () -> Unit) {
-        rule.setContent {
+        composeTestRule.setContent {
             MaterialTheme {
                 content()
             }
