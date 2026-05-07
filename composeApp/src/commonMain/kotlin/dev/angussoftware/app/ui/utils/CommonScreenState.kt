@@ -27,7 +27,12 @@ internal data class CommonScreenState(
     val isCompactScreen: Boolean,
     val tilePadding: Dp,
     val appBarHeightDp: Dp,
-)
+) {
+    /** Pre-computed top padding for screen content (status bar + app bar + tile padding). */
+    val topContentPadding: Dp
+        get() = if (!isCompactScreen) statusBarHeightDp + appBarHeightDp + tilePadding
+        else statusBarHeightDp + tilePadding
+}
 
 // Test-only override hook for window adaptive info to make isCompactScreen deterministic in tests
 // Default is null, meaning production behavior using currentWindowAdaptiveInfo()
