@@ -122,6 +122,9 @@ jobs:
       - name: Create .nojekyll file
         run: touch composeApp/build/dist/wasmJs/productionExecutable/.nojekyll
       
+      - name: Copy static pages
+        run: cp -r static/. composeApp/build/dist/wasmJs/productionExecutable/
+      
       - name: Upload web artifacts
         uses: actions/upload-artifact@v4
         with:
