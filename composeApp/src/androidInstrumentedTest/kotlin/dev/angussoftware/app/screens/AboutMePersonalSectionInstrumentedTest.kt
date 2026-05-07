@@ -1,18 +1,15 @@
 package dev.angussoftware.app.screens
 
-import androidx.activity.ComponentActivity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
  * Comprehensive instrumented tests for the AboutMePersonalSection composable.
- * 
+ *
  * This test suite covers:
  * - Visual rendering and UI composition
  * - Section title display and typography
@@ -26,9 +23,7 @@ import org.junit.runner.RunWith
  * - Layout structure verification
  */
 @RunWith(AndroidJUnit4::class)
-class AboutMePersonalSectionInstrumentedTest {
-    @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+class AboutMePersonalSectionInstrumentedTest : BaseScreenTest() {
 
     // Test data - expected string content
     private val expectedTitle = "Overly Personal"
@@ -45,10 +40,10 @@ class AboutMePersonalSectionInstrumentedTest {
             AboutMePersonalSection(alpha = 1f)
         }
 
-        rule.onNodeWithText(expectedTitle, substring = true).assertIsDisplayed()
-        rule.onNodeWithText(expectedParagraph1Start, substring = true).assertIsDisplayed()
-        rule.onNodeWithText(expectedParagraph2Start, substring = true).assertIsDisplayed()
-        rule.onNodeWithText(expectedParagraph3Start, substring = true).assertExists()
+        composeTestRule.onNodeWithText(expectedTitle, substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText(expectedParagraph1Start, substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText(expectedParagraph2Start, substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText(expectedParagraph3Start, substring = true).assertExists()
     }
 
     /**
@@ -60,7 +55,7 @@ class AboutMePersonalSectionInstrumentedTest {
             AboutMePersonalSection(alpha = 1f)
         }
 
-        rule.onNodeWithTag("about_me_personal_section").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_section").assertExists()
     }
 
     /**
@@ -72,11 +67,11 @@ class AboutMePersonalSectionInstrumentedTest {
             AboutMePersonalSection(alpha = 1f)
         }
 
-        rule.onNodeWithTag("about_me_personal_section").assertExists()
-        rule.onNodeWithTag("about_me_personal_title").assertExists()
-        rule.onNodeWithTag("about_me_personal_paragraph1").assertExists()
-        rule.onNodeWithTag("about_me_personal_paragraph2").assertExists()
-        rule.onNodeWithTag("about_me_personal_paragraph3").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_section").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_title").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_paragraph1").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_paragraph2").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_paragraph3").assertExists()
     }
 
     /**
@@ -90,8 +85,8 @@ class AboutMePersonalSectionInstrumentedTest {
         }
 
         // Elements should exist even with zero opacity
-        rule.onNodeWithTag("about_me_personal_section").assertExists()
-        rule.onNodeWithTag("about_me_personal_title").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_section").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_title").assertExists()
     }
 
     /**
@@ -103,8 +98,8 @@ class AboutMePersonalSectionInstrumentedTest {
             AboutMePersonalSection(alpha = 0.5f)
         }
 
-        rule.onNodeWithTag("about_me_personal_section").assertIsDisplayed()
-        rule.onNodeWithText(expectedTitle, substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("about_me_personal_section").assertIsDisplayed()
+        composeTestRule.onNodeWithText(expectedTitle, substring = true).assertIsDisplayed()
     }
 
 
@@ -121,7 +116,7 @@ class AboutMePersonalSectionInstrumentedTest {
         }
 
         // Both instances should exist
-        rule.onAllNodesWithTag("about_me_personal_section").assertCountEquals(2)
+        composeTestRule.onAllNodesWithTag("about_me_personal_section").assertCountEquals(2)
     }
 
     /**
@@ -133,11 +128,11 @@ class AboutMePersonalSectionInstrumentedTest {
             AboutMePersonalSection(alpha = 1f)
         }
 
-        rule.waitForIdle()
-        
+        composeTestRule.waitForIdle()
+
         // Verify content is still displayed after idle
-        rule.onNodeWithTag("about_me_personal_section").assertIsDisplayed()
-        rule.onNodeWithText(expectedTitle, substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("about_me_personal_section").assertIsDisplayed()
+        composeTestRule.onNodeWithText(expectedTitle, substring = true).assertIsDisplayed()
     }
 
     /**
@@ -150,9 +145,9 @@ class AboutMePersonalSectionInstrumentedTest {
         }
 
         // Structure should still exist even with minimal alpha
-        rule.onNodeWithTag("about_me_personal_section").assertExists()
-        rule.onNodeWithTag("about_me_personal_title").assertExists()
-        rule.onNodeWithTag("about_me_personal_paragraph1").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_section").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_title").assertExists()
+        composeTestRule.onNodeWithTag("about_me_personal_paragraph1").assertExists()
     }
 
     /**
@@ -165,14 +160,14 @@ class AboutMePersonalSectionInstrumentedTest {
         }
 
         // Each test tag should appear exactly once
-        rule.onAllNodesWithTag("about_me_personal_paragraph1").assertCountEquals(1)
-        rule.onAllNodesWithTag("about_me_personal_paragraph2").assertCountEquals(1)
-        rule.onAllNodesWithTag("about_me_personal_paragraph3").assertCountEquals(1)
+        composeTestRule.onAllNodesWithTag("about_me_personal_paragraph1").assertCountEquals(1)
+        composeTestRule.onAllNodesWithTag("about_me_personal_paragraph2").assertCountEquals(1)
+        composeTestRule.onAllNodesWithTag("about_me_personal_paragraph3").assertCountEquals(1)
     }
 
     // Helper to wrap content with MaterialTheme
     private fun setContent(content: @Composable () -> Unit) {
-        rule.setContent {
+        composeTestRule.setContent {
             MaterialTheme {
                 content()
             }

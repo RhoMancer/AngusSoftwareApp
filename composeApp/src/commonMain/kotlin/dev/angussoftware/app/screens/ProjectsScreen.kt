@@ -151,18 +151,6 @@ internal fun ProjectsScreen() {
 
     val common = rememberCommonScreenState()
 
-    val statusBarHeightDp = common.statusBarHeightDp
-    val bottomInset = common.bottomInset
-    val listState = common.listState
-    val alpha = common.alpha
-    val titleAlpha = common.titleAlpha
-    val bgAlpha = common.bgAlpha
-    val isCompactScreen = common.isCompactScreen
-    val tilePadding = common.tilePadding
-    val appBarHeightDp = common.appBarHeightDp
-    val topContentPadding =
-        if (!isCompactScreen) statusBarHeightDp + appBarHeightDp + tilePadding else statusBarHeightDp + tilePadding
-
     Box(
         modifier =
             Modifier
@@ -170,17 +158,17 @@ internal fun ProjectsScreen() {
                 .testTag(PROJECTS_SCREEN_TEST_TAG),
     ) {
         LazyColumn(
-            state = listState,
+            state = common.listState,
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
             contentPadding =
                 PaddingValues(
-                    top = topContentPadding,
-                    bottom = bottomInset + tilePadding,
+                    top = common.topContentPadding,
+                    bottom = common.bottomInset + common.tilePadding,
                 ),
-            verticalArrangement = Arrangement.spacedBy(tilePadding),
+            verticalArrangement = Arrangement.spacedBy(common.tilePadding),
         ) {
             items(projects.size) { idx ->
                 val project = projects[idx]
@@ -190,7 +178,7 @@ internal fun ProjectsScreen() {
                     } else {
                         Modifier
                     }
-                SectionCard(alpha = alpha, modifier = clickableModifier) {
+                SectionCard(alpha = common.alpha, modifier = clickableModifier) {
                     Box(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row(
@@ -347,9 +335,9 @@ internal fun ProjectsScreen() {
             }
         }
         CommonTopAppBar(
-            isCompactScreen = isCompactScreen,
-            titleAlpha = titleAlpha,
-            bgAlpha = bgAlpha,
+            isCompactScreen = common.isCompactScreen,
+            titleAlpha = common.titleAlpha,
+            bgAlpha = common.bgAlpha,
             icon = painterResource(getAngusSimpleNoBackgroundLogoSystem()),
         )
     }

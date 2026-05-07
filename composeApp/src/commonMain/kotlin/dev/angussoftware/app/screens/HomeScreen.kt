@@ -47,19 +47,6 @@ private const val SKILL_CHIPS_PER_ROW = 3
 internal fun HomeScreen() {
     val common = rememberCommonScreenState()
 
-    val statusBarHeightDp = common.statusBarHeightDp
-    val bottomInset = common.bottomInset
-    val listState = common.listState
-    val alpha = common.alpha
-    val titleAlpha = common.titleAlpha
-    val bgAlpha = common.bgAlpha
-    val isCompactScreen = common.isCompactScreen
-    val tilePadding = common.tilePadding
-    val appBarHeightDp = common.appBarHeightDp
-
-    val topContentPadding =
-        if (!isCompactScreen) statusBarHeightDp + appBarHeightDp + tilePadding else statusBarHeightDp + tilePadding
-
     Box(
         modifier =
             Modifier
@@ -67,7 +54,7 @@ internal fun HomeScreen() {
                 .testTag(HOME_SCREEN_TEST_TAG),
     ) {
         LazyColumn(
-            state = listState,
+            state = common.listState,
             modifier =
                 Modifier
                     .fillMaxSize()
@@ -75,42 +62,42 @@ internal fun HomeScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding =
                 PaddingValues(
-                    top = topContentPadding,
-                    bottom = bottomInset + tilePadding,
+                    top = common.topContentPadding,
+                    bottom = common.bottomInset + common.tilePadding,
                 ),
         ) {
             // HERO (no card)
             item {
-                HeroSection(alpha)
+                HeroSection(common.alpha)
             }
 
             // Spacer similar to ScreenContainer spacing between tiles
-            item { Spacer(modifier = Modifier.height(tilePadding * 2)) }
+            item { Spacer(modifier = Modifier.height(common.tilePadding * 2)) }
 
             // ABOUT ME
             item {
-                AboutMeProfessionalSection(alpha)
+                AboutMeProfessionalSection(common.alpha)
             }
 
-            item { Spacer(modifier = Modifier.height(tilePadding * 2)) }
+            item { Spacer(modifier = Modifier.height(common.tilePadding * 2)) }
 
             // ABOUT ME
             item {
-                AboutMePersonalSection(alpha)
+                AboutMePersonalSection(common.alpha)
             }
 
-            item { Spacer(modifier = Modifier.height(tilePadding * 2)) }
+            item { Spacer(modifier = Modifier.height(common.tilePadding * 2)) }
 
             // CONTACT
             item {
-                ContactSection(alpha)
+                ContactSection(common.alpha)
             }
         }
 
         CommonTopAppBar(
-            isCompactScreen = isCompactScreen,
-            titleAlpha = titleAlpha,
-            bgAlpha = bgAlpha,
+            isCompactScreen = common.isCompactScreen,
+            titleAlpha = common.titleAlpha,
+            bgAlpha = common.bgAlpha,
             icon = painterResource(getAngusSimpleNoBackgroundLogoSystem()),
         )
     }

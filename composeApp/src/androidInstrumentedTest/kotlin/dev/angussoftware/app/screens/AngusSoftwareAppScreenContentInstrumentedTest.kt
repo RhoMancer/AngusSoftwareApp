@@ -1,39 +1,25 @@
 package dev.angussoftware.app.screens
 
-import androidx.activity.ComponentActivity
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import dev.angussoftware.app.navigation.NAV_HOST_TEST_TAG
-import dev.angussoftware.app.ui.utils.LocalWindowAdaptiveInfoOverride
-import dev.angussoftware.app.ui.utils.WindowAdaptiveInfo
 import dev.angussoftware.app.ui.utils.WindowWidthSizeClass
-import org.junit.Rule
 import org.junit.Test
 
-class AngusSoftwareAppScreenContentInstrumentedTest {
-    @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+class AngusSoftwareAppScreenContentInstrumentedTest : BaseScreenTest() {
 
     /**
-     * ✅ SCREENSHOT TESTED: Verifies that navigating via BottomNavigationBar swaps the content area
+     * Verifies that navigating via BottomNavigationBar swaps the content area
      * to the correct destination screen in compact mode, and that selection states reflect the route.
      * Asserts presence of HOME_SCREEN_TEST_TAG, PROJECTS_SCREEN_TEST_TAG, and BLOG_SCREEN_TEST_TAG as navigation occurs.
-     * Screenshot code was used during development and removed for performance.
      */
     @Test
     fun compact_navigation_showsCorrectContent() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
-            ) {
-                AngusSoftwareAppScreen()
-            }
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) {
+            AngusSoftwareAppScreen()
         }
-        composeTestRule.waitForIdle()
 
         // NavHost always exists
         composeTestRule.onNodeWithTag(NAV_HOST_TEST_TAG).assertExists()
@@ -59,21 +45,15 @@ class AngusSoftwareAppScreenContentInstrumentedTest {
     }
 
     /**
-     * ✅ SCREENSHOT TESTED: Verifies that NavigationRail interaction (non-compact mode) correctly
+     * Verifies that NavigationRail interaction (non-compact mode) correctly
      * updates selection and swaps the content area to the expected destination screens.
      * Confirms rail presence and content tags on navigation.
-     * Screenshot code was used during development and removed for performance.
      */
     @Test
     fun nonCompact_navigationRail_selectionAndContent() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED),
-            ) {
-                AngusSoftwareAppScreen()
-            }
+        setAdaptiveContent(WindowWidthSizeClass.EXPANDED) {
+            AngusSoftwareAppScreen()
         }
-        composeTestRule.waitForIdle()
 
         // Ensure NavigationRail is shown in non-compact mode
         composeTestRule.onNodeWithTag(NAV_RAIL_TEST_TAG).assertExists()
