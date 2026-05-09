@@ -3,21 +3,9 @@ when:
     branch: [release/*]
 
 steps:
-  build-and-deploy:
+  deploy-web:
     image: localhost:5000/ci-theming-jdk23:latest
     commands:
-      # Install Android SDK
-      - |
-        if [ ! -d "$ANDROID_HOME/cmdline-tools/latest" ]; then
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline-tools.zip
-          unzip -q /tmp/cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
-          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-        else
-          echo "Android SDK cached, skipping install"
-        fi
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null 2>&1 || true
-        echo "sdk.dir=$ANDROID_HOME" > local.properties
       # Configure GPR credentials
       - |
         mkdir -p ~/.gradle
@@ -26,8 +14,6 @@ steps:
       - chmod +x gradlew
       # Build Wasm distribution
       - ./gradlew --no-daemon :composeApp:wasmJsBrowserDistribution
-      # Build Android release (APK + AAB)
-      - ./gradlew --no-daemon :composeApp:bundleRelease :composeApp:assembleRelease
       # Prepare gh-pages content
       - |
         touch composeApp/build/dist/wasmJs/productionExecutable/.nojekyll
@@ -43,8 +29,13 @@ steps:
         git push -f https://x-access-token:${GPR_TOKEN}@github.com/RhoMancer/AngusSoftwareApp.git HEAD:gh-pages
     environment:
       GRADLE_USER_HOME: /root/.gradle
-      ANDROID_HOME: /opt/android-sdk
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
       - gradle-wrapper-angusapp:/root/.gradle/wrapper
-      - android-sdk-angusapp:/opt/android-sdk
+
+  # Android release disabled — no signing keystore configured yet
+  # To enable: add keystore to /etc/angus-software/ + configure WOODPECKER_ENVIRONMENT secrets
+  # build-android:
+  #   image: localhost:5000/ci-theming-jdk23:latest
+  #   commands:
+  #     - ...assembleRelease bundleRelease...
