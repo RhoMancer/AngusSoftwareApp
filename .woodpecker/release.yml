@@ -4,14 +4,20 @@ when:
 
 steps:
   build-and-deploy:
-    image: eclipse-temurin:23-jdk
+    image: localhost:5000/ci-theming-jdk23:latest
     commands:
-      - apt-get update -qq && apt-get install -qq -y git wget curl > /dev/null 2>&1
-      # Install Node.js for wasmJs npm dependencies
+      # Install Android SDK
       - |
-        curl -fsSL https://deb.nodesource.com/setup_22.x | bash - > /dev/null 2>&1
-        apt-get install -qq -y nodejs > /dev/null 2>&1
-        node --version
+        if [ ! -d "$ANDROID_HOME/cmdline-tools/latest" ]; then
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline-tools.zip
+          unzip -q /tmp/cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
+          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+        else
+          echo "Android SDK cached, skipping install"
+        fi
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null 2>&1 || true
+        echo "sdk.dir=$ANDROID_HOME" > local.properties
       # Configure GPR credentials
       - |
         mkdir -p ~/.gradle
@@ -37,6 +43,8 @@ steps:
         git push -f https://x-access-token:${GPR_TOKEN}@github.com/RhoMancer/AngusSoftwareApp.git HEAD:gh-pages
     environment:
       GRADLE_USER_HOME: /root/.gradle
+      ANDROID_HOME: /opt/android-sdk
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
       - gradle-wrapper-angusapp:/root/.gradle/wrapper
+      - android-sdk-angusapp:/opt/android-sdk
