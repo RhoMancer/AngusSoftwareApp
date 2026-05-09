@@ -1,0 +1,20 @@
+when:
+  - event: [push, pull_request]
+    branch: [master, main, develop]
+
+steps:
+  build:
+    image: eclipse-temurin:23-jdk
+    commands:
+      - apt-get update -qq && apt-get install -qq -y git > /dev/null 2>&1
+      - |
+        mkdir -p ~/.gradle
+        echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
+        echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
+      - chmod +x gradlew
+      - ./gradlew --no-daemon :composeApp:testDebugUnitTest
+    environment:
+      GRADLE_USER_HOME: /root/.gradle
+    volumes:
+      - gradle-cache-angusapp:/root/.gradle/caches
+      - gradle-wrapper-angusapp:/root/.gradle/wrapper
