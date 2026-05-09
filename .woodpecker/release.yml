@@ -1,0 +1,42 @@
+when:
+  - event: push
+    branch: [release/*]
+
+steps:
+  build-and-deploy:
+    image: eclipse-temurin:23-jdk
+    commands:
+      - apt-get update -qq && apt-get install -qq -y git wget curl > /dev/null 2>&1
+      # Install Node.js for wasmJs npm dependencies
+      - |
+        curl -fsSL https://deb.nodesource.com/setup_22.x | bash - > /dev/null 2>&1
+        apt-get install -qq -y nodejs > /dev/null 2>&1
+        node --version
+      # Configure GPR credentials
+      - |
+        mkdir -p ~/.gradle
+        echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
+        echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
+      - chmod +x gradlew
+      # Build Wasm distribution
+      - ./gradlew --no-daemon :composeApp:wasmJsBrowserDistribution
+      # Build Android release (APK + AAB)
+      - ./gradlew --no-daemon :composeApp:bundleRelease :composeApp:assembleRelease
+      # Prepare gh-pages content
+      - |
+        touch composeApp/build/dist/wasmJs/productionExecutable/.nojekyll
+        cp -r static/. composeApp/build/dist/wasmJs/productionExecutable/
+      # Deploy to gh-pages branch
+      - |
+        cd composeApp/build/dist/wasmJs/productionExecutable
+        git init
+        git config user.name "DBSLettaBot"
+        git config user.email "noreply@letta.com"
+        git add -A
+        git commit -m "deploy: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        git push -f https://x-access-token:${GPR_TOKEN}@github.com/RhoMancer/AngusSoftwareApp.git HEAD:gh-pages
+    environment:
+      GRADLE_USER_HOME: /root/.gradle
+    volumes:
+      - gradle-cache-angusapp:/root/.gradle/caches
+      - gradle-wrapper-angusapp:/root/.gradle/wrapper
