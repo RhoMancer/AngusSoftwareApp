@@ -9,9 +9,9 @@ androidx-lifecycle = "2.9.5"
 composeMultiplatform = "1.9.0"
 #noinspection NewerVersionAvailable
 kotlin = "2.2.10"
-kover = "0.9.3"
+kover = "0.9.5"
 angusSoftware-theming = "0.0.2.32"
-angusSoftware-gradle = "0.0.0.2"
+angusSoftware-gradle = "0.0.9"
 nav_version = "2.9.1"
 uiautomator = "2.3.0"
 uiTestJunit4Android = "1.9.4"
@@ -26,6 +26,7 @@ androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", versi
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "nav_version" }
 angusSoftware-theming-compose = { module = "com.angussoftware.theming:theming-compose", version.ref = "angusSoftware-theming" }

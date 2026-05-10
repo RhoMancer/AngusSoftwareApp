@@ -10,7 +10,7 @@ Angus Software application for showcasing my portfolio and hosting my blog.
 ## Quick start
 
 Prerequisites
-- Java 11 (JDK 11)
+- Java 17 (JDK 17+)
 - Android Studio (latest stable) with Android SDK
 - Gradle Wrapper (included): use `gradlew` on Windows, `./gradlew` on macOS/Linux
 
@@ -183,7 +183,7 @@ This project currently depends on a private "Angus Software Theming" library. If
 The app should work with standard Compose Material3 theming if you wire colors/typography/shapes directly.
 
 ## Troubleshooting
-- Use JDK 11 (both Gradle and Android compile options are set to 11)
+- Use JDK 17+ (both Gradle and Android compile options target JVM 17)
 - If the Wasm dev server doesn’t open automatically, copy the printed URL from the Gradle task output
 - If Android instrumented tests fail to discover devices, ensure an emulator is running or a device is connected (USB debugging enabled)
 

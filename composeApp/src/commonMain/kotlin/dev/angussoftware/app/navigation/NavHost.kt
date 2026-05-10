@@ -22,19 +22,14 @@ internal const val BLOG_POST_ERROR_ID = "error"
 internal const val RSS_FEED_URL = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 
 /**
- * Parses the post index from a navigation route string.
- * Extracts the numeric index from the end of the route path.
+ * Parses the post ID from a navigation route string.
+ * Extracts the ID (everything after the last slash) from the route path.
  *
- * @param route The navigation route string (e.g., "BlogPost/5")
- * @return The parsed post index as Int, or 0 if parsing fails or route is invalid
+ * @param route The navigation route string (e.g., "BlogPost/post1")
+ * @return The parsed post ID, or empty string if route is null/blank
  */
-internal fun parsePostIndex(route: String?): Int =
-    try {
-        val indexStr = route?.substringAfterLast("/") ?: ""
-        indexStr.toIntOrNull() ?: 0
-    } catch (e: Exception) {
-        0
-    }
+internal fun parsePostId(route: String?): String =
+    route?.substringAfter("BlogPost/").orEmpty()
 
 /**
  * Creates a BlogPost object for loading state display.
@@ -93,20 +88,20 @@ internal fun displayCurrentScreen(navController: NavHostController) {
                 BlogScreen(navController)
             }
             composable(
-                route = "${Screen.BlogPost.name}/{postIndex}",
-                arguments = listOf(navArgument("postIndex") { type = NavType.StringType }),
+                route = "${Screen.BlogPost.name}/{postId}",
+                arguments = listOf(navArgument("postId") { type = NavType.StringType }),
             ) { backStackEntry ->
-                val postIndex = parsePostIndex(backStackEntry.destination.route)
+                val postId = backStackEntry.savedStateHandle.get<String>("postId").orEmpty()
                 val feedUrl = RSS_FEED_URL
 
                 var blogPost by remember { mutableStateOf<dev.angussoftware.app.blog.BlogPost?>(null) }
                 var isLoading by remember { mutableStateOf(true) }
 
-                LaunchedEffect(postIndex) {
+                LaunchedEffect(postId) {
                     try {
                         val repository = BlogRepository(feedUrl)
                         val allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
-                        blogPost = if (postIndex < allPosts.size) allPosts[postIndex] else null
+                        blogPost = allPosts.find { it.id == postId }
                         isLoading = false
                     } catch (e: Exception) {
                         // todo: proper error handling
