@@ -50,10 +50,10 @@ steps:
       # Run instrumented tests
       - chmod +x gradlew
       - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest
-      # Test summary
+      # Test summary (ignore exit code — XML filenames with spaces break awk parsing)
       - |
         git clone https://x-access-token:${GPR_TOKEN}@github.com/RhoMancer/ci-scripts.git /tmp/ci-scripts
-        sh /tmp/ci-scripts/scripts/test-summary.sh "composeApp/build/outputs/androidTest-results/connected/debug/TEST-*.xml"
+        sh /tmp/ci-scripts/scripts/test-summary.sh "composeApp/build/outputs/androidTest-results/connected/debug/TEST-*.xml" || true
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
       - gradle-wrapper-angusapp:/root/.gradle/wrapper
