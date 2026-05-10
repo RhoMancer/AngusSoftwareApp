@@ -1,0 +1,60 @@
+when:
+  - event: [push, pull_request]
+    branch: [master, main, develop]
+
+steps:
+  instrumented-tests:
+    image: localhost:5000/ci-theming-jdk23:latest
+    privileged: true
+    environment:
+      ANDROID_HOME: /opt/android-sdk
+      ANDROID_SDK_ROOT: /opt/android-sdk
+      ANDROID_AVD_HOME: /root/.android/avd
+      GRADLE_USER_HOME: /root/.gradle
+      DISPLAY: ":99"
+    commands:
+      - |
+        export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+        mkdir -p ~/.gradle
+        echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
+        echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
+      # Install Android SDK
+      - |
+        if [ ! -d "$ANDROID_HOME/cmdline-tools/latest" ]; then
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline-tools.zip
+          unzip -q /tmp/cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
+          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+        else
+          echo "Android SDK cached, skipping install"
+        fi
+        echo "sdk.dir=$ANDROID_HOME" > local.properties
+      # Create AVD
+      - |
+        if [ ! -f "$ANDROID_AVD_HOME/test.avd/config.ini" ]; then
+          mkdir -p $ANDROID_AVD_HOME/test.avd
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "system-images;android-34;default;x86_64" > /dev/null 2>&1
+          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-34;default;x86_64" --force
+        else
+          echo "AVD config cached, skipping creation"
+        fi
+      - $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null 2>&1 || true
+      # Start emulator
+      - |
+        Xvfb :99 -screen 0 480x800x24 &
+        sleep 2
+        $ANDROID_HOME/emulator/emulator -avd test -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -memory 4096 -no-snapshot -no-metrics -partition-size 4096 -read-only &
+        $ANDROID_HOME/platform-tools/adb wait-for-device
+        timeout 180 $ANDROID_HOME/platform-tools/adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done' || (echo "Emulator boot timeout!" && exit 1)
+        sleep 5
+      # Run instrumented tests
+      - chmod +x gradlew
+      - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest
+      # Test summary
+      - |
+        git clone https://x-access-token:${GPR_TOKEN}@github.com/RhoMancer/ci-scripts.git /tmp/ci-scripts
+        sh /tmp/ci-scripts/scripts/test-summary.sh "composeApp/build/outputs/androidTest-results/connected/debug/TEST-*.xml"
+    volumes:
+      - gradle-cache-angusapp:/root/.gradle/caches
+      - gradle-wrapper-angusapp:/root/.gradle/wrapper
+      - android-sdk-angusapp:/opt/android-sdk

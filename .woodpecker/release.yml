@@ -33,9 +33,41 @@ steps:
       - gradle-cache-angusapp:/root/.gradle/caches
       - gradle-wrapper-angusapp:/root/.gradle/wrapper
 
-  # Android release disabled — no signing keystore configured yet
-  # To enable: add keystore to /etc/angus-software/ + configure WOODPECKER_ENVIRONMENT secrets
-  # build-android:
-  #   image: localhost:5000/ci-theming-jdk23:latest
-  #   commands:
-  #     - ...assembleRelease bundleRelease...
+  build-android:
+    image: localhost:5000/ci-theming-jdk23:latest
+    commands:
+      # Install Android SDK
+      - |
+        if [ ! -d "$ANDROID_HOME/cmdline-tools/latest" ]; then
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline-tools.zip
+          unzip -q /tmp/cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
+          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+        else
+          echo "Android SDK cached, skipping install"
+        fi
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null 2>&1 || true
+        echo "sdk.dir=$ANDROID_HOME" > local.properties
+      # Configure signing keystore
+      - |
+        mkdir -p ~/.gradle
+        echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
+        echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
+        echo "storeFile=/etc/angus-software/angus-app.jks" > keystore.properties
+        echo "storePassword=${ANGUSAPP_KEYSTORE_PASSWORD}" >> keystore.properties
+        echo "keyAlias=angus-app" >> keystore.properties
+        echo "keyPassword=${ANGUSAPP_KEY_PASSWORD}" >> keystore.properties
+      # Build signed release APK + AAB
+      - chmod +x gradlew
+      - ./gradlew --no-daemon :composeApp:assembleRelease :composeApp:bundleRelease
+      # Upload APK to GitHub Release
+      - |
+        TAG_NAME=$(echo "${CI_COMMIT_BRANCH}" | sed 's|release/||')
+        gh release create "$TAG_NAME" composeApp/build/outputs/apk/release/*.apk --title "$TAG_NAME" --notes "Release $TAG_NAME"
+    environment:
+      GRADLE_USER_HOME: /root/.gradle
+      ANDROID_HOME: /opt/android-sdk
+    volumes:
+      - gradle-cache-angusapp:/root/.gradle/caches
+      - gradle-wrapper-angusapp:/root/.gradle/wrapper
+      - android-sdk-angusapp:/opt/android-sdk
