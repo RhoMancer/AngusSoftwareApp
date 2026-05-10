@@ -2,7 +2,7 @@ import com.angussoftware.gradletools.coverage.ai
 import com.angussoftware.gradletools.coverage.gaps
 import com.angussoftware.gradletools.coverage.selection
 import com.angussoftware.gradletools.coverage.thresholds
-import com.angussoftware.gradletools.coverage.CoverageUnit
+import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -84,12 +84,16 @@ angusCoverage {
             "**/app/cash/turbine/**",
         ),
     )
+}
 
-    // Coverage verification thresholds
-    verify {
-        rule {
-            minBound(50, CoverageUnit.BRANCH)
-            minBound(60, CoverageUnit.LINE)
+// Kover coverage verification thresholds
+kover {
+    currentProject {
+        verify {
+            rule("Coverage verification") {
+                minBound(50, CoverageUnit.BRANCH)
+                minBound(60, CoverageUnit.LINE)
+            }
         }
     }
 }
