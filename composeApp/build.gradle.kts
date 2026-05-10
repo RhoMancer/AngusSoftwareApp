@@ -2,6 +2,7 @@ import com.angussoftware.gradletools.coverage.ai
 import com.angussoftware.gradletools.coverage.gaps
 import com.angussoftware.gradletools.coverage.selection
 import com.angussoftware.gradletools.coverage.thresholds
+import com.angussoftware.gradletools.coverage.CoverageUnit
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -67,7 +68,7 @@ angusCoverage {
     this.unifiedReport.jacocoExclusions.set(
         listOf(
             "**/R.class",
-            "**/R\$*.class",
+            "**/R\\$*.class",
             "**/*R*.class",
             "**/BuildConfig.*",
             "**/Manifest*.*",
@@ -83,6 +84,19 @@ angusCoverage {
             "**/app/cash/turbine/**",
         ),
     )
+
+    // Coverage verification thresholds
+    verify {
+        rule {
+            minBound(50, CoverageUnit.BRANCH)
+            minBound(60, CoverageUnit.LINE)
+        }
+    }
+}
+
+// Chain coverage verification to check task
+tasks.named("check").configure {
+    dependsOn("koverVerify")
 }
 
 kotlin {
