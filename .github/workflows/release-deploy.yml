@@ -36,7 +36,7 @@ jobs:
       
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results
           path: composeApp/build/reports/tests/testDebugUnitTest/
@@ -79,7 +79,7 @@ jobs:
         run: ./gradlew :composeApp:bundleRelease :composeApp:assembleRelease
       
       - name: Upload release artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android-release
           path: |
@@ -129,7 +129,7 @@ jobs:
         run: cp -r static/. composeApp/build/dist/wasmJs/productionExecutable/
       
       - name: Upload web artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: web-distribution
           path: composeApp/build/dist/wasmJs/productionExecutable/
