@@ -88,7 +88,7 @@ angusCoverage {
 
 // Kover coverage verification thresholds
 kover {
-    currentProject {
+    reports {
         verify {
             rule("Coverage verification") {
                 minBound(50, CoverageUnit.BRANCH)
