@@ -9,8 +9,6 @@ internal class BlogRepository(
             val xml = networkClient.fetchUrlText(feedUrl)
             RssParser.parse(xml, limit)
         } catch (t: Throwable) {
-            println(t.toString())
-
             emptyList()
         }
 }

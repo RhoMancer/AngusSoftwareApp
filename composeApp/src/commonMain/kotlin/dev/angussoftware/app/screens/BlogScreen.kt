@@ -22,6 +22,7 @@ import androidx.navigation.NavHostController
 import angussoftwareapp.composeapp.generated.resources.*
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.blog.BlogRepository
+import dev.angussoftware.app.navigation.RSS_FEED_URL
 import dev.angussoftware.app.ui.components.CommonTopAppBar
 import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.utils.rememberCommonScreenState
@@ -36,7 +37,7 @@ internal fun BlogScreen(
     initialPosts: List<BlogPost>? = null,
     initialIsLoading: Boolean? = null,
 ) {
-    val feedUrl = "https://rhomancer.github.io/angus-blog-content/rss.xml"
+    val feedUrl = RSS_FEED_URL
 
     var isLoading by remember { mutableStateOf(initialIsLoading ?: true) }
     var allPosts by remember { mutableStateOf(initialPosts ?: emptyList()) }
@@ -140,9 +141,9 @@ internal fun BlogScreen(
                         val post = visiblePosts[idx]
                         val itemModifier =
                             Modifier
-                                .testTag("${BLOG_POST_ITEM_TEST_TAG}_$idx")
+                                .testTag("${BLOG_POST_ITEM_TEST_TAG}_${post.id}")
                                 .clickable {
-                                    navController?.navigate("${Screen.BlogPost.name}/$idx")
+                                    navController?.navigate("${Screen.BlogPost.name}/${post.id}")
                                 }
                         SectionCard(alpha = alpha, modifier = itemModifier) {
                             Column(

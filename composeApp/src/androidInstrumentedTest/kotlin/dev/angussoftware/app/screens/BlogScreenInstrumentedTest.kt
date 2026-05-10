@@ -6,11 +6,18 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.ui.utils.LocalWindowAdaptiveInfoOverride
 import dev.angussoftware.app.ui.utils.WindowAdaptiveInfo
 import dev.angussoftware.app.ui.utils.WindowWidthSizeClass
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
@@ -18,35 +25,36 @@ class BlogScreenInstrumentedTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val testPosts = listOf(
-        BlogPost(
-            id = "1",
-            title = "First Blog Post",
-            url = "https://example.com/post1",
-            pubDate = "2025-01-01",
-            summary = "Summary of first post",
-            imageUrl = null,
-            content = null,
-        ),
-        BlogPost(
-            id = "2",
-            title = "Second Blog Post",
-            url = "https://example.com/post2",
-            pubDate = "2025-01-02",
-            summary = "Summary of second post",
-            imageUrl = null,
-            content = null,
-        ),
-        BlogPost(
-            id = "3",
-            title = "Third Blog Post",
-            url = "https://example.com/post3",
-            pubDate = "2025-01-03",
-            summary = "Summary of third post",
-            imageUrl = null,
-            content = null,
-        ),
-    )
+    private val testPosts =
+        listOf(
+            BlogPost(
+                id = "1",
+                title = "First Blog Post",
+                url = "https://example.com/post1",
+                pubDate = "2025-01-01",
+                summary = "Summary of first post",
+                imageUrl = null,
+                content = null,
+            ),
+            BlogPost(
+                id = "2",
+                title = "Second Blog Post",
+                url = "https://example.com/post2",
+                pubDate = "2025-01-02",
+                summary = "Summary of second post",
+                imageUrl = null,
+                content = null,
+            ),
+            BlogPost(
+                id = "3",
+                title = "Third Blog Post",
+                url = "https://example.com/post3",
+                pubDate = "2025-01-03",
+                summary = "Summary of third post",
+                imageUrl = null,
+                content = null,
+            ),
+        )
 
     /**
      * Verifies that blog post items have vertical margin between them.
@@ -71,8 +79,8 @@ class BlogScreenInstrumentedTest {
         composeTestRule.onNodeWithTag(BLOG_SCREEN_TEST_TAG).assertIsDisplayed()
 
         // Verify first two blog post items exist and are displayed
-        val firstItem = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0")
-        val secondItem = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1")
+        val firstItem = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1")
+        val secondItem = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2")
 
         firstItem.assertIsDisplayed()
         secondItem.assertIsDisplayed()
@@ -113,9 +121,9 @@ class BlogScreenInstrumentedTest {
         composeTestRule.waitForIdle()
 
         // Verify all three blog post items are displayed
-        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0").assertIsDisplayed()
         composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").assertIsDisplayed()
         composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_3").assertIsDisplayed()
     }
 
     /**
@@ -136,9 +144,9 @@ class BlogScreenInstrumentedTest {
         composeTestRule.waitForIdle()
 
         // Get bounds of all three items
-        val firstBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_0").getBoundsInRoot()
-        val secondBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").getBoundsInRoot()
-        val thirdBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").getBoundsInRoot()
+        val firstBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").getBoundsInRoot()
+        val secondBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").getBoundsInRoot()
+        val thirdBounds = composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_3").getBoundsInRoot()
 
         // Calculate gaps
         val gap1 = secondBounds.top - firstBounds.bottom
@@ -163,5 +171,97 @@ class BlogScreenInstrumentedTest {
         assert(gapDifference <= tolerance) {
             "Vertical gaps should be consistent. Gap1: $gap1, Gap2: $gap2"
         }
+    }
+
+    /**
+     * Verifies that clicking on different blog post items navigates to the correct index.
+     * This test ensures that each item's click handler passes the correct index to navigation,
+     * fixing the bug where all items were navigating to index 0.
+     */
+    @Test
+    fun blogPostItems_navigateToCorrectIndex() {
+        var navigatedRoute: String? = null
+
+        composeTestRule.setContent {
+            val navController = rememberNavController()
+
+            // Listen to navigation changes
+            navController.addOnDestinationChangedListener { _, destination, arguments ->
+                navigatedRoute = destination.route
+                // Also capture the actual argument if present
+                arguments?.getString("postId")?.let { id ->
+                    navigatedRoute = "${Screen.BlogPost.name}/$id"
+                }
+            }
+
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                // Wrap in a NavHost so that navController.navigate() has a valid graph
+                NavHost(navController = navController, startDestination = Screen.Blog.name) {
+                    composable(Screen.Blog.name) {
+                        BlogScreen(
+                            navController = navController,
+                            initialPosts = testPosts,
+                            initialIsLoading = false,
+                        )
+                    }
+                    composable(
+                        route = "${Screen.BlogPost.name}/{postId}",
+                        arguments = listOf(navArgument("postId") { type = NavType.StringType }),
+                    ) { }
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        // Click on the first blog post item (id "1")
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_1").performClick()
+        composeTestRule.waitForIdle()
+
+        // Verify the navigation route contains the correct post ID
+        assertEquals(
+            "Clicking first item should navigate to BlogPost/1",
+            "${Screen.BlogPost.name}/1",
+            navigatedRoute,
+        )
+
+        // Reset for next test
+        navigatedRoute = null
+
+        // Go back and click on second item
+        composeTestRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeTestRule.waitForIdle()
+
+        // Click on the second blog post item (id "2")
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_2").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(
+            "Clicking second item should navigate to BlogPost/2",
+            "${Screen.BlogPost.name}/2",
+            navigatedRoute,
+        )
+
+        // Reset for next test
+        navigatedRoute = null
+
+        // Go back and click on third item
+        composeTestRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeTestRule.waitForIdle()
+
+        // Click on the third blog post item (id "3")
+        composeTestRule.onNodeWithTag("${BLOG_POST_ITEM_TEST_TAG}_3").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(
+            "Clicking third item should navigate to BlogPost/3",
+            "${Screen.BlogPost.name}/3",
+            navigatedRoute,
+        )
     }
 }

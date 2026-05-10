@@ -61,6 +61,28 @@ angusCoverage {
             }
         }
     }
+
+    this.unifiedReport.enabled.set(true)
+    this.unifiedReport.koverExclusions.set(listOf<String>())
+    this.unifiedReport.jacocoExclusions.set(
+        listOf(
+            "**/R.class",
+            "**/R\$*.class",
+            "**/*R*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/*Test*.*",
+            "**/generated/**",
+            "**/*ComposableSingletons*",
+            "**/androidx/**",
+            "**/android/**",
+            "**/kotlin/**",
+            "**/kotlinx/**",
+            "**/org/koin/**",
+            "**/com/arkivanov/**",
+            "**/app/cash/turbine/**",
+        ),
+    )
 }
 
 kotlin {
@@ -70,7 +92,7 @@ kotlin {
 
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
         dependencies {
             androidTestImplementation(libs.androidx.ui.test.junit4.android)
@@ -116,6 +138,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
             implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.angusSoftware.theming.compose)
@@ -150,7 +173,8 @@ android {
         // Versioning is sourced from gradle.properties
         versionName = project.version.toString()
         versionCode =
-            providers.gradleProperty("android.versionCode")
+            providers
+                .gradleProperty("android.versionCode")
                 .orElse("1")
                 .map(String::toInt)
                 .get()
@@ -194,17 +218,33 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
 // --- Web/Wasm: write human-readable version into resources for display ---
+// This task generates `src/wasmJsMain/resources/version.txt` at BUILD TIME (not when bump tasks run).
+// The file is regenerated automatically whenever the Wasm build runs, including during CI (GitHub Actions).
+// When you run `releasePatch/Minor/Major`, only `gradle.properties` is updated immediately;
+// `version.txt` will reflect the new version once the build executes (locally or in CI).
 val writeWebVersion by tasks.registering {
-    val outFile = project.layout.projectDirectory.file("src/wasmJsMain/resources/version.txt").asFile
+    val outFile =
+        project.layout.projectDirectory
+            .file("src/wasmJsMain/resources/version.txt")
+            .asFile
     inputs.property("version", project.version.toString())
     outputs.file(outFile)
-    doLast { outFile.writeText(project.version.toString()) }
+    doLast {
+        val content =
+            buildString {
+                appendLine("# AUTO-GENERATED at build time from gradle.properties")
+                appendLine("# Do not edit manually — changes will be overwritten by CI/local builds.")
+                appendLine("# To bump the version, run: ./gradlew releasePatch (or releaseMinor/releaseMajor)")
+                append(project.version.toString())
+            }
+        outFile.writeText(content)
+    }
 }
 
 // Some Gradle/KMP versions don't expose `processWasmJsMainResources`; hook into the
@@ -218,4 +258,13 @@ tasks.configureEach {
 dependencies {
     debugImplementation(compose.uiTooling)
     androidTestImplementation(libs.androidx.uiautomator)
+
+    // Force Espresso 3.7.0 to fix NoSuchMethodException on Android 16 (API 36).
+    // espresso-core 3.5.x/3.6.x uses InputManager.getInstance() which was removed in API 36.
+    configurations.configureEach {
+        resolutionStrategy {
+            force("androidx.test.espresso:espresso-core:3.7.0")
+            force("androidx.test.espresso:espresso-idling-resource:3.7.0")
+        }
+    }
 }

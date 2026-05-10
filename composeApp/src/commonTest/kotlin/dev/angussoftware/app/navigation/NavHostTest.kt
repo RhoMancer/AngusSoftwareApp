@@ -13,108 +13,66 @@ internal class NavHostTest {
         assertEquals("https://rhomancer.github.io/angus-blog-content/rss.xml", RSS_FEED_URL)
     }
 
-    // Post index parsing tests - Critical functionality
+    // Post ID parsing tests - Critical functionality
     @Test
-    fun parsePostIndexWithValidNumericRoute() {
-        val route = "BlogPost/5"
-        val result = parsePostIndex(route)
-        assertEquals(5, result, "Should parse valid numeric index correctly")
+    fun parsePostIdWithValidRoute() {
+        val route = "BlogPost/post1"
+        val result = parsePostId(route)
+        assertEquals("post1", result, "Should parse valid post ID correctly")
     }
 
     @Test
-    fun parsePostIndexWithZeroIndex() {
-        val route = "BlogPost/0"
-        val result = parsePostIndex(route)
-        assertEquals(0, result, "Should parse zero index correctly")
+    fun parsePostIdWithUrlAsId() {
+        val route = "BlogPost/https://example.com/post1"
+        val result = parsePostId(route)
+        assertEquals("https://example.com/post1", result, "Should parse URL-based post ID")
     }
 
     @Test
-    fun parsePostIndexWithLargeNumber() {
-        val route = "BlogPost/999999"
-        val result = parsePostIndex(route)
-        assertEquals(999999, result, "Should parse large numbers correctly")
-    }
-
-    @Test
-    fun parsePostIndexWithNegativeNumber() {
-        val route = "BlogPost/-5"
-        val result = parsePostIndex(route)
-        assertEquals(-5, result, "Should parse negative numbers correctly")
-    }
-
-    @Test
-    fun parsePostIndexWithInvalidStringRoute() {
-        val route = "BlogPost/invalid"
-        val result = parsePostIndex(route)
-        assertEquals(0, result, "Should return 0 for non-numeric route")
-    }
-
-    @Test
-    fun parsePostIndexWithEmptyRoute() {
+    fun parsePostIdWithEmptySegment() {
         val route = "BlogPost/"
-        val result = parsePostIndex(route)
-        assertEquals(0, result, "Should return 0 for empty index")
+        val result = parsePostId(route)
+        assertEquals("", result, "Should return empty string for empty ID segment")
     }
 
     @Test
-    fun parsePostIndexWithNullRoute() {
-        val result = parsePostIndex(null)
-        assertEquals(0, result, "Should return 0 for null route")
+    fun parsePostIdWithNullRoute() {
+        val result = parsePostId(null)
+        assertEquals("", result, "Should return empty string for null route")
     }
 
     @Test
-    fun parsePostIndexWithEmptyString() {
-        val result = parsePostIndex("")
-        assertEquals(0, result, "Should return 0 for empty string")
+    fun parsePostIdWithEmptyString() {
+        val result = parsePostId("")
+        assertEquals("", result, "Should return empty string for empty string")
     }
 
     @Test
-    fun parsePostIndexWithNoSlash() {
+    fun parsePostIdWithNoSlash() {
         val route = "BlogPost"
-        val result = parsePostIndex(route)
-        assertEquals(0, result, "Should return 0 when no slash present")
+        val result = parsePostId(route)
+        assertEquals("BlogPost", result, "Should return whole string when no slash present")
     }
 
     @Test
-    fun parsePostIndexWithMultipleSlashes() {
-        val route = "Blog/Post/Category/42"
-        val result = parsePostIndex(route)
-        assertEquals(42, result, "Should extract index after last slash")
+    fun parsePostIdWithMultipleSlashes() {
+        val route = "BlogPost/Category/42"
+        val result = parsePostId(route)
+        assertEquals("Category/42", result, "Should extract everything after BlogPost/")
     }
 
     @Test
-    fun parsePostIndexWithDecimalNumber() {
-        val route = "BlogPost/3.14"
-        val result = parsePostIndex(route)
-        assertEquals(0, result, "Should return 0 for decimal numbers")
+    fun parsePostIdWithSpecialCharacters() {
+        val route = "BlogPost/post-123_test"
+        val result = parsePostId(route)
+        assertEquals("post-123_test", result, "Should preserve special characters in ID")
     }
 
     @Test
-    fun parsePostIndexWithSpecialCharacters() {
-        val route = "BlogPost/5@#$"
-        val result = parsePostIndex(route)
-        assertEquals(0, result, "Should return 0 for strings with special characters")
-    }
-
-    @Test
-    fun parsePostIndexWithWhitespace() {
-        val route = "BlogPost/ 5 "
-        val result = parsePostIndex(route)
-        assertEquals(0, result, "Should return 0 for strings with whitespace")
-    }
-
-    @Test
-    fun parsePostIndexWithVeryLargeNumber() {
-        val route = "BlogPost/2147483647" // Int.MAX_VALUE
-        val result = parsePostIndex(route)
-        assertEquals(2147483647, result, "Should handle Int.MAX_VALUE correctly")
-    }
-
-    @Test
-    fun parsePostIndexWithNumberLargerThanIntMax() {
-        val route = "BlogPost/2147483648" // Int.MAX_VALUE + 1
-        val result = parsePostIndex(route)
-        assertEquals(0, result, "Should return 0 for numbers larger than Int.MAX_VALUE")
+    fun parsePostIdWithEncodedUrl() {
+        val route = "BlogPost/https%3A%2F%2Fexample.com%2Fpost1"
+        val result = parsePostId(route)
+        assertEquals("https%3A%2F%2Fexample.com%2Fpost1", result, "Should handle URL-encoded IDs")
     }
 
     // BlogPost creation tests - Loading state
