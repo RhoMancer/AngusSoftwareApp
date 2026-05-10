@@ -23,7 +23,7 @@ abstract class BaseScreenTest {
      * Sets the Compose content with a specific window width size class override.
      * This allows deterministic testing of adaptive layouts.
      */
-    fun setAdaptiveContent(
+    internal fun setAdaptiveContent(
         widthSizeClass: WindowWidthSizeClass,
         content: @Composable () -> Unit,
     ) {
