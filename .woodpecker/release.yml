@@ -69,18 +69,18 @@ steps:
         APK_PATH=$(find composeApp/build/outputs/apk/release/ -name "*.apk" | head -1)
         if [ -n "$APK_PATH" ]; then
           NOTES="Release ${TAG_NAME}"
-          # Create release
+          # Create release (best-effort, don't fail build on upload issues)
           ESCAPED_NOTES=$(printf '%s' "$NOTES" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
           wget -q --post-data="{\"tag_name\":\"${TAG_NAME}\",\"target_commitish\":\"master\",\"name\":\"${TAG_NAME}\",\"body\":${ESCAPED_NOTES}}" \
             --header="Authorization: token ${GPR_TOKEN}" \
             --header="Content-Type: application/json" \
-            "https://api.github.com/repos/RhoMancer/AngusSoftwareApp/releases" -O /dev/null
+            "https://api.github.com/repos/RhoMancer/AngusSoftwareApp/releases" -O /dev/null || true
           # Upload APK
-          UPLOAD_URL="https://uploads.github.com/repos/RhoMancer/AngusSoftwareApp/releases/tags/${TAG_NAME}/assets?name=$(basename $APK_PATH)"
           wget -q --post-file="$APK_PATH" \
             --header="Authorization: token ${GPR_TOKEN}" \
             --header="Content-Type: application/octet-stream" \
-            "$UPLOAD_URL" -O /dev/null
+            "https://uploads.github.com/repos/RhoMancer/AngusSoftwareApp/releases/tags/${TAG_NAME}/assets?name=$(basename $APK_PATH)" \
+            -O /dev/null || true
         else
           echo "No APK found"
         fi
