@@ -48,14 +48,15 @@ steps:
         fi
         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null 2>&1 || true
         echo "sdk.dir=$ANDROID_HOME" > local.properties
-      # Configure signing keystore
+      # Decode signing keystore from base64
       - |
         mkdir -p ~/.gradle
         echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
         echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
-        echo "storeFile=/etc/angus-software/angus-app.jks" > keystore.properties
+        echo "${ANGUSAPP_KEYSTORE_BASE64}" | base64 -d > /tmp/angusapp-upload.jks
+        echo "storeFile=/tmp/angusapp-upload.jks" > keystore.properties
         echo "storePassword=${ANGUSAPP_KEYSTORE_PASSWORD}" >> keystore.properties
-        echo "keyAlias=angus-app" >> keystore.properties
+        echo "keyAlias=${ANGUSAPP_KEY_ALIAS}" >> keystore.properties
         echo "keyPassword=${ANGUSAPP_KEY_PASSWORD}" >> keystore.properties
       # Build signed release APK + AAB
       - chmod +x gradlew
