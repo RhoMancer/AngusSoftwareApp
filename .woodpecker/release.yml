@@ -53,7 +53,9 @@ steps:
         mkdir -p ~/.gradle
         echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
         echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
-        echo "${ANGUSAPP_KEYSTORE_BASE64}" | base64 -d > /tmp/angusapp-upload.jks
+        printf '%s' "${ANGUSAPP_KEYSTORE_BASE64}" | base64 -d > /tmp/angusapp-upload.jks
+        ls -la /tmp/angusapp-upload.jks
+        keytool -list -keystore /tmp/angusapp-upload.jks -storepass "${ANGUSAPP_KEYSTORE_PASSWORD}" -alias "${ANGUSAPP_KEY_ALIAS}" || echo "KEYSTORE VERIFY FAILED"
         echo "storeFile=/tmp/angusapp-upload.jks" > keystore.properties
         echo "storePassword=${ANGUSAPP_KEYSTORE_PASSWORD}" >> keystore.properties
         echo "keyAlias=${ANGUSAPP_KEY_ALIAS}" >> keystore.properties
