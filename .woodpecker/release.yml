@@ -63,10 +63,27 @@ steps:
       # Build signed release APK + AAB
       - chmod +x gradlew
       - ./gradlew --no-daemon :composeApp:assembleRelease :composeApp:bundleRelease
-      # Upload APK to GitHub Release
+      # Create GitHub Release and upload APK via API (no gh CLI in image)
       - |
         TAG_NAME=$(echo "${CI_COMMIT_BRANCH}" | sed 's|release/||')
-        gh release create "$TAG_NAME" composeApp/build/outputs/apk/release/*.apk --title "$TAG_NAME" --notes "Release $TAG_NAME"
+        APK_PATH=$(find composeApp/build/outputs/apk/release/ -name "*.apk" | head -1)
+        if [ -n "$APK_PATH" ]; then
+          NOTES="Release ${TAG_NAME}"
+          # Create release
+          ESCAPED_NOTES=$(printf '%s' "$NOTES" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+          wget -q --post-data="{\"tag_name\":\"${TAG_NAME}\",\"target_commitish\":\"master\",\"name\":\"${TAG_NAME}\",\"body\":${ESCAPED_NOTES}}" \
+            --header="Authorization: token ${GPR_TOKEN}" \
+            --header="Content-Type: application/json" \
+            "https://api.github.com/repos/RhoMancer/AngusSoftwareApp/releases" -O /dev/null
+          # Upload APK
+          UPLOAD_URL="https://uploads.github.com/repos/RhoMancer/AngusSoftwareApp/releases/tags/${TAG_NAME}/assets?name=$(basename $APK_PATH)"
+          wget -q --post-file="$APK_PATH" \
+            --header="Authorization: token ${GPR_TOKEN}" \
+            --header="Content-Type: application/octet-stream" \
+            "$UPLOAD_URL" -O /dev/null
+        else
+          echo "No APK found"
+        fi
     environment:
       GRADLE_USER_HOME: /root/.gradle
       ANDROID_HOME: /opt/android-sdk
