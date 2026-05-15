@@ -1,6 +1,7 @@
 # Angus Software App — Kotlin Multiplatform (Android + Web/Wasm)
 
-[![CI](https://ci.angussoftware.dev/api/badges/5/status.svg)](https://ci.angussoftware.dev/repos/5)
+[![CI (master)](https://ci.angussoftware.dev/api/badges/5/status.svg?branch=master)](https://ci.angussoftware.dev/repos/5)
+
 
 Angus Software application for showcasing my portfolio and hosting my blog.
 
