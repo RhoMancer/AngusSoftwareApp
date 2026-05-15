@@ -11,7 +11,7 @@ steps:
       ANDROID_SDK_ROOT: /opt/android-sdk
       ANDROID_AVD_HOME: /root/.android/avd
       GRADLE_USER_HOME: /root/.gradle
-      DISPLAY: ":99"
+      DISPLAY: :99
     commands:
       - |
         export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
