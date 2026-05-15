@@ -38,7 +38,8 @@
         fetch('version.txt', { cache: 'no-store' })
             .then(r => r.ok ? r.text() : Promise.reject(r.status))
             .then(t => {
-                document.getElementById('version-text').textContent = (t || '').trim();
+                const version = (t || '').split('\n').find(l => l.trim() && !l.trim().startsWith('#'));
+                document.getElementById('version-text').textContent = version ? version.trim() : '';
             })
             .catch(() => {
                 // Hide badge if not available (e.g., local dev before build runs)
