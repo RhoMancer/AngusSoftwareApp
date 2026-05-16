@@ -84,6 +84,71 @@ steps:
         else
           echo "No APK found"
         fi
+      # Upload AAB to Google Play Store (non-fatal)
+      - |
+        AAB_PATH=$(find composeApp/build/outputs/bundle/release/ -name "*.aab" | head -1)
+        if [ -z "$AAB_PATH" ]; then
+          echo "WARNING: No AAB found, skipping Play Store upload"
+        elif [ -z "$GOOGLE_PLAY_SERVICE_ACCOUNT_B64" ]; then
+          echo "WARNING: GOOGLE_PLAY_SERVICE_ACCOUNT_B64 not set, skipping Play Store upload"
+        else
+          echo "Uploading AAB to Google Play Store..."
+          printf '%s' "$GOOGLE_PLAY_SERVICE_ACCOUNT_B64" | base64 -d > /tmp/service-account.json
+          pip3 install --quiet --break-system-packages PyJWT cryptography requests 2>&1
+          cat > /tmp/upload-play.py << 'PYEOF'
+        import json, os, sys
+        from datetime import datetime, timedelta
+        import jwt, requests
+        KEY_FILE = json.load(open('/tmp/service-account.json'))
+        PACKAGE = os.environ.get('PLAY_PACKAGE', 'dev.angussoftware.app')
+        AAB_PATH = os.environ.get('AAB_PATH')
+        TRACK = os.environ.get('PLAY_TRACK', 'internal')
+        TIMEOUT = 300
+        def check(r):
+            if not r.ok:
+                print(f'FAILED: {r.status_code}: {r.text}', file=sys.stderr)
+                sys.exit(1)
+        print('obtaining access token...')
+        now = datetime.now()
+        claim = {'iss': KEY_FILE['client_email'], 'scope': 'https://www.googleapis.com/auth/androidpublisher', 'aud': 'https://oauth2.googleapis.com/token', 'exp': str(int((now + timedelta(minutes=10)).timestamp())), 'iat': str(int(now.timestamp()))}
+        assertion = jwt.encode(payload=claim, key=KEY_FILE['private_key'].encode(), algorithm='RS256', headers={'alg': 'RS256', 'typ': 'JWT'})
+        r = requests.post('https://oauth2.googleapis.com/token', data={'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer', 'assertion': assertion}, timeout=TIMEOUT)
+        check(r)
+        token = r.json()['access_token']
+        hdrs = {'Authorization': f'Bearer {token}'}
+        print('creating edit...')
+        r = requests.post(f'https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{PACKAGE}/edits', json={'expiryTimeSeconds': str(int((now + timedelta(minutes=10))).timestamp())}, headers=hdrs, timeout=TIMEOUT)
+        check(r)
+        edit_id = r.json()['id']
+        print(f'edit_id={edit_id}')
+        print('uploading aab...')
+        with open(AAB_PATH, 'rb') as f:
+            r = requests.post(f'https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/{PACKAGE}/edits/{edit_id}/bundles', data=f.read(), headers={**hdrs, 'Content-Type': 'application/octet-stream'}, timeout=TIMEOUT)
+        check(r)
+        vc = r.json()['versionCode']
+        print(f'uploaded version_code={vc}')
+        print(f'assigning to {TRACK} track...')
+        r = requests.put(f'https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{PACKAGE}/edits/{edit_id}/tracks/{TRACK}', json={'releases': [{'status': 'completed', 'versionCodes': [str(vc)]}]}, headers={**hdrs, 'Content-Type': 'application/json'}, timeout=TIMEOUT)
+        check(r)
+        print(f'assigned to {TRACK}')
+        print('committing edit...')
+        r = requests.post(f'https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{PACKAGE}/edits/{edit_id}:commit', headers=hdrs, timeout=TIMEOUT)
+        check(r)
+        print(f'done - published {vc} to {TRACK}')
+        PYEOF
+          export AAB_PATH
+          set +e
+          python3 /tmp/upload-play.py 2>&1
+          PLAY_RESULT=$?
+          set -e
+          if [ $PLAY_RESULT -ne 0 ]; then
+            echo "WARNING: Play Store upload failed (non-fatal, exit=$PLAY_RESULT)"
+          else
+            echo "Play Store upload and publish successful"
+          fi
+          rm -f /tmp/service-account.json
+        fi
+        rm -f /tmp/angusapp-upload.jks
     environment:
       GRADLE_USER_HOME: /root/.gradle
       ANDROID_HOME: /opt/android-sdk
