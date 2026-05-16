@@ -26,14 +26,7 @@ steps:
       - chmod +x gradlew
       # Run tests + Kover coverage
       - ./gradlew --no-daemon :composeApp:testDebugUnitTest :composeApp:koverXmlReport :composeApp:koverVerify
-      # Coverage tollgate (CI-only: PRs only, skip on push)
-      - |
-        if [ "$CI_PIPELINE_EVENT" = "pull_request" ]; then
-          git clone https://x-access-token:${GPR_TOKEN}@github.com/RhoMancer/ci-scripts.git /tmp/ci-scripts
-          bash /tmp/ci-scripts/scripts/check-unified-coverage.sh
-        else
-          echo "Coverage tollgate skipped (push event)"
-        fi
+      # Coverage enforced by koverVerify above (single-module project, no shared/ module)
     environment:
       GRADLE_USER_HOME: /root/.gradle
       ANDROID_HOME: /opt/android-sdk
