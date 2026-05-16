@@ -1,0 +1,4 @@
+# AUTO-GENERATED at build time from gradle.properties
+# Do not edit manually — changes will be overwritten by CI/local builds.
+# To bump the version, run: ./gradlew releasePatch (or releaseMinor/releaseMajor)
+1.2.4

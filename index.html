@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Angus Software</title>
+
+    <!-- Adaptive Theme Colors -->
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
+
+    <!-- Favicons -->
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <link href="styles.css" rel="stylesheet" type="text/css">
+    <script src="network.js" type="application/javascript"></script>
+    <script src="installPrompt.js" type="application/javascript"></script>
+    <script src="composeApp.js" type="application/javascript"></script>
+</head>
+<body>
+    <!-- Loading Indicator -->
+    <div id="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading Angus Software...</p>
+    </div>
+
+    <!-- Version badge (populated at runtime from version.txt) -->
+    <div id="version-badge" style="position:fixed;right:12px;bottom:12px;padding:6px 10px;border-radius:12px;background:rgba(0,0,0,0.6);color:#fff;font:12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;">
+        <span>Version:</span>
+        <code id="version-text">loading…</code>
+    </div>
+
+    <script>
+        // Fetch human-readable version generated during build
+        fetch('version.txt', { cache: 'no-store' })
+            .then(r => r.ok ? r.text() : Promise.reject(r.status))
+            .then(t => {
+                const version = (t || '').split('\n').find(l => l.trim() && !l.trim().startsWith('#'));
+                document.getElementById('version-text').textContent = version ? version.trim() : '';
+            })
+            .catch(() => {
+                // Hide badge if not available (e.g., local dev before build runs)
+                const badge = document.getElementById('version-badge');
+                if (badge) badge.style.display = 'none';
+            });
+    </script>
+</body>
+</html>
