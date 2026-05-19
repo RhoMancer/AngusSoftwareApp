@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v6
       
       - name: Set up JDK 23
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '23'
@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v6
       
       - name: Set up JDK 23
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '23'
@@ -110,7 +110,7 @@ jobs:
         uses: actions/checkout@v6
       
       - name: Set up JDK 23
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '23'
