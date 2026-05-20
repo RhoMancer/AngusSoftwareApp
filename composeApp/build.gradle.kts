@@ -113,10 +113,6 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
-        dependencies {
-            androidTestImplementation(libs.androidx.ui.test.junit4.android)
-            debugImplementation(libs.androidx.ui.test.manifest)
-        }
     }
 
     @OptIn(ExperimentalWasmDsl::class)
@@ -276,6 +272,8 @@ tasks.configureEach {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.androidx.ui.test.junit4.android)
     androidTestImplementation(libs.androidx.uiautomator)
 
     // Force Espresso 3.7.0 to fix NoSuchMethodException on Android 16 (API 36).
