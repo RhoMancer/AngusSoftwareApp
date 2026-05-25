@@ -6,7 +6,7 @@ android-targetSdk = "36"
 androidx-activity = "1.11.0"
 androidx-lifecycle = "2.10.0"
 #noinspection NewerVersionAvailable
-composeMultiplatform = "1.10.3"
+composeMultiplatform = "1.11.0"
 #noinspection NewerVersionAvailable
 kotlin = "2.3.21"
 kover = "0.9.5"
