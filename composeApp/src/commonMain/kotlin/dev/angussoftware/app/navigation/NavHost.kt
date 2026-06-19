@@ -87,6 +87,9 @@ internal fun displayCurrentScreen(navController: NavHostController) {
             composable(route = Screen.Blog.name) {
                 BlogScreen(navController)
             }
+            composable(route = Screen.Settings.name) {
+                SettingsScreen()
+            }
             composable(
                 route = "${Screen.BlogPost.name}/{postId}",
                 arguments = listOf(navArgument("postId") { type = NavType.StringType }),
