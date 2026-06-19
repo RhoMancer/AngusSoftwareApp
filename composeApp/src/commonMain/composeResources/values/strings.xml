@@ -90,6 +90,11 @@
     <string name="project_tap_target_booster_subtitle">Improve your touching and pressing aim with this targeting game</string>
     <string name="project_tap_target_booster_desc">With four different modes to help improve you accuracy and speed, Tap Target Booster is fun way to measure and hone your touch screen skills!</string>
 
+    <!-- Projects: Temperlux -->
+    <string name="project_temperlux_title">Temperlux</string>
+    <string name="project_temperlux_subtitle">Brightness controller for external and internal displays</string>
+    <string name="project_temperlux_desc">A brightness controller for external (DDC/CI) and internal (backlight) displays, written in Rust with GTK4/Libadwaita. Features per-display sliders, sync modes, scheduling, and 16 color themes. Available on crates.io and GitHub.</string>
+
     <!-- Blog screen -->
     <string name="blog_title">Rhoman¢er's Blog</string>
     <string name="blog_loading">Loading posts...</string>
