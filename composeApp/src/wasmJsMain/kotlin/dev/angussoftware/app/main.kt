@@ -9,28 +9,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.window.ComposeViewport
 import com.angussoftware.theming.compose.ui.theme.AngusTheme
+import com.angussoftware.theming.compose.ui.theme.initializeThemeMode
 import dev.angussoftware.app.installprompt.DefaultInstallPromptPlatform
 import dev.angussoftware.app.installprompt.InstallPromptController
 import dev.angussoftware.app.installprompt.InstallPromptHost
+import dev.angussoftware.app.preferences.loadThemePreferences
 import dev.angussoftware.app.screens.AngusSoftwareAppScreen
+import dev.angussoftware.app.theme.AppThemeProvider
+import dev.angussoftware.app.theme.LocalAppThemeState
 import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal fun main() {
-    ComposeViewport(document.body!!) {
-        AngusTheme {
-            val uriHandler = LocalUriHandler.current
-            val controller = remember {
-                val platform = DefaultInstallPromptPlatform { url ->
-                    uriHandler.openUri(url)
-                }
-                InstallPromptController(platform).also { it.initialize() }
-            }
+    // Load theme preferences on startup
+    val prefs = loadThemePreferences()
+    initializeThemeMode(prefs.themeMode)
 
-            Box(modifier = Modifier.fillMaxSize()) {
-                AngusSoftwareAppScreen()
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    InstallPromptHost(controller)
+    ComposeViewport(document.body!!) {
+        AppThemeProvider {
+            val themeState = LocalAppThemeState.current
+            AngusTheme(
+                colorTheme = themeState.activeColorTheme,
+            ) {
+                val uriHandler = LocalUriHandler.current
+                val controller = remember {
+                    val platform = DefaultInstallPromptPlatform { url ->
+                        uriHandler.openUri(url)
+                    }
+                    InstallPromptController(platform).also { it.initialize() }
+                }
+
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AngusSoftwareAppScreen()
+                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                        InstallPromptHost(controller)
+                    }
                 }
             }
         }

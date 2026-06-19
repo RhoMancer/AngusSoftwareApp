@@ -113,4 +113,20 @@
 
     <!-- Blog post states -->
     <string name="blog_post_not_found">Post not found</string>
+
+    <!-- Navigation: Settings -->
+    <string name="nav_settings">Settings</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme_mode">Theme Mode</string>
+    <string name="settings_theme_mode_system">System</string>
+    <string name="settings_theme_mode_light">Light</string>
+    <string name="settings_theme_mode_dark">Dark</string>
+    <string name="settings_light_theme">Light Colors</string>
+    <string name="settings_dark_theme">Dark Colors</string>
+    <string name="settings_theme_warning_dark_in_light">This is a dark theme — it may look wrong in light mode</string>
+    <string name="settings_theme_warning_light_in_dark">This is a light theme — it may look wrong in dark mode</string>
+</resources>
 </resources>
