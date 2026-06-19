@@ -32,6 +32,7 @@ internal enum class Screen {
     Home,
     Projects,
     Blog,
+    Settings,
     BlogPost,
 }
 
@@ -41,11 +42,13 @@ internal const val NAV_RAIL_TEST_TAG = "NavigationRail"
 internal const val NAV_ITEM_HOME_TAG = "NavItem_Home"
 internal const val NAV_ITEM_PROJECTS_TAG = "NavItem_Projects"
 internal const val NAV_ITEM_BLOG_TAG = "NavItem_Blog"
+internal const val NAV_ITEM_SETTINGS_TAG = "NavItem_Settings"
 
 // Screen content tags for destination verification in tests
 internal const val HOME_SCREEN_TEST_TAG = "HomeScreen"
 internal const val PROJECTS_SCREEN_TEST_TAG = "ProjectsScreen"
 internal const val BLOG_SCREEN_TEST_TAG = "BlogScreen"
+internal const val SETTINGS_SCREEN_TEST_TAG = "SettingsScreen"
 internal const val BLOG_POST_ITEM_TEST_TAG = "BlogPostItem"
 
 /** Navigation destination descriptor — eliminates duplicated NavigationBarItem/RailItem blocks. */
@@ -60,6 +63,7 @@ private val NAV_DESTINATIONS = listOf(
     NavDestination(Screen.Home, Res.string.nav_home, Icons.Default.Home, NAV_ITEM_HOME_TAG),
     NavDestination(Screen.Projects, Res.string.nav_projects, Icons.AutoMirrored.Filled.List, NAV_ITEM_PROJECTS_TAG),
     NavDestination(Screen.Blog, Res.string.nav_blog, Icons.Default.Create, NAV_ITEM_BLOG_TAG),
+    NavDestination(Screen.Settings, Res.string.nav_settings, Icons.Default.Settings, NAV_ITEM_SETTINGS_TAG),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
