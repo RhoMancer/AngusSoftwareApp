@@ -9,7 +9,12 @@ import androidx.compose.ui.tooling.preview.Devices.PHONE
 import androidx.compose.ui.tooling.preview.Devices.TABLET
 import androidx.compose.ui.tooling.preview.Preview
 import com.angussoftware.theming.compose.ui.theme.AngusTheme
+import com.angussoftware.theming.compose.ui.theme.initializeThemeMode
+import dev.angussoftware.app.preferences.initThemePreferences
+import dev.angussoftware.app.preferences.loadThemePreferences
 import dev.angussoftware.app.screens.AngusSoftwareAppScreen
+import dev.angussoftware.app.theme.AppThemeProvider
+import dev.angussoftware.app.theme.LocalAppThemeState
 
 internal class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,9 +22,22 @@ internal class MainActivity : ComponentActivity() {
 
         // Enable edge-to-edge display
         enableEdgeToEdge()
+
+        // Initialize theme preference storage
+        initThemePreferences(this)
+
+        // Load saved preferences and initialize theme mode
+        val prefs = loadThemePreferences()
+        initializeThemeMode(prefs.themeMode)
+
         setContent {
-            AngusTheme {
-                AngusSoftwareAppScreen()
+            AppThemeProvider {
+                val themeState = LocalAppThemeState.current
+                AngusTheme(
+                    colorTheme = themeState.activeColorTheme,
+                ) {
+                    AngusSoftwareAppScreen()
+                }
             }
         }
     }
@@ -33,7 +51,9 @@ internal class MainActivity : ComponentActivity() {
 )
 @Composable
 private fun SmallAndroidPreview() {
-    AngusSoftwareAppScreen()
+    AngusTheme {
+        AngusSoftwareAppScreen()
+    }
 }
 
 @Preview(
@@ -43,7 +63,9 @@ private fun SmallAndroidPreview() {
 )
 @Composable
 private fun AppAndroidPreview() {
-    AngusSoftwareAppScreen()
+    AngusTheme {
+        AngusSoftwareAppScreen()
+    }
 }
 
 @Preview(
@@ -53,5 +75,7 @@ private fun AppAndroidPreview() {
 )
 @Composable
 private fun TabletAndroidPreview() {
-    AngusSoftwareAppScreen()
+    AngusTheme {
+        AngusSoftwareAppScreen()
+    }
 }
