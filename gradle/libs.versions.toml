@@ -10,7 +10,7 @@ composeMultiplatform = "1.10.3"
 #noinspection NewerVersionAvailable
 kotlin = "2.3.21"
 kover = "0.9.5"
-angusSoftware-theming = "0.0.2.32"
+angusSoftware-theming = "0.0.2.33"
 angusSoftware-gradle = "0.0.9"
 nav_version = "2.9.2"
 uiautomator = "2.3.0"
