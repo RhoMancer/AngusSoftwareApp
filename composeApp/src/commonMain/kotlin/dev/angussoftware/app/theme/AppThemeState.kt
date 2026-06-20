@@ -4,8 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalConfiguration
 import com.angussoftware.theming.compose.ui.theme.ColorTheme
 import com.angussoftware.theming.compose.ui.theme.ThemeMode
 import com.angussoftware.theming.compose.ui.theme.isDarkThemeEnabled
