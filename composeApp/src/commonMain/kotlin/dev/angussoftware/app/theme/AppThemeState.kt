@@ -48,10 +48,11 @@ class AppThemeState(initialPrefs: ThemePreferences = loadThemePreferences()) {
 
 /**
  * Singleton theme state — one instance for the entire app.
+ * Lazy-initialized on first access (inside composable scope).
  * Avoids CompositionLocalProvider which can interfere with
  * touch event handling on Compose Web (WasmJs canvas).
  */
-private val appThemeState = AppThemeState()
+private val appThemeState by lazy { AppThemeState() }
 
 /**
  * Returns the singleton theme state.
