@@ -12,6 +12,8 @@ steps:
         echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
         echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
       - chmod +x gradlew
+      # Clear stale gradle lock from previous failed builds
+      - rm -f /root/.gradle/caches/journal-1/journal-1.lock
       # Build Wasm distribution
       - ./gradlew --no-daemon :composeApp:wasmJsBrowserDistribution
       # Prepare gh-pages content
