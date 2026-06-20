@@ -15,35 +15,31 @@ import dev.angussoftware.app.installprompt.InstallPromptController
 import dev.angussoftware.app.installprompt.InstallPromptHost
 import dev.angussoftware.app.preferences.loadThemePreferences
 import dev.angussoftware.app.screens.AngusSoftwareAppScreen
-import dev.angussoftware.app.theme.AppThemeProvider
-import dev.angussoftware.app.theme.LocalAppThemeState
+import dev.angussoftware.app.theme.rememberAppThemeState
 import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal fun main() {
-    // Load theme preferences on startup
     val prefs = loadThemePreferences()
     initializeThemeMode(prefs.themeMode)
 
     ComposeViewport(document.body!!) {
-        AppThemeProvider {
-            val themeState = LocalAppThemeState.current
-            AngusTheme(
-                colorTheme = themeState.activeColorTheme,
-            ) {
-                val uriHandler = LocalUriHandler.current
-                val controller = remember {
-                    val platform = DefaultInstallPromptPlatform { url ->
-                        uriHandler.openUri(url)
-                    }
-                    InstallPromptController(platform).also { it.initialize() }
+        val themeState = rememberAppThemeState()
+        AngusTheme(
+            colorTheme = themeState.activeColorTheme,
+        ) {
+            val uriHandler = LocalUriHandler.current
+            val controller = remember {
+                val platform = DefaultInstallPromptPlatform { url ->
+                    uriHandler.openUri(url)
                 }
+                InstallPromptController(platform).also { it.initialize() }
+            }
 
-                Box(modifier = Modifier.fillMaxSize()) {
-                    AngusSoftwareAppScreen()
-                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                        InstallPromptHost(controller)
-                    }
+            Box(modifier = Modifier.fillMaxSize()) {
+                AngusSoftwareAppScreen()
+                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                    InstallPromptHost(controller)
                 }
             }
         }

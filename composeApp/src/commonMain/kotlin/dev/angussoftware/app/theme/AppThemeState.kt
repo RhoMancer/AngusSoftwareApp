@@ -1,7 +1,6 @@
 package dev.angussoftware.app.theme
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,13 +20,12 @@ class AppThemeState(initialPrefs: ThemePreferences = loadThemePreferences()) {
     var prefs by mutableStateOf(initialPrefs)
         private set
 
-    /** The color theme to pass to AngusTheme for the current mode. */
     val activeColorTheme: ColorTheme
         get() {
             return when (prefs.themeMode) {
                 ThemeMode.LIGHT -> prefs.lightTheme
                 ThemeMode.DARK -> prefs.darkTheme
-                ThemeMode.SYSTEM -> prefs.darkTheme
+                ThemeMode.SYSTEM -> ColorTheme.Angus
             }
         }
 
@@ -49,29 +47,16 @@ class AppThemeState(initialPrefs: ThemePreferences = loadThemePreferences()) {
 }
 
 /**
- * CompositionLocal providing the app-wide theme state.
+ * Singleton theme state — one instance for the entire app.
+ * Avoids CompositionLocalProvider which can interfere with
+ * touch event handling on Compose Web (WasmJs canvas).
  */
-val LocalAppThemeState = compositionLocalOf<AppThemeState> {
-    error("AppThemeState not provided. Wrap your content in AppThemeProvider.")
-}
+private val appThemeState = AppThemeState()
 
 /**
- * Provides app-wide theme state via CompositionLocal.
- * Call once at the top level of the app.
- */
-@Composable
-fun AppThemeProvider(content: @Composable () -> Unit) {
-    val state = remember { AppThemeState() }
-    androidx.compose.runtime.CompositionLocalProvider(LocalAppThemeState provides state) {
-        content()
-    }
-}
-
-/**
- * Access the app-wide theme state.
+ * Returns the singleton theme state.
  */
 @Composable
 fun rememberAppThemeState(): AppThemeState {
-    return LocalAppThemeState.current
+    return appThemeState
 }
-

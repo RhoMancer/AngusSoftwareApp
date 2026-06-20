@@ -13,8 +13,7 @@ import com.angussoftware.theming.compose.ui.theme.initializeThemeMode
 import dev.angussoftware.app.preferences.initThemePreferences
 import dev.angussoftware.app.preferences.loadThemePreferences
 import dev.angussoftware.app.screens.AngusSoftwareAppScreen
-import dev.angussoftware.app.theme.AppThemeProvider
-import dev.angussoftware.app.theme.LocalAppThemeState
+import dev.angussoftware.app.theme.rememberAppThemeState
 
 internal class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,13 +30,11 @@ internal class MainActivity : ComponentActivity() {
         initializeThemeMode(prefs.themeMode)
 
         setContent {
-            AppThemeProvider {
-                val themeState = LocalAppThemeState.current
-                AngusTheme(
-                    colorTheme = themeState.activeColorTheme,
-                ) {
-                    AngusSoftwareAppScreen()
-                }
+            val themeState = rememberAppThemeState()
+            AngusTheme(
+                colorTheme = themeState.activeColorTheme,
+            ) {
+                AngusSoftwareAppScreen()
             }
         }
     }
