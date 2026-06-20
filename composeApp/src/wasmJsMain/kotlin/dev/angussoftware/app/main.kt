@@ -25,7 +25,7 @@ internal fun main() {
         val themeState = rememberAppThemeState()
         initializeThemeMode(themeState.prefs.themeMode)
 
-        val activeTheme = themeState.activeColorTheme
+        val activeTheme = themeState.resolvedColorTheme()
         if (activeTheme == ColorTheme.Angus) {
             AngusTheme {
                 AppContent()
