@@ -18,44 +18,7 @@
     <link href="styles.css" rel="stylesheet" type="text/css">
     <script src="network.js" type="application/javascript"></script>
     <script src="installPrompt.js" type="application/javascript"></script>
-    <script>
-        // Feature detection for WebAssembly GC (required by Kotlin/Wasm)
-        try {
-            new WebAssembly.Module(new Uint8Array([
-                0,97,115,109,1,0,0,0,1,7,1,96,1,111,1,111,3,2,1,0,10,2,1,0,11
-            ]));
-        } catch (e) {
-            document.getElementById('loading-spinner').innerHTML =
-                '<p style="color:#ff6b6b;font-family:sans-serif;text-align:center;padding:20px;">' +
-                'This browser does not support WebAssembly GC.<br>' +
-                'Please update to a recent version of Chrome, Edge, or Safari 17.4+.' +
-                '</p>';
-            throw e;
-        }
-    </script>
     <script src="composeApp.js" type="application/javascript"></script>
-    <script>
-        // Hide loading spinner once Compose app mounts (checked via MutationObserver)
-        (function() {
-            var observer = new MutationObserver(function(mutations) {
-                if (document.querySelector('canvas, #ComposeViewport')) {
-                    var spinner = document.getElementById('loading-spinner');
-                    if (spinner) spinner.style.display = 'none';
-                    observer.disconnect();
-                }
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
-            // Safety timeout: if app doesn't load in 15s, show error
-            setTimeout(function() {
-                if (!document.querySelector('canvas, #ComposeViewport')) {
-                    var spinner = document.getElementById('loading-spinner');
-                    if (spinner) {
-                        spinner.innerHTML = '<p style="color:#ff6b6b;font-family:sans-serif;text-align:center;padding:20px;">App failed to load. Please try refreshing the page.</p>';
-                    }
-                }
-            }, 15000);
-        })();
-    </script>
 </head>
 <body>
     <!-- Loading Indicator -->
