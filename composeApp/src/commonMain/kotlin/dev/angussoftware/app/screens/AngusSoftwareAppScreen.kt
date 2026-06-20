@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ import angussoftwareapp.composeapp.generated.resources.Res
 import angussoftwareapp.composeapp.generated.resources.nav_blog
 import angussoftwareapp.composeapp.generated.resources.nav_home
 import angussoftwareapp.composeapp.generated.resources.nav_projects
+import angussoftwareapp.composeapp.generated.resources.nav_settings
 import dev.angussoftware.app.navigation.DefaultNavigationBarHeight
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.navigation.displayCurrentScreen
@@ -32,6 +34,7 @@ internal enum class Screen {
     Home,
     Projects,
     Blog,
+    Settings,
     BlogPost,
 }
 
@@ -41,6 +44,7 @@ internal const val NAV_RAIL_TEST_TAG = "NavigationRail"
 internal const val NAV_ITEM_HOME_TAG = "NavItem_Home"
 internal const val NAV_ITEM_PROJECTS_TAG = "NavItem_Projects"
 internal const val NAV_ITEM_BLOG_TAG = "NavItem_Blog"
+internal const val NAV_ITEM_SETTINGS_TAG = "NavItem_Settings"
 
 // Screen content tags for destination verification in tests
 internal const val HOME_SCREEN_TEST_TAG = "HomeScreen"
@@ -60,6 +64,7 @@ private val NAV_DESTINATIONS = listOf(
     NavDestination(Screen.Home, Res.string.nav_home, Icons.Default.Home, NAV_ITEM_HOME_TAG),
     NavDestination(Screen.Projects, Res.string.nav_projects, Icons.AutoMirrored.Filled.List, NAV_ITEM_PROJECTS_TAG),
     NavDestination(Screen.Blog, Res.string.nav_blog, Icons.Default.Create, NAV_ITEM_BLOG_TAG),
+    NavDestination(Screen.Settings, Res.string.nav_settings, Icons.Default.Info, NAV_ITEM_SETTINGS_TAG),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
