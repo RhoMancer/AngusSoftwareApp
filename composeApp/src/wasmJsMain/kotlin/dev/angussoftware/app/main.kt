@@ -13,18 +13,15 @@ import com.angussoftware.theming.compose.ui.theme.initializeThemeMode
 import dev.angussoftware.app.installprompt.DefaultInstallPromptPlatform
 import dev.angussoftware.app.installprompt.InstallPromptController
 import dev.angussoftware.app.installprompt.InstallPromptHost
-import dev.angussoftware.app.preferences.loadThemePreferences
 import dev.angussoftware.app.screens.AngusSoftwareAppScreen
 import dev.angussoftware.app.theme.rememberAppThemeState
 import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal fun main() {
-    val prefs = loadThemePreferences()
-    initializeThemeMode(prefs.themeMode)
-
     ComposeViewport(document.body!!) {
         val themeState = rememberAppThemeState()
+        initializeThemeMode(themeState.prefs.themeMode)
         AngusTheme(
             colorTheme = themeState.activeColorTheme,
         ) {
