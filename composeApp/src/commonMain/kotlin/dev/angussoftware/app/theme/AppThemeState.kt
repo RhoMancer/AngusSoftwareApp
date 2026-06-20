@@ -24,7 +24,7 @@ class AppThemeState(initialPrefs: ThemePreferences = loadThemePreferences()) {
         get() = when (prefs.themeMode) {
             ThemeMode.LIGHT -> prefs.lightTheme
             ThemeMode.DARK -> prefs.darkTheme
-            ThemeMode.SYSTEM -> prefs.darkTheme
+            ThemeMode.SYSTEM -> ColorTheme.Angus
         }
 
     fun updateThemeMode(mode: ThemeMode) {
