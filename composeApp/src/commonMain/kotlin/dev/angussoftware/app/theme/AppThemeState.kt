@@ -72,6 +72,6 @@ fun AppThemeProvider(content: @Composable () -> Unit) {
  */
 @Composable
 fun rememberAppThemeState(): AppThemeState {
-    return androidx.compose.runtime.currentComposer.consume(LocalAppThemeState)
+    return LocalAppThemeState.current
 }
 
