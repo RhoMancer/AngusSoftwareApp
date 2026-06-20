@@ -4,8 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import com.angussoftware.theming.compose.ui.theme.ColorTheme
 import com.angussoftware.theming.compose.ui.theme.ThemeMode
+import com.angussoftware.theming.compose.ui.theme.isDarkThemeEnabled
 import com.angussoftware.theming.compose.ui.theme.setThemeMode
 import dev.angussoftware.app.preferences.ThemePreferences
 import dev.angussoftware.app.preferences.loadThemePreferences
@@ -19,7 +22,18 @@ class AppThemeState(initialPrefs: ThemePreferences = loadThemePreferences()) {
         get() = when (prefs.themeMode) {
             ThemeMode.LIGHT -> prefs.lightTheme
             ThemeMode.DARK -> prefs.darkTheme
-            ThemeMode.SYSTEM -> ColorTheme.Angus
+            ThemeMode.SYSTEM -> prefs.lightTheme  // fallback, overridden in activeColorThemeComposable
+        }
+
+    /** Composable version that resolves system dark/light state. */
+    @Composable
+    fun activeColorThemeComposable(): ColorTheme = when (prefs.themeMode) {
+            ThemeMode.LIGHT -> prefs.lightTheme
+            ThemeMode.DARK -> prefs.darkTheme
+            ThemeMode.SYSTEM -> {
+                val isDark = isDarkThemeEnabled() ?: false
+                if (isDark) prefs.darkTheme else prefs.lightTheme
+            }
         }
 
     fun updateThemeMode(mode: ThemeMode) {

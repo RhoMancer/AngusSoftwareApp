@@ -27,7 +27,7 @@ internal class MainActivity : ComponentActivity() {
             val themeState = rememberAppThemeState()
             initializeThemeMode(themeState.prefs.themeMode)
 
-            val activeTheme = themeState.activeColorTheme
+            val activeTheme = themeState.activeColorThemeComposable()
             if (activeTheme == ColorTheme.Angus) {
                 AngusTheme {
                     AngusSoftwareAppScreen()
