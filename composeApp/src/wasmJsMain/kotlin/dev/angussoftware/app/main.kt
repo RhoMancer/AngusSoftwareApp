@@ -24,28 +24,41 @@ internal fun main() {
         val themeState = rememberAppThemeState()
         initializeThemeMode(themeState.prefs.themeMode)
 
-        val content: @Composable () -> Unit = {
-            val uriHandler = LocalUriHandler.current
-            val controller = remember {
-                val platform = DefaultInstallPromptPlatform { url ->
-                    uriHandler.openUri(url)
-                }
-                InstallPromptController(platform).also { it.initialize() }
-            }
-
-            Box(modifier = Modifier.fillMaxSize()) {
-                AngusSoftwareAppScreen()
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    InstallPromptHost(controller)
-                }
-            }
-        }
-
         val activeTheme = themeState.activeColorTheme
         if (activeTheme == ColorTheme.Angus) {
-            AngusTheme(content = content)
+            AngusTheme {
+                val uriHandler = LocalUriHandler.current
+                val controller = remember {
+                    val platform = DefaultInstallPromptPlatform { url ->
+                        uriHandler.openUri(url)
+                    }
+                    InstallPromptController(platform).also { it.initialize() }
+                }
+
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AngusSoftwareAppScreen()
+                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                        InstallPromptHost(controller)
+                    }
+                }
+            }
         } else {
-            AngusTheme(colorTheme = activeTheme, content = content)
+            AngusTheme(colorTheme = activeTheme) {
+                val uriHandler = LocalUriHandler.current
+                val controller = remember {
+                    val platform = DefaultInstallPromptPlatform { url ->
+                        uriHandler.openUri(url)
+                    }
+                    InstallPromptController(platform).also { it.initialize() }
+                }
+
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AngusSoftwareAppScreen()
+                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                        InstallPromptHost(controller)
+                    }
+                }
+            }
         }
     }
 }
