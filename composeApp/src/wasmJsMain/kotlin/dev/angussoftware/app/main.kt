@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.window.ComposeViewport
 import com.angussoftware.theming.compose.ui.theme.AngusTheme
+import com.angussoftware.theming.compose.ui.theme.ColorTheme
 import com.angussoftware.theming.compose.ui.theme.initializeThemeMode
 import dev.angussoftware.app.installprompt.DefaultInstallPromptPlatform
 import dev.angussoftware.app.installprompt.InstallPromptController
@@ -22,9 +23,8 @@ internal fun main() {
     ComposeViewport(document.body!!) {
         val themeState = rememberAppThemeState()
         initializeThemeMode(themeState.prefs.themeMode)
-        AngusTheme(
-            colorTheme = themeState.activeColorTheme,
-        ) {
+
+        val content: @Composable () -> Unit = {
             val uriHandler = LocalUriHandler.current
             val controller = remember {
                 val platform = DefaultInstallPromptPlatform { url ->
@@ -39,6 +39,13 @@ internal fun main() {
                     InstallPromptHost(controller)
                 }
             }
+        }
+
+        val activeTheme = themeState.activeColorTheme
+        if (activeTheme == ColorTheme.Angus) {
+            AngusTheme(content = content)
+        } else {
+            AngusTheme(colorTheme = activeTheme, content = content)
         }
     }
 }
