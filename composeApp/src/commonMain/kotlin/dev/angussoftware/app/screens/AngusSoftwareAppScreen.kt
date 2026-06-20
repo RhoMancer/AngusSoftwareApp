@@ -5,7 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings as SettingsIcon
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +21,7 @@ import angussoftwareapp.composeapp.generated.resources.Res
 import angussoftwareapp.composeapp.generated.resources.nav_blog
 import angussoftwareapp.composeapp.generated.resources.nav_home
 import angussoftwareapp.composeapp.generated.resources.nav_projects
+import angussoftwareapp.composeapp.generated.resources.nav_settings
 import dev.angussoftware.app.navigation.DefaultNavigationBarHeight
 import dev.angussoftware.app.navigation.LocalNavigationBarHeight
 import dev.angussoftware.app.navigation.displayCurrentScreen
@@ -64,7 +65,7 @@ private val NAV_DESTINATIONS = listOf(
     NavDestination(Screen.Home, Res.string.nav_home, Icons.Default.Home, NAV_ITEM_HOME_TAG),
     NavDestination(Screen.Projects, Res.string.nav_projects, Icons.AutoMirrored.Filled.List, NAV_ITEM_PROJECTS_TAG),
     NavDestination(Screen.Blog, Res.string.nav_blog, Icons.Default.Create, NAV_ITEM_BLOG_TAG),
-    NavDestination(Screen.Settings, Res.string.nav_settings, SettingsIcon, NAV_ITEM_SETTINGS_TAG),
+    NavDestination(Screen.Settings, Res.string.nav_settings, Icons.Default.Info, NAV_ITEM_SETTINGS_TAG),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
