@@ -21,7 +21,7 @@ import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal fun main() {
-    // Load theme preferences on startup
+    // Safe to call — loadThemePreferences has try-catch around localStorage
     val prefs = loadThemePreferences()
     initializeThemeMode(prefs.themeMode)
 
