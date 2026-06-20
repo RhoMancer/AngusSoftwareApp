@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.angussoftware.theming.compose.ui.theme.ColorTheme
 import com.angussoftware.theming.compose.ui.theme.ThemeMode
-import com.angussoftware.theming.compose.ui.theme.isDarkThemeEnabled
 import com.angussoftware.theming.compose.ui.theme.setThemeMode
 import dev.angussoftware.app.preferences.ThemePreferences
 import dev.angussoftware.app.preferences.loadThemePreferences
@@ -16,22 +15,16 @@ class AppThemeState(initialPrefs: ThemePreferences = loadThemePreferences()) {
     var prefs by mutableStateOf(initialPrefs)
         private set
 
+    /**
+     * Returns the active color theme. In SYSTEM mode, uses the dark theme
+     * (AngusTheme handles system dark/light detection for Angus brand colors).
+     * For community themes, switching to Light/Dark mode explicitly picks the right one.
+     */
     val activeColorTheme: ColorTheme
         get() = when (prefs.themeMode) {
             ThemeMode.LIGHT -> prefs.lightTheme
             ThemeMode.DARK -> prefs.darkTheme
-            ThemeMode.SYSTEM -> prefs.lightTheme  // fallback, overridden in activeColorThemeComposable
-        }
-
-    /** Composable version that resolves system dark/light state. */
-    @Composable
-    fun activeColorThemeComposable(): ColorTheme = when (prefs.themeMode) {
-            ThemeMode.LIGHT -> prefs.lightTheme
-            ThemeMode.DARK -> prefs.darkTheme
-            ThemeMode.SYSTEM -> {
-                val isDark = isDarkThemeEnabled() ?: false
-                if (isDark) prefs.darkTheme else prefs.lightTheme
-            }
+            ThemeMode.SYSTEM -> prefs.darkTheme
         }
 
     fun updateThemeMode(mode: ThemeMode) {
