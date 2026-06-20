@@ -113,7 +113,7 @@ internal fun ProjectsScreen() {
                         Res.drawable.angus_solitaire_3,
                     ),
                 link = "https://play.google.com/store/apps/details?id=gms.angus.angussoli",
-                icon = getAngusSolitaireIcon(),
+                icon = getAngusSolitareIcon(),
             ),
             Project(
                 title = stringResource(Res.string.project_blink_reader_title),
