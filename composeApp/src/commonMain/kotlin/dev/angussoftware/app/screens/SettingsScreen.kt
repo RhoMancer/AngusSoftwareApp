@@ -18,8 +18,6 @@ import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.utils.rememberCommonScreenState
 import org.jetbrains.compose.resources.stringResource
 
-internal const val SETTINGS_SCREEN_TEST_TAG = "SettingsScreen"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SettingsScreen() {
