@@ -10,7 +10,7 @@ private const val KEY_DARK = "angus_dark_theme"
 
 private fun safeGetItem(key: String): String? = try {
     window.localStorage.getItem(key)
-} catch (e: dynamic) {
+} catch (e: Throwable) {
     null
 }
 
@@ -37,7 +37,7 @@ actual fun saveThemePreferences(prefs: ThemePreferences) {
         window.localStorage.setItem(KEY_MODE, prefs.themeMode.name)
         window.localStorage.setItem(KEY_LIGHT, prefs.lightTheme.name)
         window.localStorage.setItem(KEY_DARK, prefs.darkTheme.name)
-    } catch (e: dynamic) {
+    } catch (e: Throwable) {
         // localStorage not available (private browsing, disabled cookies)
     }
 }
