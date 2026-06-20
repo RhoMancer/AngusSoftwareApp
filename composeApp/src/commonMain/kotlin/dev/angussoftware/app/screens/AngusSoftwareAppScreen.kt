@@ -50,7 +50,6 @@ internal const val NAV_ITEM_SETTINGS_TAG = "NavItem_Settings"
 internal const val HOME_SCREEN_TEST_TAG = "HomeScreen"
 internal const val PROJECTS_SCREEN_TEST_TAG = "ProjectsScreen"
 internal const val BLOG_SCREEN_TEST_TAG = "BlogScreen"
-internal const val SETTINGS_SCREEN_TEST_TAG = "SettingsScreen"
 internal const val BLOG_POST_ITEM_TEST_TAG = "BlogPostItem"
 
 /** Navigation destination descriptor — eliminates duplicated NavigationBarItem/RailItem blocks. */

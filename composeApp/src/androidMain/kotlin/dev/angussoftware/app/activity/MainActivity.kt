@@ -9,9 +9,9 @@ import androidx.compose.ui.tooling.preview.Devices.PHONE
 import androidx.compose.ui.tooling.preview.Devices.TABLET
 import androidx.compose.ui.tooling.preview.Preview
 import com.angussoftware.theming.compose.ui.theme.AngusTheme
+import com.angussoftware.theming.compose.ui.theme.ColorTheme
 import com.angussoftware.theming.compose.ui.theme.initializeThemeMode
 import dev.angussoftware.app.preferences.initThemePreferences
-import dev.angussoftware.app.preferences.loadThemePreferences
 import dev.angussoftware.app.screens.AngusSoftwareAppScreen
 import dev.angussoftware.app.theme.rememberAppThemeState
 
@@ -21,20 +21,21 @@ internal class MainActivity : ComponentActivity() {
 
         // Enable edge-to-edge display
         enableEdgeToEdge()
-
-        // Initialize theme preference storage
         initThemePreferences(this)
-
-        // Load saved preferences and initialize theme mode
-        val prefs = loadThemePreferences()
-        initializeThemeMode(prefs.themeMode)
 
         setContent {
             val themeState = rememberAppThemeState()
-            AngusTheme(
-                colorTheme = themeState.activeColorTheme,
-            ) {
-                AngusSoftwareAppScreen()
+            initializeThemeMode(themeState.prefs.themeMode)
+
+            val activeTheme = themeState.activeColorTheme
+            if (activeTheme == ColorTheme.Angus) {
+                AngusTheme {
+                    AngusSoftwareAppScreen()
+                }
+            } else {
+                AngusTheme(colorTheme = activeTheme) {
+                    AngusSoftwareAppScreen()
+                }
             }
         }
     }
@@ -48,9 +49,7 @@ internal class MainActivity : ComponentActivity() {
 )
 @Composable
 private fun SmallAndroidPreview() {
-    AngusTheme {
-        AngusSoftwareAppScreen()
-    }
+    AngusSoftwareAppScreen()
 }
 
 @Preview(
@@ -60,9 +59,7 @@ private fun SmallAndroidPreview() {
 )
 @Composable
 private fun AppAndroidPreview() {
-    AngusTheme {
-        AngusSoftwareAppScreen()
-    }
+    AngusSoftwareAppScreen()
 }
 
 @Preview(
@@ -72,7 +69,5 @@ private fun AppAndroidPreview() {
 )
 @Composable
 private fun TabletAndroidPreview() {
-    AngusTheme {
-        AngusSoftwareAppScreen()
-    }
+    AngusSoftwareAppScreen()
 }
