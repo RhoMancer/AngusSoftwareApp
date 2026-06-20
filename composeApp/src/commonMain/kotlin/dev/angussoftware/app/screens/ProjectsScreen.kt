@@ -64,6 +64,13 @@ internal fun ProjectsScreen() {
                 icon = getAngusSimpleLogoSystem(),
             ),
             Project(
+                title = stringResource(Res.string.project_temperlux_title),
+                subtitle = stringResource(Res.string.project_temperlux_subtitle),
+                description = stringResource(Res.string.project_temperlux_desc),
+                technologies = listOf("Rust", "GTK4", "libadwaita"),
+                link = "https://github.com/RhoMancer/temperlux",
+            ),
+            Project(
                 title = stringResource(Res.string.project_google_play_developer_account),
                 link = "https://play.google.com/store/apps/dev?id=7308269362866323199",
                 icon = getGooglePlayStoreIcon(),
@@ -106,7 +113,7 @@ internal fun ProjectsScreen() {
                         Res.drawable.angus_solitaire_3,
                     ),
                 link = "https://play.google.com/store/apps/details?id=gms.angus.angussoli",
-                icon = getAngusSolitareIcon(),
+                icon = getAngusSolitaireIcon(),
             ),
             Project(
                 title = stringResource(Res.string.project_blink_reader_title),
