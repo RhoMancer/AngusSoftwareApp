@@ -18,13 +18,32 @@ import dev.angussoftware.app.ui.components.SectionCard
 import dev.angussoftware.app.ui.utils.rememberCommonScreenState
 import org.jetbrains.compose.resources.stringResource
 
+internal const val SETTINGS_SCREEN_TEST_TAG = "SettingsScreen"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SettingsScreen() {
     val themeState = rememberAppThemeState()
     val prefs = themeState.prefs
     val common = rememberCommonScreenState()
-    val allThemes = ColorTheme.allWithNames
+    val allThemes = listOf(
+        ColorTheme.AngusLight to "Angus Light",
+        ColorTheme.AngusDark to "Angus Dark",
+        ColorTheme.CatppuccinLatte to "Catppuccin Latte",
+        ColorTheme.CatppuccinFrappe to "Catppuccin Frappe",
+        ColorTheme.CatppuccinMacchiato to "Catppuccin Macchiato",
+        ColorTheme.CatppuccinMocha to "Catppuccin Mocha",
+        ColorTheme.Nord to "Nord",
+        ColorTheme.NordPolar to "Nord Polar",
+        ColorTheme.GruvboxDark to "Gruvbox Dark",
+        ColorTheme.GruvboxLight to "Gruvbox Light",
+        ColorTheme.SolarizedDark to "Solarized Dark",
+        ColorTheme.SolarizedLight to "Solarized Light",
+        ColorTheme.Dracula to "Dracula",
+        ColorTheme.RosePine to "Rose Pine",
+        ColorTheme.RosePineMoon to "Rose Pine Moon",
+        ColorTheme.RosePineDawn to "Rose Pine Dawn",
+    )
 
     Box(
         modifier = Modifier
@@ -75,7 +94,7 @@ internal fun SettingsScreen() {
                         selected = prefs.lightTheme,
                         onSelect = { theme -> themeState.updateLightTheme(theme) },
                     )
-                    if (!prefs.lightTheme.isLightTheme && prefs.lightTheme != ColorTheme.Angus) {
+                    if (!prefs.lightTheme.isLightTheme) {
                         WarningText(stringResource(Res.string.settings_theme_warning_dark_in_light))
                     }
 
@@ -92,7 +111,7 @@ internal fun SettingsScreen() {
                         selected = prefs.darkTheme,
                         onSelect = { theme -> themeState.updateDarkTheme(theme) },
                     )
-                    if (!prefs.darkTheme.isDarkTheme && prefs.darkTheme != ColorTheme.Angus) {
+                    if (!prefs.darkTheme.isDarkTheme) {
                         WarningText(stringResource(Res.string.settings_theme_warning_light_in_dark))
                     }
                 }

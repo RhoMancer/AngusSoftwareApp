@@ -12,14 +12,22 @@ steps:
         echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
         echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
       - chmod +x gradlew
-      # Clear stale gradle lock from previous failed builds
-      - rm -f /root/.gradle/caches/journal-1/journal-1.lock
       # Build Wasm distribution
       - ./gradlew --no-daemon :composeApp:wasmJsBrowserDistribution
-      # Prepare gh-pages content
+      # Prepare gh-pages content + cache-bust script tags
       - |
         touch composeApp/build/dist/wasmJs/productionExecutable/.nojekyll
         cp -r static/. composeApp/build/dist/wasmJs/productionExecutable/
+        # Write version.txt from gradle.properties into build output
+        APP_VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)
+        echo -n "$APP_VERSION" > composeApp/build/dist/wasmJs/productionExecutable/version.txt
+        # Add cache-busting query param to script/css tags so CDN serves fresh content
+        export BUILD_TS=$(date -u +%s)
+        INDEX=composeApp/build/dist/wasmJs/productionExecutable/index.html
+        sed -i "s|composeApp.js|composeApp.js?v=$BUILD_TS|g" "$INDEX"
+        sed -i "s|network.js|network.js?v=$BUILD_TS|g" "$INDEX"
+        sed -i "s|installPrompt.js|installPrompt.js?v=$BUILD_TS|g" "$INDEX"
+        sed -i "s|styles.css|styles.css?v=$BUILD_TS|g" "$INDEX"
       # Deploy to gh-pages branch
       - |
         cd composeApp/build/dist/wasmJs/productionExecutable

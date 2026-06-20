@@ -1,7 +1,9 @@
 package dev.angussoftware.app
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -10,6 +12,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.window.ComposeViewport
 import com.angussoftware.theming.compose.ui.theme.AngusTheme
 import com.angussoftware.theming.compose.ui.theme.ColorTheme
+import com.angussoftware.theming.compose.ui.theme.ThemeMode
 import com.angussoftware.theming.compose.ui.theme.initializeThemeMode
 import dev.angussoftware.app.installprompt.DefaultInstallPromptPlatform
 import dev.angussoftware.app.installprompt.InstallPromptController
@@ -24,41 +27,32 @@ internal fun main() {
         val themeState = rememberAppThemeState()
         initializeThemeMode(themeState.prefs.themeMode)
 
-        val activeTheme = themeState.activeColorTheme
-        if (activeTheme == ColorTheme.Angus) {
-            AngusTheme {
-                val uriHandler = LocalUriHandler.current
-                val controller = remember {
-                    val platform = DefaultInstallPromptPlatform { url ->
-                        uriHandler.openUri(url)
-                    }
-                    InstallPromptController(platform).also { it.initialize() }
-                }
-
-                Box(modifier = Modifier.fillMaxSize()) {
-                    AngusSoftwareAppScreen()
-                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                        InstallPromptHost(controller)
-                    }
-                }
-            }
+        val activeTheme = if (themeState.prefs.themeMode == ThemeMode.SYSTEM) {
+            val isDark = isSystemInDarkTheme()
+            if (isDark) themeState.prefs.darkTheme else themeState.prefs.lightTheme
         } else {
-            AngusTheme(colorTheme = activeTheme) {
-                val uriHandler = LocalUriHandler.current
-                val controller = remember {
-                    val platform = DefaultInstallPromptPlatform { url ->
-                        uriHandler.openUri(url)
-                    }
-                    InstallPromptController(platform).also { it.initialize() }
-                }
+            themeState.activeColorTheme
+        }
+        AngusTheme(colorTheme = activeTheme) {
+            AppContent()
+        }
+    }
+}
 
-                Box(modifier = Modifier.fillMaxSize()) {
-                    AngusSoftwareAppScreen()
-                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                        InstallPromptHost(controller)
-                    }
-                }
-            }
+@Composable
+private fun AppContent() {
+    val uriHandler = LocalUriHandler.current
+    val controller = remember {
+        val platform = DefaultInstallPromptPlatform { url ->
+            uriHandler.openUri(url)
+        }
+        InstallPromptController(platform).also { it.initialize() }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AngusSoftwareAppScreen()
+        Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+            InstallPromptHost(controller)
         }
     }
 }

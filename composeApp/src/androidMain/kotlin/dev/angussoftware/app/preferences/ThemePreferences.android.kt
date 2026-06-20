@@ -17,24 +17,16 @@ private const val KEY_DARK = "dark_theme"
 
 actual fun loadThemePreferences(): ThemePreferences {
     if (!::appContext.isInitialized) return ThemePreferences()
-
     val prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     return ThemePreferences(
-        themeMode = runCatching {
-            ThemeMode.valueOf(prefs.getString(KEY_MODE, ThemeMode.SYSTEM.name)!!)
-        }.getOrDefault(ThemeMode.SYSTEM),
-        lightTheme = runCatching {
-            ColorTheme.valueOf(prefs.getString(KEY_LIGHT, ColorTheme.Angus.name)!!)
-        }.getOrDefault(ColorTheme.Angus),
-        darkTheme = runCatching {
-            ColorTheme.valueOf(prefs.getString(KEY_DARK, ColorTheme.Angus.name)!!)
-        }.getOrDefault(ColorTheme.Angus),
+        themeMode = runCatching { ThemeMode.valueOf(prefs.getString(KEY_MODE, ThemeMode.SYSTEM.name)!!) }.getOrDefault(ThemeMode.SYSTEM),
+        lightTheme = runCatching { ColorTheme.valueOf(prefs.getString(KEY_LIGHT, ColorTheme.Angus.name)!!) }.getOrDefault(ColorTheme.Angus),
+        darkTheme = runCatching { ColorTheme.valueOf(prefs.getString(KEY_DARK, ColorTheme.Angus.name)!!) }.getOrDefault(ColorTheme.Angus),
     )
 }
 
 actual fun saveThemePreferences(prefs: ThemePreferences) {
     if (!::appContext.isInitialized) return
-
     appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         .edit()
         .putString(KEY_MODE, prefs.themeMode.name)
