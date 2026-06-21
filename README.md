@@ -10,6 +10,26 @@ Angus Software application for showcasing my portfolio and hosting my blog.
 - Live demo: https://rhomancer.github.io/AngusSoftwareApp/
 - Google Play listing: Available on Internal Testing track
 
+## Internationalization
+
+The app supports 14 languages (~68% of world population). The browser/device locale is automatically detected.
+
+| Language | Code | | Language | Code |
+|----------|------|-|----------|------|
+| English | `en` | | Italian | `it` |
+| German | `de` | | Russian | `ru` |
+| Spanish | `es` | | Hindi | `hi` |
+| French | `fr` | | Arabic | `ar` |
+| Portuguese | `pt` | | Turkish | `tr` |
+| Japanese | `ja` | | Dutch | `nl` |
+| Chinese | `zh` | | Korean | `ko` |
+
+### Adding a new language
+
+1. Copy `composeResources/values/strings.xml` to `composeResources/values-<lang>/strings.xml`
+2. Translate the values (keep `name` attributes identical)
+3. Rebuild — translations are compiled into the app at build time
+
 ## Quick start
 
 Prerequisites
