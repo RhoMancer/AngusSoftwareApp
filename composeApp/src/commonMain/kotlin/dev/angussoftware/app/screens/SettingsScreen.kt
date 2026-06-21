@@ -160,7 +160,7 @@ private fun ThemeDropdown(
     onSelect: (ColorTheme) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val selectedName = allThemes.find { it.first == selected }?.second ?: "Angus"
+    val selectedName = allThemes.find { it.first == selected }?.second ?: allThemes.first().second
 
     Box {
         OutlinedButton(
