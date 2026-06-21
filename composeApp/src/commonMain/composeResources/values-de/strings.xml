@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Navigation labels -->
+    <string name="nav_home">Startseite</string>
+    <string name="nav_projects">Projekte</string>
+    <string name="nav_blog">Blog</string>
+    <string name="nav_settings">Einstellungen</string>
+
+    <!-- Home screen: Hero -->
+    <string name="home_name">Angus Software</string>
+    <string name="home_title">(Pro) Softwareentwickler</string>
+    <string name="home_tagline">Software täglich geschrieben, für Spaß und Wachstum</string>
+
+    <!-- Home screen: About -->
+    <string name="home_about_pro_title">Berufserfahrung</string>
+    <string name="home_skills_title">Kernkompetenzen</string>
+    <string name="home_about_per_title">Persönlich</string>
+
+    <!-- Home screen: Skills list -->
+    <string name="home_skill_android">Android</string>
+    <string name="home_skill_javascript">JavaScript</string>
+    <string name="home_skill_react">React</string>
+    <string name="home_skill_nodejs">Node.js</string>
+    <string name="home_skill_uiux">UI/UX</string>
+    <string name="home_skill_git">Git</string>
+    <string name="home_skill_cicd">CI/CD</string>
+
+    <!-- Home screen: Contact -->
+    <string name="home_contact_title">Kontaktinformationen</string>
+    <string name="home_contact_email_label">E-Mail</string>
+    <string name="home_contact_location_label">Standort</string>
+    <string name="home_contact_location_value">Chicago, IL</string>
+    <string name="home_connect_with_me">Vernetzen Sie sich mit mir</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_appearance">Erscheinungsbild</string>
+    <string name="settings_theme_mode">Designmodus</string>
+    <string name="settings_theme_mode_system">System</string>
+    <string name="settings_theme_mode_light">Hell</string>
+    <string name="settings_theme_mode_dark">Dunkel</string>
+    <string name="settings_light_theme">Helle Farben</string>
+    <string name="settings_dark_theme">Dunkle Farben</string>
+    <string name="settings_theme_warning_dark_in_light">Dies ist ein dunkles Design — es könnte im hellen Modus falsch aussehen</string>
+    <string name="settings_theme_warning_light_in_dark">Dies ist ein helles Design — es könnte im dunklen Modus falsch aussehen</string>
+
+    <!-- Blog screen -->
+    <string name="blog_title">Rhoman¢er's Blog</string>
+    <string name="blog_loading">Beiträge werden geladen...</string>
+    <string name="blog_empty">Es gibt keine neuen Beiträge zum Anzeigen.</string>
+    <string name="blog_load_more">Weitere Beiträge laden</string>
+
+    <!-- Common UI strings -->
+    <string name="ui_back">Zurück</string>
+    <string name="ui_open">Öffnen</string>
+    <string name="ui_open_in_browser">Im Browser öffnen</string>
+    <string name="ui_previous">Zurück</string>
+    <string name="ui_next">Weiter</string>
+    <string name="ui_loading">Wird geladen...</string>
+    <string name="ui_image_placeholder">Bildplatzhalter</string>
+    <string name="ui_profile_image">Profilbild</string>
+
+    <!-- Blog post states -->
+    <string name="blog_post_not_found">Beitrag nicht gefunden</string>
+
+    <!-- Projects: Temperlux -->
+    <string name="project_temperlux_subtitle">Helligkeitsregelung für externe und interne Displays</string>
+    <string name="project_temperlux_desc">Ein Helligkeitsregler für externe (DDC/CI) und interne (Hintergrundbeleuchtung) Displays, geschrieben in Rust mit GTK4/Libadwaita. Bietet pro-Display-Schieberegler, Synchronisierungsmodi, Zeitplanung und 16 Farbdesigns. Verfügbar auf crates.io und GitHub.</string>
+</resources>
