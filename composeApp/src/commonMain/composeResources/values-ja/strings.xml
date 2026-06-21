@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Navigation labels -->
+    <string name="nav_home">ホーム</string>
+    <string name="nav_projects">プロジェクト</string>
+    <string name="nav_blog">ブログ</string>
+    <string name="nav_settings">設定</string>
+
+    <!-- Home screen: Hero -->
+    <string name="home_name">Angus Software</string>
+    <string name="home_title">（プロ）ソフトウェア開発者</string>
+    <string name="home_tagline">楽しみと成長のために毎日ソフトウェアを書く</string>
+
+    <!-- Home screen: About -->
+    <string name="home_about_pro_title">職務経験</string>
+    <string name="home_skills_title">主要スキル</string>
+    <string name="home_about_per_title">個人的なこと</string>
+
+    <!-- Home screen: Skills list -->
+    <string name="home_skill_android">Android</string>
+    <string name="home_skill_javascript">JavaScript</string>
+    <string name="home_skill_react">React</string>
+    <string name="home_skill_nodejs">Node.js</string>
+    <string name="home_skill_uiux">UI/UX</string>
+    <string name="home_skill_git">Git</string>
+    <string name="home_skill_cicd">CI/CD</string>
+
+    <!-- Home screen: Contact -->
+    <string name="home_contact_title">連絡先情報</string>
+    <string name="home_contact_email_label">メール</string>
+    <string name="home_contact_location_label">所在地</string>
+    <string name="home_connect_with_me">つながりましょう</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">設定</string>
+    <string name="settings_appearance">外観</string>
+    <string name="settings_theme_mode">テーマモード</string>
+    <string name="settings_theme_mode_system">システム</string>
+    <string name="settings_theme_mode_light">ライト</string>
+    <string name="settings_theme_mode_dark">ダーク</string>
+    <string name="settings_light_theme">ライトカラー</string>
+    <string name="settings_dark_theme">ダークカラー</string>
+    <string name="settings_theme_warning_dark_in_light">これはダークテーマです — ライトモードでは正しく表示されない場合があります</string>
+    <string name="settings_theme_warning_light_in_dark">これはライトテーマです — ダークモードでは正しく表示されない場合があります</string>
+
+    <!-- Blog screen -->
+    <string name="blog_loading">投稿を読み込み中...</string>
+    <string name="blog_empty">表示する新しい投稿はありません。</string>
+    <string name="blog_load_more">さらに投稿を読み込む</string>
+
+    <!-- Common UI strings -->
+    <string name="ui_back">戻る</string>
+    <string name="ui_open">開く</string>
+    <string name="ui_open_in_browser">ブラウザで開く</string>
+    <string name="ui_previous">前へ</string>
+    <string name="ui_next">次へ</string>
+    <string name="ui_loading">読み込み中...</string>
+    <string name="ui_image_placeholder">画像プレースホルダー</string>
+    <string name="ui_profile_image">プロフィール画像</string>
+
+    <!-- Blog post states -->
+    <string name="blog_post_not_found">投稿が見つかりません</string>
+
+    <!-- Projects -->
+    <string name="project_temperlux_subtitle">外部・内部ディスプレイの明るさコントローラー</string>
+    <string name="project_temperlux_desc">外部（DDC/CI）および内部（バックライト）ディスプレイの明るさコントローラー。RustとGTK4/Libadwaitaで作成。ディスプレイごとのスライダー、同期モード、スケジューリング、16色テーマを備えています。crates.ioとGitHubで利用可能。</string>
+</resources>
