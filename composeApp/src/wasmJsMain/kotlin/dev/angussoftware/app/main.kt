@@ -20,9 +20,15 @@ import dev.angussoftware.app.installprompt.InstallPromptHost
 import dev.angussoftware.app.screens.AngusSoftwareAppScreen
 import dev.angussoftware.app.theme.rememberAppThemeState
 import kotlinx.browser.document
+import kotlinx.browser.window
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal fun main() {
+    // Read browser locale and set it so Compose resources resolve correctly
+    val browserLang = window.navigator.language ?: "en"
+    val shortLang = browserLang.split("-_")[0]
+    setupLocale(shortLang)
+
     ComposeViewport(document.body!!) {
         val themeState = rememberAppThemeState()
         initializeThemeMode(themeState.prefs.themeMode)
