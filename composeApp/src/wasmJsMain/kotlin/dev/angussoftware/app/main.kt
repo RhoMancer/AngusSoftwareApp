@@ -17,6 +17,7 @@ import com.angussoftware.theming.compose.ui.theme.initializeThemeMode
 import dev.angussoftware.app.installprompt.DefaultInstallPromptPlatform
 import dev.angussoftware.app.installprompt.InstallPromptController
 import dev.angussoftware.app.installprompt.InstallPromptHost
+import dev.angussoftware.app.i18n.setupLocale
 import dev.angussoftware.app.screens.AngusSoftwareAppScreen
 import dev.angussoftware.app.theme.rememberAppThemeState
 import kotlinx.browser.document
