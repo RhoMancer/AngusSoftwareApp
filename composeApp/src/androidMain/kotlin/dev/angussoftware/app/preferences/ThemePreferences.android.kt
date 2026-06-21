@@ -18,10 +18,14 @@ private const val KEY_DARK = "dark_theme"
 actual fun loadThemePreferences(): ThemePreferences {
     if (!::appContext.isInitialized) return ThemePreferences()
     val prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    val lightRaw = prefs.getString(KEY_LIGHT, null)
+    val darkRaw = prefs.getString(KEY_DARK, null)
+    val lightParsed = runCatching { ColorTheme.valueOf(lightRaw ?: "") }.getOrNull()
+    val darkParsed = runCatching { ColorTheme.valueOf(darkRaw ?: "") }.getOrNull()
     return ThemePreferences(
         themeMode = runCatching { ThemeMode.valueOf(prefs.getString(KEY_MODE, ThemeMode.SYSTEM.name)!!) }.getOrDefault(ThemeMode.SYSTEM),
-        lightTheme = runCatching { ColorTheme.valueOf(prefs.getString(KEY_LIGHT, ColorTheme.Angus.name)!!) }.getOrDefault(ColorTheme.Angus),
-        darkTheme = runCatching { ColorTheme.valueOf(prefs.getString(KEY_DARK, ColorTheme.Angus.name)!!) }.getOrDefault(ColorTheme.Angus),
+        lightTheme = when (lightParsed) { null, ColorTheme.Angus -> ColorTheme.AngusLight; else -> lightParsed },
+        darkTheme = when (darkParsed) { null, ColorTheme.Angus -> ColorTheme.AngusDark; else -> darkParsed },
     )
 }
 

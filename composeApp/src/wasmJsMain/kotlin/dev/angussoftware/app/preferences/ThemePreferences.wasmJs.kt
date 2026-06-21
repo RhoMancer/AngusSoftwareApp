@@ -12,14 +12,30 @@ private fun safeGetItem(key: String): String? = try {
     window.localStorage.getItem(key)
 } catch (e: Throwable) { null }
 
+private fun parseLightTheme(raw: String?): ColorTheme {
+    val parsed = runCatching { ColorTheme.valueOf(raw ?: "") }.getOrNull()
+    return when (parsed) {
+        null, ColorTheme.Angus -> ColorTheme.AngusLight
+        else -> parsed
+    }
+}
+
+private fun parseDarkTheme(raw: String?): ColorTheme {
+    val parsed = runCatching { ColorTheme.valueOf(raw ?: "") }.getOrNull()
+    return when (parsed) {
+        null, ColorTheme.Angus -> ColorTheme.AngusDark
+        else -> parsed
+    }
+}
+
 actual fun loadThemePreferences(): ThemePreferences {
     val mode = safeGetItem(KEY_MODE)
     val light = safeGetItem(KEY_LIGHT)
     val dark = safeGetItem(KEY_DARK)
     return ThemePreferences(
         themeMode = runCatching { ThemeMode.valueOf(mode ?: ThemeMode.SYSTEM.name) }.getOrDefault(ThemeMode.SYSTEM),
-        lightTheme = runCatching { ColorTheme.valueOf(light ?: ColorTheme.Angus.name) }.getOrDefault(ColorTheme.Angus),
-        darkTheme = runCatching { ColorTheme.valueOf(dark ?: ColorTheme.Angus.name) }.getOrDefault(ColorTheme.Angus),
+        lightTheme = parseLightTheme(light),
+        darkTheme = parseDarkTheme(dark),
     )
 }
 
