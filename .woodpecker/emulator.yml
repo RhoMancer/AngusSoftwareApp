@@ -41,21 +41,21 @@ steps:
         sleep 2
         $ANDROID_HOME/emulator/emulator -avd test -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -memory 4096 -no-snapshot -no-metrics -partition-size 4096 -read-only &
         $ANDROID_HOME/platform-tools/adb wait-for-device
-        timeout 180 $ANDROID_HOME/platform-tools/adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done' || (echo "Emulator boot timeout!" && exit 1)
+        timeout 180 $ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed | grep -q 1 || (echo "Emulator boot timeout" && exit 1)
         sleep 5
       - chmod +x gradlew
       - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest :composeApp:androidConnectedTestCoverageReport
       - |
         echo "Polling for staged kover XML"
         i=0
-        while [ $i -lt 90 ]; do
-          if [ -f /shared/kover/$CI_COMMIT_SHA/report.xml ]; then
+        while [ $$i -lt 90 ]; do
+          if [ -f /shared/kover/$$CI_COMMIT_SHA/report.xml ]; then
             echo "Found kover XML"
             mkdir -p composeApp/build/reports/kover
-            cp /shared/kover/$CI_COMMIT_SHA/report.xml composeApp/build/reports/kover/report.xml
+            cp /shared/kover/$$CI_COMMIT_SHA/report.xml composeApp/build/reports/kover/report.xml
             break
           fi
-          i=$((i + 1))
+          i=$$((i + 1))
           sleep 10
         done
       - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport || true
