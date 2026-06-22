@@ -119,6 +119,23 @@ internal class RssParserTest {
     // === Atom-style link href fallback ===
 
     @Test
+    internal fun fallsBackToHttpGuidAsUrlWhenNoLink() {
+        val xml =
+            """
+            <rss><channel>
+              <item>
+                <title>HTTP Guid</title>
+                <guid>http://example.com/insecure-guid</guid>
+              </item>
+            </channel></rss>
+            """.trimIndent()
+
+        val posts = RssParser.parse(xml)
+        assertEquals(1, posts.size)
+        assertEquals("http://example.com/insecure-guid", posts.first().url)
+    }
+
+    @Test
     internal fun fallsBackToAtomLinkHref() {
         val xml =
             """
