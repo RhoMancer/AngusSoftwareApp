@@ -1,0 +1,12 @@
+version: 0.1
+lint:
+  definitions:
+    - name: shellcheck
+      ignore:
+        - gradlew
+    - name: markdownlint
+      ignore:
+        - README.md
+    - name: yamllint
+      ignore:
+        - .github/workflows/vibecheck.yml
