@@ -11,7 +11,7 @@ steps:
       ANDROID_SDK_ROOT: /opt/android-sdk
       ANDROID_AVD_HOME: /root/.android/avd
       GRADLE_USER_HOME: /root/.gradle
-      DISPLAY: :99
+      DISPLAY: ":99"
     commands:
       - |
         export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
@@ -47,12 +47,45 @@ steps:
         $ANDROID_HOME/platform-tools/adb wait-for-device
         timeout 180 $ANDROID_HOME/platform-tools/adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done' || (echo "Emulator boot timeout!" && exit 1)
         sleep 5
-      # Run instrumented tests
+      # Run instrumented tests + JaCoCo coverage in single invocation
       - chmod +x gradlew
-      - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest
-      # Note: test-summary.sh skipped — XML filenames with spaces/parens break awk parsing.
-      # Gradle output already shows test counts (e.g., "191 tests completed, 0 failures").
+      - |
+        TEST_EXIT=0
+        ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest :composeApp:androidConnectedTestCoverageReport || TEST_EXIT=$?
+        
+        # Poll for staged kover XML from build pipeline
+        STAGED_KOVER="/shared/kover/${CI_COMMIT_SHA}/report.xml"
+        echo "=== Polling for staged kover XML at $STAGED_KOVER ==="
+        for i in $(seq 1 90); do
+          if [ -f "$STAGED_KOVER" ]; then
+            echo "Staged kover XML available after $((i * 10))s"
+            mkdir -p composeApp/build/reports/kover
+            cp "$STAGED_KOVER" composeApp/build/reports/kover/report.xml
+            SKIP_KOVER_FLAG="-PskipKoverGen"
+            break
+          fi
+          sleep 10
+        done
+        if [ -z "$SKIP_KOVER_FLAG" ]; then
+          echo "WARNING: staged kover XML not found, will regenerate (slow)"
+        fi
+
+        # Generate unified coverage report (merges kover + jacoco)
+        ./gradlew --no-daemon -PskipJaCoCoRegen $SKIP_KOVER_FLAG :composeApp:unifiedCoverageReport || true
+        
+        # Run koverVerify against combined coverage
+        ./gradlew --no-daemon :composeApp:koverVerify || true
+
+        # Output unified coverage
+        if [ -f composeApp/build/reports/coverage/UNIFIED_COVERAGE.md ]; then
+          echo "=== Unified Coverage ==="
+          cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md
+        fi
+        
+        exit $TEST_EXIT
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
       - gradle-wrapper-angusapp:/root/.gradle/wrapper
       - android-sdk-angusapp:/opt/android-sdk
+      # Read kover XML staged by build pipeline
+      - kover-xml-angusapp:/shared/kover

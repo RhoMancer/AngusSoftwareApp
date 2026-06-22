@@ -99,9 +99,42 @@ kover {
     }
 }
 
-// Chain coverage verification to check task
+// Chain coverage verification to check task (local dev only — CI runs koverVerify
+// in the emulator pipeline after unified coverage is available)
 tasks.named("check").configure {
     dependsOn("koverVerify")
+}
+
+// unifiedCoverageReport wiring — mirrors BlocsAndMavericsKotlin pattern.
+// In CI, build pipeline stages kover XML to a shared volume; emulator pipeline
+// copies it here and runs with -PskipKoverGen to avoid re-running unit tests.
+afterEvaluate {
+    tasks.matching { it.name == "unifiedCoverageReport" }.configureEach {
+        if (!project.hasProperty("skipJaCoCoRegen")) {
+            dependsOn("androidConnectedTestCoverageReport")
+        } else {
+            doFirst {
+                val jacocoXml = layout.buildDirectory
+                    .file("reports/jacoco/androidConnectedTest/report.xml").get().asFile
+                require(jacocoXml.exists()) {
+                    "skipJaCoCoRegen=true but ${jacocoXml.absolutePath} is missing."
+                }
+                logger.lifecycle("Using pre-existing JaCoCo XML: ${jacocoXml.absolutePath}")
+            }
+        }
+        if (!project.hasProperty("skipKoverGen")) {
+            dependsOn("koverXmlReport")
+        } else {
+            doFirst {
+                val koverXml = layout.buildDirectory
+                    .file("reports/kover/report.xml").get().asFile
+                require(koverXml.exists()) {
+                    "skipKoverGen=true but ${koverXml.absolutePath} is missing."
+                }
+                logger.lifecycle("Using pre-staged Kover XML: ${koverXml.absolutePath}")
+            }
+        }
+    }
 }
 
 kotlin {
