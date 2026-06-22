@@ -24,9 +24,20 @@ steps:
         echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
         echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
       - chmod +x gradlew
-      # Run tests + Kover coverage
-      - ./gradlew --no-daemon :composeApp:testDebugUnitTest :composeApp:koverXmlReport :composeApp:koverVerify
-      # Coverage enforced by koverVerify above (single-module project, no shared/ module)
+      # Run unit tests + generate Kover XML (NO koverVerify — that runs in emulator
+      # pipeline after unified coverage with instrumented tests is available)
+      - ./gradlew --no-daemon :composeApp:testDebugUnitTest :composeApp:koverXmlReport
+      # Stage kover XML for emulator pipeline to consume
+      - |
+        if [ -f composeApp/build/reports/kover/report.xml ]; then
+          mkdir -p /shared/kover/${CI_COMMIT_SHA}
+          cp composeApp/build/reports/kover/report.xml /shared/kover/${CI_COMMIT_SHA}/report.xml
+          echo "=== Staged kover XML for emulator pipeline ==="
+          ls -la /shared/kover/${CI_COMMIT_SHA}/
+          find /shared/kover -mindepth 1 -maxdepth 1 -type d -mtime +1 -exec rm -rf {} + 2>/dev/null || true
+        else
+          echo "WARNING: kover XML not found — emulator pipeline will need to regenerate"
+        fi
     environment:
       GRADLE_USER_HOME: /root/.gradle
       ANDROID_HOME: /opt/android-sdk
@@ -34,6 +45,8 @@ steps:
       - gradle-cache-angusapp:/root/.gradle/caches
       - gradle-wrapper-angusapp:/root/.gradle/wrapper
       - android-sdk-angusapp:/opt/android-sdk
+      # Shared volume — kover XML staged here for emulator pipeline
+      - kover-xml-angusapp:/shared/kover
 
   validate-commits:
     image: alpine:latest
