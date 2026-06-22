@@ -47,18 +47,17 @@ steps:
       - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest :composeApp:androidConnectedTestCoverageReport
       - |
         echo "Polling for staged kover XML"
-        FOUND=0
-        for i in $(seq 1 90); do
+        i=0
+        while [ $i -lt 90 ]; do
           if [ -f /shared/kover/$CI_COMMIT_SHA/report.xml ]; then
             echo "Found kover XML"
             mkdir -p composeApp/build/reports/kover
             cp /shared/kover/$CI_COMMIT_SHA/report.xml composeApp/build/reports/kover/report.xml
-            FOUND=1
             break
           fi
+          i=$((i + 1))
           sleep 10
         done
-        if [ "$FOUND" = "0" ]; then echo "WARNING: kover XML not found"; fi
       - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport || true
       - ./gradlew --no-daemon :composeApp:koverVerify || true
       - cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md || true
