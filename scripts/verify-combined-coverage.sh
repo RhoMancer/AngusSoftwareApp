@@ -1,5 +1,7 @@
 #!/bin/sh
-# Parses UNIFIED_COVERAGE.md and enforces combined coverage thresholds
+# Parses UNIFIED_COVERAGE.md and enforces combined coverage thresholds.
+# Defaults: 38% lines, 53% branches (floor to prevent regressions;
+# @Composable code excluded from Kover since it can't be unit-tested).
 set -e
 REPORT="$1"
 MIN_LINES="$2"
