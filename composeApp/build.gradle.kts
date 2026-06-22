@@ -86,18 +86,9 @@ angusCoverage {
     )
 }
 
-// Kover coverage verification thresholds
-// Current: 9.5% LINE / 18.8% BRANCH — set floor just above current to prevent regressions
-kover {
-    reports {
-        verify {
-            rule("Coverage verification") {
-                minBound(15, CoverageUnit.BRANCH)
-                minBound(8, CoverageUnit.LINE)
-            }
-        }
-    }
-}
+// Kover report generation (NO verify — combined coverage verification
+// happens in CI emulator pipeline via scripts/verify-combined-coverage.sh)
+// which checks the UNIFIED_COVERAGE.md against combined unit+instrumented thresholds
 
 // Chain coverage verification to check task (local dev only — CI runs koverVerify
 // in the emulator pipeline after unified coverage is available)
