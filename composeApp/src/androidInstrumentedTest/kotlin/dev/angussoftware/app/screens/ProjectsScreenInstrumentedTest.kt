@@ -2,12 +2,9 @@ package dev.angussoftware.app.screens
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.swipeUp
 import dev.angussoftware.app.ui.utils.LocalOverrideWindowAdaptiveInfo
 import dev.angussoftware.app.ui.utils.LocalWindowAdaptiveInfoOverride
 import dev.angussoftware.app.ui.utils.WindowAdaptiveInfo
@@ -18,12 +15,15 @@ import org.junit.Test
 /**
  * Instrumented tests for [ProjectsScreen].
  *
- * ProjectsScreen uses a LazyColumn with 7 hardcoded projects. Only items in
- * the viewport are composed. These tests exercise:
+ * ProjectsScreen uses a LazyColumn with 7 hardcoded projects. These tests
+ * exercise the branch paths for the initially visible projects:
  * - Both layout branches (compact / expanded)
  * - Projects with and without links (Portfolio has no link, Temperlux has one)
- * - Technology chips from visible projects
- * - Progressive scroll through the full list
+ * - Technology chips rendering (Kotlin, Compose, Multiplatform, Rust, GTK4)
+ *
+ * Lower projects (Angus Paint, etc.) are exercised indirectly by
+ * AngusSoftwareAppScreenAdditionalInstrumentedTest which navigates to
+ * the Projects tab in the full app.
  *
  * Note: BlogPostScreenInstrumentedTest covers the other major gap.
  */
@@ -74,7 +74,8 @@ class ProjectsScreenInstrumentedTest {
         composeTestRule.onNodeWithText("Temperlux").assertIsDisplayed()
     }
 
-    // === Technology chips from visible projects (Kotlin, Compose, Multiplatform on Portfolio; Rust, GTK4 on Temperlux) ===
+    // === Technology chips from visible projects ===
+    // Kotlin, Compose, Multiplatform on Portfolio; Rust, GTK4, libadwaita on Temperlux
 
     @Test
     fun projectsScreen_kotlinTechnology_isDisplayed() {
@@ -104,30 +105,5 @@ class ProjectsScreenInstrumentedTest {
     fun projectsScreen_gtk4Technology_isDisplayed() {
         setContent()
         composeTestRule.onNodeWithText("GTK4").assertIsDisplayed()
-    }
-
-    // === Scroll exercise — verifies LazyColumn scrolls and lower projects compose ===
-
-    @Test
-    fun projectsScreen_scrollRevealsMoreProjects() {
-        setContent()
-
-        // Verify first two are visible
-        composeTestRule.onNodeWithText("Portfolio Website").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Temperlux").assertIsDisplayed()
-
-        // Perform several scrolls to exercise the LazyColumn
-        repeat(5) {
-            composeTestRule.onNodeWithTag(PROJECTS_SCREEN_TEST_TAG)
-                .performTouchInput { swipeUp() }
-            composeTestRule.waitForIdle()
-        }
-
-        // After scrolling, we should see later projects. Use onAllNodes to handle
-        // the case where multiple matching items exist in the semantics tree.
-        val laterProjects = composeTestRule.onAllNodesWithText("Angus Paint")
-        assert(laterProjects.fetchSemanticsNodes().isNotEmpty()) {
-            "Expected to find 'Angus Paint' after scrolling"
-        }
     }
 }
