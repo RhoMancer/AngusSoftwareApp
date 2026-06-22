@@ -140,10 +140,12 @@ kover {
                 )
                 // Generated resource files — not hand-written code
                 classes(
-                    "**/String0.*",
-                    "**/Drawable0.*",
-                    "**/ActualResourceCollectors.*",
-                    "**/Res.*",
+                    "**/String0*",
+                    "**/Drawable0*",
+                    "**/ActualResourceCollectors*",
+                    "**/Res",
+                    "dev.angussoftware.app.Res",
+                    "dev.angussoftware.app.Res\$*",
                 )
             }
         }
