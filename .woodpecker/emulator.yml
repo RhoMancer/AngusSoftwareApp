@@ -59,6 +59,39 @@ steps:
         done
       - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport
       - cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md
+      - echo "=== KOVER PER-FILE BREAKDOWN ==="
+      - |
+        if [ -f composeApp/build/reports/kover/report.xml ]; then
+          python3 -c "
+          import xml.etree.ElementTree as ET
+          tree = ET.parse('composeApp/build/reports/kover/report.xml')
+          for pkg in tree.findall('.//package'):
+              pkg_name = pkg.get('name','')
+              for cls in pkg.findall('class'):
+                  cls_name = cls.get('name','')
+                  source = cls.get('sourcefilename','')
+                  line_missed = 0
+                  line_covered = 0
+                  instr_missed = 0
+                  instr_covered = 0
+                  branch_missed = 0
+                  branch_covered = 0
+                  for c in cls.findall('counter'):
+                      ctype = c.get('type','')
+                      missed = int(c.get('missed','0'))
+                      covered = int(c.get('covered','0'))
+                      if ctype == 'LINE':
+                          line_missed += missed; line_covered += covered
+                      elif ctype == 'INSTRUCTION':
+                          instr_missed += missed; instr_covered += covered
+                      elif ctype == 'BRANCH':
+                          branch_missed += missed; branch_covered += covered
+                  total_lines = line_missed + line_covered
+                  if total_lines > 0:
+                      pct = 100.0 * line_covered / total_lines if total_lines > 0 else 0
+                      print(f'{source}: {line_covered}/{total_lines} lines ({pct:.0f}%), {instr_missed} instr missed, {branch_missed} branches missed')
+          "
+        fi
       - sh scripts/verify-combined-coverage.sh composeApp/build/reports/coverage/UNIFIED_COVERAGE.md 38 53
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
