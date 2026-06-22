@@ -57,9 +57,9 @@ steps:
           i=$$((i + 1))
           sleep 10
         done
-      - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport || true
-      - ./gradlew --no-daemon :composeApp:koverVerify || true
-      - cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md || true
+      - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport
+      - cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md
+      - sh scripts/verify-combined-coverage.sh composeApp/build/reports/coverage/UNIFIED_COVERAGE.md 38 60
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
       - gradle-wrapper-angusapp:/root/.gradle/wrapper
