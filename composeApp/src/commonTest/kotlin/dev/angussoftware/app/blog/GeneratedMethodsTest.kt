@@ -140,8 +140,8 @@ internal class GeneratedMethodsTest {
     @Test
     fun windowAdaptiveInfo_copy() {
         val original = WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT)
-        val copy = original.copy(sizeClass = WindowWidthSizeClass.EXPANDED)
-        assertEquals(WindowWidthSizeClass.EXPANDED, copy.sizeClass)
+        val copy = original.copy(widthSizeClass = WindowWidthSizeClass.EXPANDED)
+        assertEquals(WindowWidthSizeClass.EXPANDED, copy.widthSizeClass)
     }
 
     @Test
