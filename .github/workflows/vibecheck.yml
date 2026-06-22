@@ -29,4 +29,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           severity_threshold: "medium"
           confidence_threshold: "medium"
-          skip_issues: "true"
