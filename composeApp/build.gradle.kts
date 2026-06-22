@@ -126,6 +126,7 @@ kover {
                     "com.arkivanov", "com.arkivanov.**",
                     "app.cash.turbine", "app.cash.turbine.**",
                 )
+                annotatedBy("androidx.compose.runtime.Composable")
             }
         }
     }
