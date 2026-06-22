@@ -376,6 +376,14 @@ internal fun ContactSection(alpha: Float) {
                     platform = stringResource(Res.string.platform_protopro),
                     url = stringResource(Res.string.url_protopro),
                 )
+                SocialMediaButton(
+                    platform = stringResource(Res.string.platform_kofi),
+                    url = stringResource(Res.string.url_kofi),
+                )
+                SocialMediaButton(
+                    platform = stringResource(Res.string.platform_sponsors),
+                    url = stringResource(Res.string.url_sponsors),
+                )
             }
         }
     }
