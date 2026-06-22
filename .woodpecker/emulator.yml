@@ -13,11 +13,10 @@ steps:
       GRADLE_USER_HOME: /root/.gradle
       DISPLAY: ":99"
     commands:
-      - |
-        export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
-        mkdir -p ~/.gradle
-        echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
-        echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
+      - export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
+      - mkdir -p ~/.gradle
+      - echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
+      - echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
       - |
         if [ ! -d "$ANDROID_HOME/cmdline-tools/latest" ]; then
           mkdir -p $ANDROID_HOME/cmdline-tools
@@ -45,32 +44,24 @@ steps:
         timeout 180 $ANDROID_HOME/platform-tools/adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done' || (echo "Emulator boot timeout!" && exit 1)
         sleep 5
       - chmod +x gradlew
+      - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest :composeApp:androidConnectedTestCoverageReport
+      - echo "=== Polling for staged kover XML ==="
       - |
-        set -x
-        TEST_EXIT=0
-        ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest :composeApp:androidConnectedTestCoverageReport || TEST_EXIT=$?
-        STAGED_KOVER="/shared/kover/$CI_COMMIT_SHA/report.xml"
-        echo "Looking for staged kover XML at $STAGED_KOVER"
-        for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90; do
-          if [ -f "$STAGED_KOVER" ]; then
-            echo "Found kover XML after $((i * 10)) seconds"
+        FOUND=0
+        for i in $(seq 1 90); do
+          if [ -f /shared/kover/$CI_COMMIT_SHA/report.xml ]; then
+            echo "Found kover XML"
             mkdir -p composeApp/build/reports/kover
-            cp "$STAGED_KOVER" composeApp/build/reports/kover/report.xml
-            SKIP_FLAG="-PskipKoverGen"
+            cp /shared/kover/$CI_COMMIT_SHA/report.xml composeApp/build/reports/kover/report.xml
+            FOUND=1
             break
           fi
           sleep 10
         done
-        if [ -z "$SKIP_FLAG" ]; then
-          echo "WARNING: kover XML not found after polling, will regenerate"
-        fi
-        ./gradlew --no-daemon -PskipJaCoCoRegen $SKIP_FLAG :composeApp:unifiedCoverageReport || true
-        ./gradlew --no-daemon :composeApp:koverVerify || true
-        if [ -f composeApp/build/reports/coverage/UNIFIED_COVERAGE.md ]; then
-          echo "=== Unified Coverage ==="
-          cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md
-        fi
-        exit $TEST_EXIT
+        if [ "$FOUND" = "0" ]; then echo "WARNING: kover XML not found"; fi
+      - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport || true
+      - ./gradlew --no-daemon :composeApp:koverVerify || true
+      - cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md || true
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
       - gradle-wrapper-angusapp:/root/.gradle/wrapper
