@@ -128,6 +128,20 @@ kover {
                 )
                 annotatedBy("androidx.compose.runtime.Composable")
             }
+            // Exclude framework-generated code that tests the language, not our logic
+            excludes {
+                // compositionLocalOf { null } default lambdas — body is literally return null
+                classes(
+                    "dev.angussoftware.app.ui.utils.LocalOverrideWindowAdaptiveInfo",
+                    "dev.angussoftware.app.ui.utils.LocalWindowAdaptiveInfoOverride",
+                    "dev.angussoftware.app.navigation.LocalNavigationBarHeight",
+                )
+                // Kotlin compiler-generated enum methods (values/valueOf) never called in production
+                classes(
+                    "dev.angussoftware.app.ui.utils.WindowWidthSizeClass",
+                )
+            }
+            }
         }
     }
 }
