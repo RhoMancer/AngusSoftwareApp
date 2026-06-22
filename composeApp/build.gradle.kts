@@ -138,6 +138,13 @@ kover {
                 classes(
                     "dev.angussoftware.app.ui.utils.WindowWidthSizeClass",
                 )
+                // Generated resource files — not hand-written code
+                classes(
+                    "**/String0.*",
+                    "**/Drawable0.*",
+                    "**/ActualResourceCollectors.*",
+                    "**/Res.*",
+                )
             }
         }
     }
