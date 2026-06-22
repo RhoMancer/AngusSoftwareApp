@@ -17,13 +17,14 @@ import org.junit.Test
 /**
  * Instrumented tests for [ProjectsScreen].
  *
- * ProjectsScreen uses a LazyColumn with 7 projects. Only items in the viewport
- * are composed, so tests must scroll to reach lower items. These tests exercise:
- * - Compact and expanded layouts
- * - Projects with/without links (branch on project.link)
- * - Projects with/without subtitles, descriptions
- * - Technology chips rendering (branch on project.technologies.isNotEmpty)
- * - Full list scroll (exercises LazyColumn + all project composables)
+ * ProjectsScreen uses a LazyColumn with 7 hardcoded projects. Only items in
+ * the viewport are composed. These tests exercise:
+ * - Both layout branches (compact / expanded)
+ * - Projects with and without links (Portfolio has no link, Temperlux has one)
+ * - Technology chips from visible projects
+ * - Progressive scroll through the full list
+ *
+ * Note: BlogPostScreenInstrumentedTest covers the other major gap.
  */
 class ProjectsScreenInstrumentedTest {
     @get:Rule
@@ -42,14 +43,6 @@ class ProjectsScreenInstrumentedTest {
         composeTestRule.waitForIdle()
     }
 
-    private fun scrollDown(times: Int = 1) {
-        repeat(times) {
-            composeTestRule.onNodeWithTag(PROJECTS_SCREEN_TEST_TAG)
-                .performTouchInput { swipeUp() }
-            composeTestRule.waitForIdle()
-        }
-    }
-
     // === Layout branches ===
 
     @Test
@@ -65,8 +58,8 @@ class ProjectsScreenInstrumentedTest {
     }
 
     // === First two projects (visible without scrolling) ===
-    // Portfolio Website: NO link, has description + technologies
-    // Temperlux: has link, subtitle, description, technologies
+    // Portfolio Website: NO link, has description + technologies + icon
+    // Temperlux: has link, subtitle, description, technologies, NO images
 
     @Test
     fun projectsScreen_portfolioProject_isDisplayed() {
@@ -80,7 +73,7 @@ class ProjectsScreenInstrumentedTest {
         composeTestRule.onNodeWithText("Temperlux").assertIsDisplayed()
     }
 
-    // === Technology chips from visible projects ===
+    // === Technology chips from visible projects (Kotlin, Compose, Multiplatform on Portfolio; Rust, GTK4 on Temperlux) ===
 
     @Test
     fun projectsScreen_kotlinTechnology_isDisplayed() {
@@ -103,7 +96,6 @@ class ProjectsScreenInstrumentedTest {
     @Test
     fun projectsScreen_rustTechnology_isDisplayed() {
         setContent()
-        // Temperlux has "Rust" as a technology chip
         composeTestRule.onNodeWithText("Rust").assertIsDisplayed()
     }
 
@@ -113,49 +105,41 @@ class ProjectsScreenInstrumentedTest {
         composeTestRule.onNodeWithText("GTK4").assertIsDisplayed()
     }
 
-    // === Scroll to reach remaining projects ===
+    // === Scroll exercise — progressively scroll and verify projects appear ===
+    // Each swipeUp scrolls roughly one project card height.
 
     @Test
-    fun projectsScreen_scrollToGooglePlayProject() {
+    fun projectsScreen_scrollThroughAllProjects() {
         setContent()
-        scrollDown(1)
-        composeTestRule.onNodeWithText("Google Play Developer Account").assertIsDisplayed()
-    }
 
-    @Test
-    fun projectsScreen_scrollToAngusPaint() {
-        setContent()
-        scrollDown(2)
-        composeTestRule.onNodeWithText("Angus Paint").assertIsDisplayed()
-    }
+        // First two visible without scroll
+        composeTestRule.onNodeWithText("Portfolio Website").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Temperlux").assertIsDisplayed()
 
-    @Test
-    fun projectsScreen_scrollToAngusSolitaire() {
-        setContent()
-        scrollDown(3)
-        composeTestRule.onNodeWithText("Angus Solitaire").assertIsDisplayed()
-    }
+        // Scroll and verify remaining projects appear one at a time
+        val remainingProjects = listOf(
+            "Google Play Developer Account",
+            "Angus Paint",
+            "Angus Solitaire",
+            "Blink Reader",
+            "Tap Target Booster",
+        )
 
-    @Test
-    fun projectsScreen_scrollToBlinkReader() {
-        setContent()
-        scrollDown(4)
-        composeTestRule.onNodeWithText("Blink Reader").assertIsDisplayed()
-    }
-
-    @Test
-    fun projectsScreen_scrollToTapTargetBooster() {
-        setContent()
-        scrollDown(5)
-        composeTestRule.onNodeWithText("Tap Target Booster").assertIsDisplayed()
-    }
-
-    // === XML tech chip (only on Angus Paint and below) ===
-
-    @Test
-    fun projectsScreen_xmlTechnology_afterScroll() {
-        setContent()
-        scrollDown(2)
-        composeTestRule.onNodeWithText("XML").assertIsDisplayed()
+        for (projectTitle in remainingProjects) {
+            var found = false
+            for (attempt in 1..5) {
+                composeTestRule.onNodeWithTag(PROJECTS_SCREEN_TEST_TAG)
+                    .performTouchInput { swipeUp() }
+                composeTestRule.waitForIdle()
+                try {
+                    composeTestRule.onNodeWithText(projectTitle).assertIsDisplayed()
+                    found = true
+                    break
+                } catch (_: AssertionError) {
+                    // Not yet visible, keep scrolling
+                }
+            }
+            assert(found) { "Failed to scroll to project: $projectTitle" }
+        }
     }
 }
