@@ -1,7 +1,5 @@
 package dev.angussoftware.app.blog
 
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -10,18 +8,28 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 internal class BlogViewModelTest {
+    private val testPosts = listOf(
+        BlogPost(id = "1", title = "First", url = "https://example.com/1", pubDate = null, summary = null, imageUrl = null, content = null),
+        BlogPost(id = "2", title = "Second", url = "https://example.com/2", pubDate = null, summary = null, imageUrl = null, content = null),
+    )
+
     private fun makeViewModel(
         posts: List<BlogPost> = emptyList(),
         throwOnFetch: Throwable? = null,
-        testScope: TestScope,
+        testScope: kotlinx.coroutines.test.TestScope,
     ): BlogViewModel {
         val repo = if (throwOnFetch != null) {
-            BlogRepository(
-                feedUrl = "https://test.example.com/feed.xml",
+            // Subclass BlogRepository to throw from fetchPosts — the real repo
+            // catches exceptions internally and returns emptyList(), so we need
+            // to override at the repo level to test BlogViewModel's catch block.
+            object : BlogRepository(
+                feedUrl = "unused",
                 networkClient = object : NetworkClient {
-                    override suspend fun fetchUrlText(url: String): String = throw throwOnFetch
+                    override suspend fun fetchUrlText(url: String): String = ""
                 },
-            )
+            ) {
+                override suspend fun fetchPosts(limit: Int): List<BlogPost> = throw throwOnFetch
+            }
         } else {
             BlogRepository(
                 feedUrl = "https://test.example.com/feed.xml",
@@ -40,15 +48,9 @@ internal class BlogViewModelTest {
         )
     }
 
-    private val testPosts = listOf(
-        BlogPost(id = "1", title = "First", url = "https://example.com/1", pubDate = null, summary = null, imageUrl = null, content = null),
-        BlogPost(id = "2", title = "Second", url = "https://example.com/2", pubDate = null, summary = null, imageUrl = null, content = null),
-    )
-
     @Test
     fun initialState_isLoading() = runTest {
         val vm = makeViewModel(testPosts, testScope = this)
-        // Before advancing, state should be Loading (init calls fetchPosts but coroutine hasn't run)
         assertTrue(vm.uiState.value is BlogUiState.Loading)
     }
 
@@ -104,7 +106,6 @@ internal class BlogViewModelTest {
     @Test
     fun getPostByIndex_whenLoading_returnsNull() = runTest {
         val vm = makeViewModel(testPosts, testScope = this)
-        // Don't advance — still in Loading state
         assertNull(vm.getPostByIndex(0))
     }
 
@@ -118,7 +119,6 @@ internal class BlogViewModelTest {
     @Test
     fun getPosts_whenLoading_returnsEmpty() = runTest {
         val vm = makeViewModel(testPosts, testScope = this)
-        // Don't advance — still in Loading state
         assertTrue(vm.getPosts().isEmpty())
     }
 
@@ -132,22 +132,24 @@ internal class BlogViewModelTest {
     @Test
     fun fetchPosts_calledOnce_doesNotRefetch() = runTest {
         val fetchCount = intArrayOf(0)
-        val repo = BlogRepository(
-            feedUrl = "https://test.example.com/feed.xml",
+        val repo = object : BlogRepository(
+            feedUrl = "unused",
             networkClient = object : NetworkClient {
-                override suspend fun fetchUrlText(url: String): String {
-                    fetchCount[0]++
-                    return "<rss><channel><item><title>A</title><link>https://x.com/a</link></item></channel></rss>"
-                }
+                override suspend fun fetchUrlText(url: String): String = ""
             },
-        )
+        ) {
+            override suspend fun fetchPosts(limit: Int): List<BlogPost> {
+                fetchCount[0]++
+                return listOf(BlogPost(id = "1", title = "A", url = "https://x.com/a", pubDate = null, summary = null, imageUrl = null, content = null))
+            }
+        }
         val vm = BlogViewModel(
             feedUrl = "https://test.example.com/feed.xml",
             repository = repo,
             scope = this,
         )
         advanceUntilIdle()
-        vm.fetchPosts() // second call — should be no-op
+        vm.fetchPosts()
         advanceUntilIdle()
         assertEquals(1, fetchCount[0])
     }
