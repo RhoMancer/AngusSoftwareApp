@@ -45,8 +45,8 @@ steps:
         sleep 5
       - chmod +x gradlew
       - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest :composeApp:androidConnectedTestCoverageReport
-      - echo "=== Polling for staged kover XML ==="
       - |
+        echo "Polling for staged kover XML"
         FOUND=0
         for i in $(seq 1 90); do
           if [ -f /shared/kover/$CI_COMMIT_SHA/report.xml ]; then
