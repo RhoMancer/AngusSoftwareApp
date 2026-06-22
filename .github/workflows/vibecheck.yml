@@ -19,12 +19,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
 
       - name: Run vibeCheck
-        uses: WolffM/vibecheck@main
+        uses: WolffM/vibecheck@14bd86a322106fa499e30d89b6df8bf7cc0435d3 # main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           severity_threshold: medium
