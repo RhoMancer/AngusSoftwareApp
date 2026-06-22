@@ -25,6 +25,24 @@ kover {
     merge {
         subprojects()
     }
+    reports {
+        filters {
+            excludes {
+                // Generated resource files — not hand-written code
+                classes(
+                    "angussoftwareapp.composeapp.generated.resources.String0",
+                    "angussoftwareapp.composeapp.generated.resources.String0\$*",
+                    "angussoftwareapp.composeapp.generated.resources.Drawable0",
+                    "angussoftwareapp.composeapp.generated.resources.Drawable0\$*",
+                    "angussoftwareapp.composeapp.generated.resources.Res",
+                    "angussoftwareapp.composeapp.generated.resources.Res\$*",
+                )
+                packages(
+                    "angussoftwareapp.composeapp.generated.resources",
+                )
+            }
+        }
+    }
 }
 
 // --- Version bump utilities (file-driven) ---
