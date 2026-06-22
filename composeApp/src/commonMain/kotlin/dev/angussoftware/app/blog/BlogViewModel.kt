@@ -3,6 +3,7 @@ package dev.angussoftware.app.blog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.angussoftware.app.navigation.RSS_FEED_URL
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +18,7 @@ internal sealed class BlogUiState {
 internal class BlogViewModel(
     private val feedUrl: String = RSS_FEED_URL,
     private val repository: BlogRepository = BlogRepository(feedUrl),
+    private val scope: CoroutineScope? = null,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<BlogUiState>(BlogUiState.Loading)
     val uiState: StateFlow<BlogUiState> = _uiState.asStateFlow()
@@ -31,7 +33,8 @@ internal class BlogViewModel(
         if (fetchStarted) return
         fetchStarted = true
 
-        viewModelScope.launch {
+        val s = scope ?: viewModelScope
+        s.launch {
             _uiState.value = BlogUiState.Loading
             try {
                 val posts = repository.fetchPosts(limit = Int.MAX_VALUE)
