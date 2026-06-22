@@ -2,9 +2,9 @@ name: Instrumented Tests
 
 on:
   pull_request:
-    branches: [develop, master]
+    branches: [master]
   push:
-    branches: [develop, master]
+    branches: [master]
 
 permissions:
   contents: read
