@@ -17,19 +17,13 @@ import org.junit.Test
 /**
  * Instrumented tests for [ProjectsScreen].
  *
- * ProjectsScreen hardcodes 7 projects with varying optional fields:
- * - Portfolio Website: has description + technologies, NO link, NO images, has icon
- * - Temperlux: has subtitle + description + link + technologies, NO images
- * - Google Play Developer Account: has link + icon only, NO description/images/tech
- * - Angus Paint: has all fields including 7 images
- * - Angus Solitaire: has all fields including 3 images
- * - Blink Reader: has all fields including 3 images
- * - Tap Target Booster: has all fields including 4 images
- *
- * These tests verify that projects with different field combinations render correctly,
- * exercising all conditional branches in the composable. Uses assertExists for items
- * that may be off-screen in the LazyColumn (JaCoCo still counts them as covered when
- * the composable executes, even if not displayed).
+ * ProjectsScreen uses a LazyColumn with 7 projects. Only items in the viewport
+ * are composed, so tests must scroll to reach lower items. These tests exercise:
+ * - Compact and expanded layouts
+ * - Projects with/without links (branch on project.link)
+ * - Projects with/without subtitles, descriptions
+ * - Technology chips rendering (branch on project.technologies.isNotEmpty)
+ * - Full list scroll (exercises LazyColumn + all project composables)
  */
 class ProjectsScreenInstrumentedTest {
     @get:Rule
@@ -48,11 +42,15 @@ class ProjectsScreenInstrumentedTest {
         composeTestRule.waitForIdle()
     }
 
-    private fun scrollDown() {
-        composeTestRule.onNodeWithTag(PROJECTS_SCREEN_TEST_TAG)
-            .performTouchInput { swipeUp() }
-        composeTestRule.waitForIdle()
+    private fun scrollDown(times: Int = 1) {
+        repeat(times) {
+            composeTestRule.onNodeWithTag(PROJECTS_SCREEN_TEST_TAG)
+                .performTouchInput { swipeUp() }
+            composeTestRule.waitForIdle()
+        }
     }
+
+    // === Layout branches ===
 
     @Test
     fun projectsScreen_compactLayout_isDisplayed() {
@@ -66,7 +64,9 @@ class ProjectsScreenInstrumentedTest {
         composeTestRule.onNodeWithTag(PROJECTS_SCREEN_TEST_TAG).assertIsDisplayed()
     }
 
-    // === Projects visible at top of LazyColumn ===
+    // === First two projects (visible without scrolling) ===
+    // Portfolio Website: NO link, has description + technologies
+    // Temperlux: has link, subtitle, description, technologies
 
     @Test
     fun projectsScreen_portfolioProject_isDisplayed() {
@@ -80,39 +80,7 @@ class ProjectsScreenInstrumentedTest {
         composeTestRule.onNodeWithText("Temperlux").assertIsDisplayed()
     }
 
-    // === Projects requiring scroll (use assertExists — still exercises composable code) ===
-
-    @Test
-    fun projectsScreen_googlePlayProject_exists() {
-        setContent()
-        composeTestRule.onNodeWithText("Google Play Developer Account").assertExists()
-    }
-
-    @Test
-    fun projectsScreen_angusPaintProject_exists() {
-        setContent()
-        composeTestRule.onNodeWithText("Angus Paint").assertExists()
-    }
-
-    @Test
-    fun projectsScreen_angusSolitaireProject_exists() {
-        setContent()
-        composeTestRule.onNodeWithText("Angus Solitaire").assertExists()
-    }
-
-    @Test
-    fun projectsScreen_blinkReaderProject_exists() {
-        setContent()
-        composeTestRule.onNodeWithText("Blink Reader").assertExists()
-    }
-
-    @Test
-    fun projectsScreen_tapTargetBoosterProject_exists() {
-        setContent()
-        composeTestRule.onNodeWithText("Tap Target Booster").assertExists()
-    }
-
-    // === Technology chips (branch: project.technologies.isNotEmpty()) ===
+    // === Technology chips from visible projects ===
 
     @Test
     fun projectsScreen_kotlinTechnology_isDisplayed() {
@@ -133,34 +101,61 @@ class ProjectsScreenInstrumentedTest {
     }
 
     @Test
-    fun projectsScreen_rustTechnology_exists() {
+    fun projectsScreen_rustTechnology_isDisplayed() {
         setContent()
-        composeTestRule.onNodeWithText("Rust").assertExists()
+        // Temperlux has "Rust" as a technology chip
+        composeTestRule.onNodeWithText("Rust").assertIsDisplayed()
     }
 
     @Test
-    fun projectsScreen_gtk4Technology_exists() {
+    fun projectsScreen_gtk4Technology_isDisplayed() {
         setContent()
-        composeTestRule.onNodeWithText("GTK4").assertExists()
+        composeTestRule.onNodeWithText("GTK4").assertIsDisplayed()
+    }
+
+    // === Scroll to reach remaining projects ===
+
+    @Test
+    fun projectsScreen_scrollToGooglePlayProject() {
+        setContent()
+        scrollDown(1)
+        composeTestRule.onNodeWithText("Google Play Developer Account").assertIsDisplayed()
     }
 
     @Test
-    fun projectsScreen_xmlTechnology_exists() {
+    fun projectsScreen_scrollToAngusPaint() {
         setContent()
-        composeTestRule.onNodeWithText("XML").assertExists()
+        scrollDown(2)
+        composeTestRule.onNodeWithText("Angus Paint").assertIsDisplayed()
     }
 
-    // === Scroll exercise (exercises LazyColumn + page indicator dots) ===
+    @Test
+    fun projectsScreen_scrollToAngusSolitaire() {
+        setContent()
+        scrollDown(3)
+        composeTestRule.onNodeWithText("Angus Solitaire").assertIsDisplayed()
+    }
 
     @Test
-    fun projectsScreen_scrollRevealsMoreProjects() {
+    fun projectsScreen_scrollToBlinkReader() {
         setContent()
+        scrollDown(4)
+        composeTestRule.onNodeWithText("Blink Reader").assertIsDisplayed()
+    }
 
-        composeTestRule.onNodeWithText("Portfolio Website").assertIsDisplayed()
+    @Test
+    fun projectsScreen_scrollToTapTargetBooster() {
+        setContent()
+        scrollDown(5)
+        composeTestRule.onNodeWithText("Tap Target Booster").assertIsDisplayed()
+    }
 
-        scrollDown()
-        scrollDown()
+    // === XML tech chip (only on Angus Paint and below) ===
 
-        composeTestRule.onNodeWithText("Tap Target Booster").assertExists()
+    @Test
+    fun projectsScreen_xmlTechnology_afterScroll() {
+        setContent()
+        scrollDown(2)
+        composeTestRule.onNodeWithText("XML").assertIsDisplayed()
     }
 }
