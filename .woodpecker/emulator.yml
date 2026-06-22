@@ -1,66 +1,62 @@
-when:
-  - event: [push, pull_request]
-    branch: [master, main]
+depends_on:
+  - build
+
+platform: linux/amd64
+privileged: true
 
 steps:
-  instrumented-tests:
-    image: localhost:5000/ci-theming-jdk23:latest
-    privileged: true
+  - name: boot-emulator
+    image: codycraven/android-33-emulator:latest
     environment:
       ANDROID_HOME: /opt/android-sdk
       ANDROID_SDK_ROOT: /opt/android-sdk
-      ANDROID_AVD_HOME: /root/.android/avd
-      GRADLE_USER_HOME: /root/.gradle
-      DISPLAY: ":99"
     commands:
-      - export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
-      - mkdir -p ~/.gradle
-      - echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
-      - echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
+      - echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+      - echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64" --force --device "Nexus 6"
+      - >
+        nohup $ANDROID_HOME/emulator/emulator -avd test
+        -no-window -gpu swiftshader_indirect -no-audio
+        -no-boot-anim -memory 2048 -no-snapshot
+        -no-metrics -partition-size 2048 -read-only &
       - |
-        if [ ! -d "$ANDROID_HOME/cmdline-tools/latest" ]; then
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline-tools.zip
-          unzip -q /tmp/cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
-          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-        else
-          echo "Android SDK cached, skipping install"
-        fi
-        echo "sdk.dir=$ANDROID_HOME" > local.properties
+        timeout 180 $ANDROID_HOME/platform-tools/adb wait-for-device
+        $ANDROID_HOME/platform-tools/adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+
+  - name: run-tests
+    image: codycraven/android-33-emulator:latest
+    environment:
+      ANDROID_HOME: /opt/android-sdk
+      ANDROID_SDK_ROOT: /opt/android-sdk
+    commands:
+      - timeout 120 $ANDROID_HOME/platform-tools/adb wait-for-device
       - |
-        if [ ! -f "$ANDROID_AVD_HOME/test.avd/config.ini" ]; then
-          mkdir -p $ANDROID_AVD_HOME/test.avd
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "system-images;android-34;default;x86_64" > /dev/null 2>&1
-          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-34;default;x86_64" --force
-        else
-          echo "AVD config cached, skipping creation"
-        fi
-      - $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null 2>&1 || true
-      - |
-        Xvfb :99 -screen 0 480x800x24 &
-        sleep 2
-        $ANDROID_HOME/emulator/emulator -avd test -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -memory 2048 -no-snapshot -no-metrics -partition-size 2048 -read-only &
-        $ANDROID_HOME/platform-tools/adb wait-for-device
-        sleep 45
-      - chmod +x gradlew
-      - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest :composeApp:androidConnectedTestCoverageReport
-      - |
-        echo "Polling for staged kover XML"
-        i=0
-        while [ $$i -lt 90 ]; do
-          if [ -f /shared/kover/$$CI_COMMIT_SHA/report.xml ]; then
-            echo "Found kover XML"
-            mkdir -p composeApp/build/reports/kover
-            cp /shared/kover/$$CI_COMMIT_SHA/report.xml composeApp/build/reports/kover/report.xml
+        max_wait=60
+        waited=0
+        while [ $waited -lt $max_wait ]; do
+          result=$($ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+          if [ "$result" = "1" ]; then
+            echo "Boot completed after ${waited}s"
             break
           fi
-          i=$$((i + 1))
-          sleep 10
+          sleep 1
+          waited=$((waited + 1))
         done
+        if [ $waited -ge $max_wait ]; then
+          echo "WARNING: Emulator boot timeout after ${max_wait}s"
+        fi
+      - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest :composeApp:androidConnectedTestCoverageReport
+      - |
+        if [ -f /shared/kover/$$CI_COMMIT_SHA/report.xml ]; then
+          mkdir -p composeApp/build/reports/kover
+          cp /shared/kover/$$CI_COMMIT_SHA/report.xml composeApp/build/reports/kover/report.xml
+        else
+          echo "WARNING: No staged Kover XML found, generating locally"
+          ./gradlew --no-daemon :composeApp:koverXmlReport
+        fi
       - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport
       - cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md
-      - echo "=== KOVER XML CLASS NAMES ==="
-      - grep '<class' composeApp/build/reports/kover/report.xml | grep -i 'string0\|drawable0\|resourcecollector\|>Res<' | head -20
+      - echo "=== ALL KOVER CLASS NAMES ==="
+      - grep '<class' composeApp/build/reports/kover/report.xml | sed 's/.*name="//' | sed 's/".*//' | sort -u
       - sh scripts/verify-combined-coverage.sh composeApp/build/reports/coverage/UNIFIED_COVERAGE.md 38 53
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
