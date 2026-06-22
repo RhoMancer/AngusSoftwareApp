@@ -140,14 +140,15 @@ kover {
                 )
                 // Generated resource files — not hand-written code
                 classes(
-                    "*.String0",
-                    "*.String0\$*",
-                    "*.Drawable0",
-                    "*.Drawable0\$*",
-                    "*.ActualResourceCollectors",
-                    "*.ActualResourceCollectors\$*",
-                    "*.Res",
-                    "*.Res\$*",
+                    "angussoftwareapp.composeapp.generated.resources.String0",
+                    "angussoftwareapp.composeapp.generated.resources.String0\$*",
+                    "angussoftwareapp.composeapp.generated.resources.Drawable0",
+                    "angussoftwareapp.composeapp.generated.resources.Drawable0\$*",
+                    "angussoftwareapp.composeapp.generated.resources.Res",
+                    "angussoftwareapp.composeapp.generated.resources.Res\$*",
+                )
+                packages(
+                    "angussoftwareapp.composeapp.generated.resources",
                 )
             }
         }
