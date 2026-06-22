@@ -64,7 +64,25 @@ angusCoverage {
     }
 
     this.unifiedReport.enabled.set(true)
-    this.unifiedReport.koverExclusions.set(listOf<String>())
+    this.unifiedReport.koverExclusions.set(
+        listOf(
+            "**/R.class",
+            "**/R\\$*.class",
+            "**/*R*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/*Test*.*",
+            "**/generated/**",
+            "**/*ComposableSingletons*",
+            "**/androidx/**",
+            "**/android/**",
+            "**/kotlin/**",
+            "**/kotlinx/**",
+            "**/org/koin/**",
+            "**/com/arkivanov/**",
+            "**/app/cash/turbine/**",
+        ),
+    )
     this.unifiedReport.jacocoExclusions.set(
         listOf(
             "**/R.class",
@@ -86,9 +104,32 @@ angusCoverage {
     )
 }
 
-// Kover report generation (NO verify — combined coverage verification
-// happens in CI emulator pipeline via scripts/verify-combined-coverage.sh)
-// which checks the UNIFIED_COVERAGE.md against combined unit+instrumented thresholds
+// Kover report generation with exclusions matching JaCoCo
+// (NO verify — combined coverage verification happens in CI emulator pipeline
+// via scripts/verify-combined-coverage.sh against combined unit+instrumented thresholds)
+kover {
+    reports {
+        filters {
+            excludes {
+                classes(
+                    "**/R.class", "**/R\$*.class", "**/*R*.class",
+                    "**/BuildConfig.*", "**/Manifest*.*",
+                    "**/*Test*.*", "**/generated/**",
+                    "**/*ComposableSingletons*",
+                )
+                packages(
+                    "androidx", "androidx.**",
+                    "android", "android.**",
+                    "kotlin", "kotlin.**",
+                    "kotlinx", "kotlinx.**",
+                    "org.koin", "org.koin.**",
+                    "com.arkivanov", "com.arkivanov.**",
+                    "app.cash.turbine", "app.cash.turbine.**",
+                )
+            }
+        }
+    }
+}
 
 // Chain coverage verification to check task (local dev only — CI runs koverVerify
 // in the emulator pipeline after unified coverage is available)
