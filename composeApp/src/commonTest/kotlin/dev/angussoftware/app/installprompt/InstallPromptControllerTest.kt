@@ -232,4 +232,50 @@ internal class InstallPromptControllerTest {
         assertTrue(controller.state.isPlayStoreBannerVisible)
         assertFalse(controller.state.isPwaBannerVisible)
     }
+
+    // ========== State Change Listener Tests ==========
+
+    @Test
+    internal fun givenStateChangeListener_whenStateChanges_thenListenerInvoked() {
+        val platform = MockPlatform(isAndroidPlatform = true)
+        val controller = InstallPromptController(platform)
+        controller.initialize()
+
+        val receivedStates = mutableListOf<InstallPromptState>()
+        controller.setStateChangeListener { state -> receivedStates.add(state) }
+
+        // Trigger a state change
+        controller.onPlayStoreDismiss()
+
+        assertEquals(1, receivedStates.size)
+        assertFalse(receivedStates[0].isPlayStoreBannerVisible)
+    }
+
+    // ========== Deferred Prompt at Init Tests ==========
+
+    @Test
+    internal fun givenNonAndroidPlatformWithDeferredPromptAtInit_thenPwaBannerVisibleImmediately() {
+        val platform = MockPlatform(isAndroidPlatform = false, deferredPromptAvailable = true)
+        val controller = InstallPromptController(platform)
+
+        controller.initialize()
+
+        // Should show PWA banner immediately since deferred prompt was already available
+        assertTrue(controller.state.hasDeferredPrompt)
+        assertTrue(controller.state.isPwaBannerVisible)
+    }
+
+    // ========== Invalid Dismissal Timestamp Tests ==========
+
+    @Test
+    internal fun givenNonNumericDismissalTimestamp_thenTreatedAsNotDismissed() {
+        val platform = MockPlatform(isAndroidPlatform = true)
+        platform.storage[PLAY_PROMPT_DISMISSED_AT_KEY] = "not-a-number"
+        val controller = InstallPromptController(platform)
+
+        controller.initialize()
+
+        // Invalid timestamp should be treated as not dismissed → banner visible
+        assertTrue(controller.state.isPlayStoreBannerVisible)
+    }
 }
