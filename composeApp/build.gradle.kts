@@ -108,6 +108,16 @@ angusCoverage {
 // (NO verify — combined coverage verification happens in CI emulator pipeline
 // via scripts/verify-combined-coverage.sh against combined unit+instrumented thresholds)
 kover {
+    currentProject {
+        instrumentation {
+            excludedClasses.addAll(
+                "angussoftwareapp.composeapp.generated.resources.String0",
+                "angussoftwareapp.composeapp.generated.resources.Drawable0",
+                "angussoftwareapp.composeapp.generated.resources.Res",
+                "angussoftwareapp.composeapp.generated.resources.ActualResourceCollectors",
+            )
+        }
+    }
     reports {
         filters {
             excludes {
