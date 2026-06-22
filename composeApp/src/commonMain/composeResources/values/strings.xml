@@ -62,11 +62,15 @@
     <string name="platform_github">GitHub</string>
     <string name="platform_bluesky">BlueSky</string>
     <string name="platform_protopro">ProtoPro</string>
+    <string name="platform_kofi">Ko-fi</string>
+    <string name="platform_sponsors">Sponsor</string>
     <!-- Home screen: Social platform URLs -->
     <string name="url_linkedin">https://www.linkedin.com/</string>
     <string name="url_github">https://github.com/</string>
     <string name="url_bluesky">https://bsky.app/</string>
     <string name="url_protopro">https://beta.protopro.blue/profile/did%3Aplc%3Azyksze4sapogtongk3sly3ts</string>
+    <string name="url_kofi">https://ko-fi.com/angussoftware</string>
+    <string name="url_sponsors">https://github.com/sponsors/RhoMancer</string>
 
     <string name="project_google_play_developer_account">Google Play Developer Account</string>
 
