@@ -252,3 +252,9 @@ This will:
 Notes
 - Coverage for instrumented tests is enabled for the debug build type (test coverage is turned on in Gradle).
 - If the instrumented coverage task isn’t found, ensure you are on a recent Android Gradle Plugin and try running with `--info` to inspect available tasks.
+
+## Support
+
+If you find this project useful, consider supporting development:
+
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/angussoftware)
