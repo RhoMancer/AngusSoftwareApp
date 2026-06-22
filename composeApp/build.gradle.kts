@@ -127,9 +127,7 @@ kover {
                     "app.cash.turbine", "app.cash.turbine.**",
                 )
                 annotatedBy("androidx.compose.runtime.Composable")
-            }
-            // Exclude framework-generated code that tests the language, not our logic
-            excludes {
+                // Exclude framework-generated code that tests the language, not our logic
                 // compositionLocalOf { null } default lambdas — body is literally return null
                 classes(
                     "dev.angussoftware.app.ui.utils.LocalOverrideWindowAdaptiveInfo",
@@ -140,7 +138,6 @@ kover {
                 classes(
                     "dev.angussoftware.app.ui.utils.WindowWidthSizeClass",
                 )
-            }
             }
         }
     }
