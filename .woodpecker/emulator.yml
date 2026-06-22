@@ -59,8 +59,8 @@ steps:
         done
       - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport
       - cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md
-      - echo "=== KOVER XML CLASS NAMES ==="
-      - grep '<class' composeApp/build/reports/kover/report.xml | grep -i 'string0\|drawable0\|resourcecollector\|>Res<' | head -20
+      - echo "=== ALL KOVER CLASS NAMES ==="
+      - grep '<class' composeApp/build/reports/kover/report.xml | sed 's/.*name="//' | sed 's/".*//' | sort -u
       - sh scripts/verify-combined-coverage.sh composeApp/build/reports/coverage/UNIFIED_COVERAGE.md 38 53
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
