@@ -59,6 +59,8 @@ steps:
         done
       - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport
       - cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md
+      - echo "=== KOVER MISSED CLASSES (FQN) ==="
+      - sh scripts/kover-breakdown.sh
       - sh scripts/verify-combined-coverage.sh composeApp/build/reports/coverage/UNIFIED_COVERAGE.md 38 53
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
