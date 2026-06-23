@@ -25,40 +25,6 @@ kover {
     merge {
         subprojects()
     }
-    reports {
-        filters {
-            excludes {
-                // Standard exclusions (mirrors composeApp/build.gradle.kts)
-                classes(
-                    "**/R.class", "**/R\$*.class", "**/*R*.class",
-                    "**/BuildConfig.*", "**/Manifest*.*",
-                    "**/*Test*.*", "**/generated/**",
-                    "**/*ComposableSingletons*",
-                )
-                packages(
-                    "androidx", "androidx.**",
-                    "android", "android.**",
-                    "kotlin", "kotlin.**",
-                    "kotlinx", "kotlinx.**",
-                    "org.koin", "org.koin.**",
-                    "com.arkivanov", "com.arkivanov.**",
-                    "app.cash.turbine", "app.cash.turbine.**",
-                    "angussoftwareapp.composeapp.generated.resources",
-                )
-                annotatedBy("androidx.compose.runtime.Composable")
-                // Generated resource files — not hand-written code
-                classes(
-                    "angussoftwareapp.composeapp.generated.resources.String0",
-                    "angussoftwareapp.composeapp.generated.resources.String0\$*",
-                    "angussoftwareapp.composeapp.generated.resources.Drawable0",
-                    "angussoftwareapp.composeapp.generated.resources.Drawable0\$*",
-                    "angussoftwareapp.composeapp.generated.resources.Res",
-                    "angussoftwareapp.composeapp.generated.resources.Res\$*",
-                    "angussoftwareapp.composeapp.generated.resources.ActualResourceCollectors",
-                )
-            }
-        }
-    }
 }
 
 // --- Version bump utilities (file-driven) ---

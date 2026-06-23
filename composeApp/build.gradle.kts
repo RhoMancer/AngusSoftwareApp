@@ -108,16 +108,6 @@ angusCoverage {
 // (NO verify — combined coverage verification happens in CI emulator pipeline
 // via scripts/verify-combined-coverage.sh against combined unit+instrumented thresholds)
 kover {
-    currentProject {
-        instrumentation {
-            excludedClasses.addAll(
-                "angussoftwareapp.composeapp.generated.resources.String0",
-                "angussoftwareapp.composeapp.generated.resources.Drawable0",
-                "angussoftwareapp.composeapp.generated.resources.Res",
-                "angussoftwareapp.composeapp.generated.resources.ActualResourceCollectors",
-            )
-        }
-    }
     reports {
         filters {
             excludes {
@@ -147,18 +137,6 @@ kover {
                 // Kotlin compiler-generated enum methods (values/valueOf) never called in production
                 classes(
                     "dev.angussoftware.app.ui.utils.WindowWidthSizeClass",
-                )
-                // Generated resource files — not hand-written code
-                classes(
-                    "angussoftwareapp.composeapp.generated.resources.String0",
-                    "angussoftwareapp.composeapp.generated.resources.String0\$*",
-                    "angussoftwareapp.composeapp.generated.resources.Drawable0",
-                    "angussoftwareapp.composeapp.generated.resources.Drawable0\$*",
-                    "angussoftwareapp.composeapp.generated.resources.Res",
-                    "angussoftwareapp.composeapp.generated.resources.Res\$*",
-                )
-                packages(
-                    "angussoftwareapp.composeapp.generated.resources",
                 )
             }
         }
