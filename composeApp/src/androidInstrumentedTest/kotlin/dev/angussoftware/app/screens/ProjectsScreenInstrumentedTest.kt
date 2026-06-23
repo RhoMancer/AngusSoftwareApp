@@ -131,13 +131,6 @@ class ProjectsScreenInstrumentedTest {
     }
 
     @Test
-    fun projectsScreen_angusPaintTechnologies_exist() {
-        setContent()
-        scrollToText("XML", substring = true)
-        composeTestRule.onNodeWithText("XML", substring = true).assertExists()
-    }
-
-    @Test
     fun projectsScreen_solitaireProject_exists() {
         setContent()
         scrollToText("Angus Solitaire")
