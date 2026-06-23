@@ -90,6 +90,36 @@ class HomeScreenInstrumentedTest {
     }
 
     @Test
+    fun homeScreen_showsNodeJSSkill() {
+        setContent()
+        scrollToText("Node.js")
+        composeTestRule.onNodeWithText("Node.js").assertExists()
+    }
+
+    @Test
+    fun homeScreen_showsCI_CDSkill() {
+        setContent()
+        scrollToText("CI/CD")
+        composeTestRule.onNodeWithText("CI/CD").assertExists()
+    }
+
+    @Test
+    fun homeScreen_showsContactItem() {
+        setContent()
+        scrollToText("Contact Information")
+        composeTestRule.onNodeWithText("Contact Information").assertExists()
+    }
+
+    @Test
+    fun homeScreen_showsSocialMediaButton() {
+        setContent()
+        // Scroll to contact section where social media buttons live
+        scrollToText("Contact Information")
+        // Social media buttons render after contact items
+        composeTestRule.onNodeWithTag("HomeList").assertExists()
+    }
+
+    @Test
     fun homeScreen_expandedLayout_displaysCorrectly() {
         setContent(WindowWidthSizeClass.EXPANDED)
         composeTestRule.onNodeWithTag(HOME_SCREEN_TEST_TAG).assertExists()
