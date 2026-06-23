@@ -43,7 +43,6 @@ steps:
         $ANDROID_HOME/platform-tools/adb wait-for-device
         sleep 45
       - chmod +x gradlew
-      - touch composeApp/src/androidInstrumentedTest/kotlin/dev/angussoftware/app/screens/SettingsScreenInstrumentedTest.kt
       - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest :composeApp:androidConnectedTestCoverageReport
       - |
         echo "Polling for staged kover XML"
