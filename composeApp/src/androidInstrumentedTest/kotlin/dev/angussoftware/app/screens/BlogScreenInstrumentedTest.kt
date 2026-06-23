@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -263,5 +264,95 @@ class BlogScreenInstrumentedTest {
             "${Screen.BlogPost.name}/3",
             navigatedRoute,
         )
+    }
+
+    // === Tests for missed lines: empty state, image placeholder, load more ===
+
+    @Test
+    fun blogScreen_emptyState_showsEmptyMessage() {
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                BlogScreen(
+                    initialPosts = emptyList(),
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("There are no new Posts to display.").assertExists()
+    }
+
+    @Test
+    fun blogScreen_postWithImageUrl_showsImagePlaceholder() {
+        val postsWithImage = listOf(
+            BlogPost(
+                id = "img1",
+                title = "Post With Image",
+                url = "https://example.com/post",
+                pubDate = "2025-01-01",
+                summary = "Summary",
+                imageUrl = "https://example.com/image.jpg",
+                content = null,
+            ),
+        )
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                BlogScreen(
+                    initialPosts = postsWithImage,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Image placeholder").assertExists()
+    }
+
+    @Test
+    fun blogScreen_morePostsThanPageSize_showsLoadMoreButton() {
+        // Create more posts than the default page size
+        val manyPosts = (1..15).map { i ->
+            BlogPost(
+                id = "post$i",
+                title = "Post Number $i",
+                url = "https://example.com/post$i",
+                pubDate = "2025-01-0$i",
+                summary = "Summary $i",
+                imageUrl = null,
+                content = null,
+            )
+        }
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                BlogScreen(
+                    initialPosts = manyPosts,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Load more posts").assertExists()
+    }
+
+    @Test
+    fun blogScreen_fewPosts_noLoadMoreButton() {
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                BlogScreen(
+                    initialPosts = testPosts,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        // With only 2 test posts, "Load more" should not appear
+        composeTestRule.onNodeWithText("Post Number 1").assertDoesNotExist()
     }
 }
