@@ -4,9 +4,9 @@ if [ ! -f "$JACOCO_XML" ]; then
   echo "JaCoCo XML not found"
   exit 0
 fi
-python3 -c '
+python3 << 'PYEOF'
 import xml.etree.ElementTree as ET
-tree = ET.parse("'"$JACOCO_XML"'")
+tree = ET.parse("composeApp/build/reports/jacoco/androidConnectedTest/report.xml")
 for pkg in tree.findall(".//package"):
     for sf in pkg.findall("sourcefile"):
         src = sf.get("name","")
@@ -16,26 +16,25 @@ for pkg in tree.findall(".//package"):
             ci = int(line.get("ci","0"))
             nr = line.get("nr","")
             if mi > 0 and ci == 0:
-                missed_lines.append(nr)
+                missed_lines.append(int(nr))
         if missed_lines:
-            # Group consecutive line numbers
             groups = []
-            start = int(missed_lines[0])
+            start = missed_lines[0]
             prev = start
             for ln in missed_lines[1:]:
-                ln = int(ln)
                 if ln == prev + 1:
                     prev = ln
                 else:
                     if start == prev:
                         groups.append(str(start))
                     else:
-                        groups.append(f"{start}-{prev}")
+                        groups.append(str(start) + "-" + str(prev))
                     start = ln
                     prev = ln
             if start == prev:
                 groups.append(str(start))
             else:
-                groups.append(f"{start}-{prev}")
-            print(f"{src}: lines {', '.join(groups)}")
-'
+                groups.append(str(start) + "-" + str(prev))
+            joined = ", ".join(groups)
+            print(src + ": lines " + joined)
+PYEOF
