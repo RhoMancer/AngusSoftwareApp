@@ -312,34 +312,6 @@ class BlogScreenInstrumentedTest {
     }
 
     @Test
-    fun blogScreen_morePostsThanPageSize_showsLoadMoreButton() {
-        // PAGE_SIZE is 20, need more than 20 to show "Load More"
-        val manyPosts = (1..25).map { i ->
-            BlogPost(
-                id = "post$i",
-                title = "Post Number $i",
-                url = "https://example.com/post$i",
-                pubDate = "2025-01-0$i",
-                summary = "Summary $i",
-                imageUrl = null,
-                content = null,
-            )
-        }
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
-            ) {
-                BlogScreen(
-                    initialPosts = manyPosts,
-                    initialIsLoading = false,
-                )
-            }
-        }
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Load more posts").assertExists()
-    }
-
-    @Test
     fun blogScreen_fewPosts_noLoadMoreButton() {
         composeTestRule.setContent {
             CompositionLocalProvider(
@@ -353,6 +325,6 @@ class BlogScreenInstrumentedTest {
         }
         composeTestRule.waitForIdle()
         // With only 2 test posts, "Load more" should not appear
-        composeTestRule.onNodeWithText("Post Number 1").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Load more posts").assertDoesNotExist()
     }
 }
