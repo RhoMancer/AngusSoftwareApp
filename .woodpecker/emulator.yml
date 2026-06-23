@@ -59,6 +59,8 @@ steps:
         done
       - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport
       - cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md
+      - echo "=== JACOCO GAPS (TOP 20) ==="
+      - sh scripts/jacoco-gaps.sh
       - sh scripts/verify-combined-coverage.sh composeApp/build/reports/coverage/UNIFIED_COVERAGE.md 80 55
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
