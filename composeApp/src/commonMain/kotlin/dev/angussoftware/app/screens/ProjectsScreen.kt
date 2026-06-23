@@ -169,6 +169,7 @@ internal fun ProjectsScreen() {
             modifier =
                 Modifier
                     .fillMaxSize()
+                    .testTag("ProjectsList")
                     .padding(horizontal = 16.dp),
             contentPadding =
                 PaddingValues(
