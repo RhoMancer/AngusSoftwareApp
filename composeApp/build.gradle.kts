@@ -125,6 +125,8 @@ kover {
                     "org.koin", "org.koin.**",
                     "com.arkivanov", "com.arkivanov.**",
                     "app.cash.turbine", "app.cash.turbine.**",
+                    // Generated resource accessors (String0, Drawable0, Res, etc.)
+                    "angussoftwareapp.composeapp.generated.resources",
                 )
                 annotatedBy("androidx.compose.runtime.Composable")
                 // Exclude framework-generated code that tests the language, not our logic
@@ -152,9 +154,23 @@ kover {
                 // Screen files — @Composable UI facades only (no tested pure functions)
                 classes(
                     "*.BlogScreenKt",
+                    "*.BlogScreenKt\$*",
                     "*.HomeScreenKt",
                     "*.ProjectsScreenKt",
+                    "*.ProjectsScreenKt\$*",
                     "*.CommonComponentsKt",
+                    // @Composable helper functions in file facades
+                    "*.CommonScreenStateKt",
+                    "*.WindowAdaptiveInfoKt",
+                    "*.AppThemeStateKt",
+                    "*.AngusSoftwareAppScreenKt",
+                    // Private data classes used only by @Composable code
+                    "*.NavDestination",
+                    "*.Project",
+                    // Android-only: locale helper, activity lifecycle
+                    "*.LocaleHelper_androidKt",
+                    "*.MainActivity",
+                    "*.MainActivity\$*",
                 )
             }
         }
