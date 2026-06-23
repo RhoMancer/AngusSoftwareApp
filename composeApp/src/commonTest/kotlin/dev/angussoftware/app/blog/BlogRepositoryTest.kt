@@ -149,7 +149,6 @@ internal class BlogRepositoryTest {
             // This will use the actual DefaultNetworkClient which should handle the error
             assertEquals(emptyList(), result, "Should return empty list when using default client with invalid URL")
         }
-}
 
     // Mock that returns invalid XML to trigger parser exception
     private class MockCorruptNetworkClient : NetworkClient {
@@ -167,3 +166,4 @@ internal class BlogRepositoryTest {
 
             assertEquals(emptyList(), result, "Should return empty list on parse error")
         }
+}

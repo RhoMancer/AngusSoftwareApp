@@ -73,7 +73,6 @@ class AppThemeStateTest {
         state.updateThemeMode(ThemeMode.DARK)
         assertEquals(ColorTheme.AngusDark, state.activeColorTheme)
     }
-}
 
     @Test
     fun createStateWithDefaultPreferences() {
@@ -81,3 +80,4 @@ class AppThemeStateTest {
         val state = AppThemeState()
         assertEquals(ThemeMode.SYSTEM, state.prefs.themeMode)
     }
+}
