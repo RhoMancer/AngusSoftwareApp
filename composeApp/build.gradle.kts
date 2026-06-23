@@ -100,6 +100,16 @@ angusCoverage {
             "**/org/koin/**",
             "**/com/arkivanov/**",
             "**/app/cash/turbine/**",
+            // Android-only: Activity lifecycle, SharedPreferences, platform stubs
+            "**/MainActivity*",
+            "**/MainActivity\$*",
+            "**/ThemePreferences_androidKt",
+            "**/Platform_androidKt",
+            "**/LocaleHelper_androidKt",
+            "**/Network_androidKt",
+            "**/Network_androidKt\$*",
+            // @Composable lambdas inside displayCurrentScreen
+            "**/NavHostKt\$displayCurrentScreen*",
         ),
     )
 }

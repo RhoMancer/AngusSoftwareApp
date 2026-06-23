@@ -79,6 +79,7 @@ internal fun BlogScreen(
             modifier =
                 Modifier
                     .fillMaxSize()
+                    .testTag("BlogList")
                     .padding(horizontal = 16.dp),
             contentPadding =
                 PaddingValues(

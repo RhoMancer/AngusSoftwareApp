@@ -4,10 +4,12 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -308,6 +310,7 @@ class BlogScreenInstrumentedTest {
             }
         }
         composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("BlogList").performScrollToNode(hasText("Image placeholder"))
         composeTestRule.onNodeWithText("Image placeholder").assertExists()
     }
 
