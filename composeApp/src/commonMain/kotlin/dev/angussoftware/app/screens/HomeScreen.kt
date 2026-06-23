@@ -58,6 +58,7 @@ internal fun HomeScreen() {
             modifier =
                 Modifier
                     .fillMaxSize()
+                    .testTag("HomeList")
                     .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding =
