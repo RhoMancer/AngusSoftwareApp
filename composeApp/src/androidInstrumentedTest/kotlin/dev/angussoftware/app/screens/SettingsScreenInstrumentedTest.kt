@@ -100,6 +100,32 @@ class SettingsScreenInstrumentedTest : BaseScreenTest() {
     }
 
     @Test
+    fun settingsScreen_lightThemeDropdown_showsAllThemes() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) {
+            SettingsScreen()
+        }
+        composeTestRule.waitForIdle()
+        // Open the light theme dropdown
+        composeTestRule.onNodeWithText("Angus Light").performClick()
+        composeTestRule.waitForIdle()
+        // Verify multiple themes are now visible in the dropdown
+        composeTestRule.onNodeWithText("Nord").assertExists()
+    }
+
+    @Test
+    fun settingsScreen_darkThemeDropdown_showsAllThemes() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) {
+            SettingsScreen()
+        }
+        composeTestRule.waitForIdle()
+        // Open the dark theme dropdown
+        composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
+        // Verify themes are visible
+        composeTestRule.onNodeWithText("Dracula").assertExists()
+    }
+
+    @Test
     fun settingsScreen_themeModeChips_areClickable() {
         setAdaptiveContent(WindowWidthSizeClass.COMPACT) {
             SettingsScreen()
