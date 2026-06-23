@@ -208,29 +208,28 @@ class ProjectsScreenInstrumentedTest {
     fun projectsScreen_angusPaintCarouselExists() {
         setContent()
         scrollToText("Angus Paint")
-        // The pager should exist once the card is scrolled into view
-        composeTestRule.onNodeWithTag("ProjectPager_Angus Paint").assertExists()
+        composeTestRule.onNodeWithTag("ProjectPager_3").assertExists()
     }
 
     @Test
     fun projectsScreen_solitaireCarouselExists() {
         setContent()
         scrollToText("Angus Solitaire")
-        composeTestRule.onNodeWithTag("ProjectPager_Angus Solitaire").assertExists()
+        composeTestRule.onNodeWithTag("ProjectPager_4").assertExists()
     }
 
     @Test
     fun projectsScreen_blinkReaderCarouselExists() {
         setContent()
         scrollToText("Blink Reader")
-        composeTestRule.onNodeWithTag("ProjectPager_Blink Reader").assertExists()
+        composeTestRule.onNodeWithTag("ProjectPager_5").assertExists()
     }
 
     @Test
     fun projectsScreen_tapTargetCarouselExists() {
         setContent()
         scrollToText("Tap Target Booster")
-        composeTestRule.onNodeWithTag("ProjectPager_Tap Target Booster").assertExists()
+        composeTestRule.onNodeWithTag("ProjectPager_6").assertExists()
     }
 
     @Test

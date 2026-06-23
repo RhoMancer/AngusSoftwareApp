@@ -227,7 +227,7 @@ internal fun ProjectsScreen() {
                                 ) {
                                     HorizontalPager(
                                         state = pagerState,
-                                        modifier = Modifier.fillMaxSize().testTag("ProjectPager_${project.title}"),
+                                        modifier = Modifier.fillMaxSize().testTag("ProjectPager_$idx"),
                                     ) { page ->
                                         val res = project.images[page]
                                         Image(
