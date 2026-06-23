@@ -106,4 +106,97 @@ class ProjectsScreenInstrumentedTest {
         setContent()
         composeTestRule.onNodeWithText("GTK4").assertIsDisplayed()
     }
+
+    // === Projects with images (need scrolling to reach) ===
+    // Angus Paint, Solitaire, Blink Reader, Tap Target all have image carousels
+
+    @Test
+    fun projectsScreen_angusPaintProject_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Angus Paint").assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_angusPaintDescription_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Angus Paint").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Paint your own masterpiece", substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_angusPaintTechnologies_areDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Angus Paint").assertIsDisplayed()
+        composeTestRule.onNodeWithText("XML", substring = true).assertExists()
+    }
+
+    @Test
+    fun projectsScreen_solitaireProject_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Angus Solitaire").assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_solitaireDescription_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Angus Solitaire").assertIsDisplayed()
+        composeTestRule.onNodeWithText("score as many points", substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_blinkReaderProject_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Blink Reader").assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_blinkReaderDescription_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Blink Reader").assertIsDisplayed()
+        composeTestRule.onNodeWithText("enhanced speed", substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_tapTargetProject_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Tap Target Booster").assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_tapTargetDescription_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Tap Target Booster").assertIsDisplayed()
+        composeTestRule.onNodeWithText("touch screen skills", substring = true).assertIsDisplayed()
+    }
+
+    // === Google Play developer account entry ===
+
+    @Test
+    fun projectsScreen_googlePlayEntry_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Google Play Developer Account").assertIsDisplayed()
+    }
+
+    // === Verify all project descriptions render ===
+
+    @Test
+    fun projectsScreen_portfolioDescription_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Portfolio Website").assertIsDisplayed()
+        composeTestRule.onNodeWithText("dynamic content", substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_temperluxDescription_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Temperlux").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Brightness controller", substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_temperluxSubtitle_isDisplayed() {
+        setContent()
+        composeTestRule.onNodeWithText("Temperlux").assertIsDisplayed()
+        composeTestRule.onNodeWithText("external and internal displays", substring = true).assertIsDisplayed()
+    }
 }
