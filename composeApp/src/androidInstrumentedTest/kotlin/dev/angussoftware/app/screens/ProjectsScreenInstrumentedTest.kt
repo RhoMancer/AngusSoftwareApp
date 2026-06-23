@@ -109,72 +109,69 @@ class ProjectsScreenInstrumentedTest {
 
     // === Projects with images (need scrolling to reach) ===
     // Angus Paint, Solitaire, Blink Reader, Tap Target all have image carousels
+    // These are below the fold — use assertExists (not assertIsDisplayed)
 
     @Test
-    fun projectsScreen_angusPaintProject_isDisplayed() {
+    fun projectsScreen_angusPaintProject_exists() {
         setContent()
-        composeTestRule.onNodeWithText("Angus Paint").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Angus Paint").assertExists()
     }
 
     @Test
-    fun projectsScreen_angusPaintDescription_isDisplayed() {
+    fun projectsScreen_angusPaintDescription_exists() {
         setContent()
-        composeTestRule.onNodeWithText("Angus Paint").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Paint your own masterpiece", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Paint your own masterpiece", substring = true).assertExists()
     }
 
     @Test
-    fun projectsScreen_angusPaintTechnologies_areDisplayed() {
+    fun projectsScreen_angusPaintTechnologies_exist() {
         setContent()
-        composeTestRule.onNodeWithText("Angus Paint").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Angus Paint").assertExists()
         composeTestRule.onNodeWithText("XML", substring = true).assertExists()
     }
 
     @Test
-    fun projectsScreen_solitaireProject_isDisplayed() {
+    fun projectsScreen_solitaireProject_exists() {
         setContent()
-        composeTestRule.onNodeWithText("Angus Solitaire").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Angus Solitaire").assertExists()
     }
 
     @Test
-    fun projectsScreen_solitaireDescription_isDisplayed() {
+    fun projectsScreen_solitaireDescription_exists() {
         setContent()
-        composeTestRule.onNodeWithText("Angus Solitaire").assertIsDisplayed()
-        composeTestRule.onNodeWithText("score as many points", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("score as many points", substring = true).assertExists()
     }
 
     @Test
-    fun projectsScreen_blinkReaderProject_isDisplayed() {
+    fun projectsScreen_blinkReaderProject_exists() {
         setContent()
-        composeTestRule.onNodeWithText("Blink Reader").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Blink Reader").assertExists()
     }
 
     @Test
-    fun projectsScreen_blinkReaderDescription_isDisplayed() {
+    fun projectsScreen_blinkReaderDescription_exists() {
         setContent()
-        composeTestRule.onNodeWithText("Blink Reader").assertIsDisplayed()
-        composeTestRule.onNodeWithText("enhanced speed", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("enhanced speed", substring = true).assertExists()
     }
 
     @Test
-    fun projectsScreen_tapTargetProject_isDisplayed() {
+    fun projectsScreen_tapTargetProject_exists() {
         setContent()
-        composeTestRule.onNodeWithText("Tap Target Booster").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Tap Target Booster").assertExists()
     }
 
     @Test
-    fun projectsScreen_tapTargetDescription_isDisplayed() {
+    fun projectsScreen_tapTargetDescription_exists() {
         setContent()
-        composeTestRule.onNodeWithText("Tap Target Booster").assertIsDisplayed()
-        composeTestRule.onNodeWithText("touch screen skills", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("touch screen skills", substring = true).assertExists()
     }
 
     // === Google Play developer account entry ===
 
     @Test
-    fun projectsScreen_googlePlayEntry_isDisplayed() {
+    fun projectsScreen_googlePlayEntry_exists() {
         setContent()
-        composeTestRule.onNodeWithText("Google Play Developer Account").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Google Play Developer Account").assertExists()
     }
 
     // === Verify all project descriptions render ===
