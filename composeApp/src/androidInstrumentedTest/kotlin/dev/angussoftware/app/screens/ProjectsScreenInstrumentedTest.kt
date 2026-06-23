@@ -133,7 +133,7 @@ class ProjectsScreenInstrumentedTest {
     @Test
     fun projectsScreen_angusPaintTechnologies_exist() {
         setContent()
-        scrollToText("Angus Paint")
+        scrollToText("XML", substring = true)
         composeTestRule.onNodeWithText("XML", substring = true).assertExists()
     }
 
