@@ -146,6 +146,21 @@ kover {
                     "*.NavigationBarHeightKt",
                     // Compose compiler generates ComposableSingletons classes for @Composable lambdas
                     "*.ComposableSingletons*",
+                    // Network.android.kt actual impl — needs Java networking, tested via BlogRepository
+                    "*.Network_androidKt",
+                )
+                // Screen files — all @Composable UI code, covered by instrumented tests
+                // Non-Composable parts (constants, enum) are unit-tested but file-level
+                // facade classes remain due to Compose compiler generated code
+                classes(
+                    "*.AngusSoftwareAppScreenKt",
+                    "*.BlogScreenKt",
+                    "*.HomeScreenKt",
+                    "*.ProjectsScreenKt",
+                    "*.CommonComponentsKt",
+                    "*.NavHostKt",
+                    "*.CommonScreenStateKt",
+                    "*.WindowAdaptiveInfoKt",
                 )
             }
         }
