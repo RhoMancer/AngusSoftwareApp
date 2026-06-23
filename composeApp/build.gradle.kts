@@ -144,8 +144,8 @@ kover {
                     "*.ThemePreferences_androidKt",
                     "*.Platform_androidKt",
                     "*.NavigationBarHeightKt",
-                    // MainActivity compiled as ComposableSingletons$MainActivityKt by Compose compiler
-                    "*.ComposableSingletons\$MainActivityKt",
+                    // Compose compiler generates ComposableSingletons classes for @Composable lambdas
+                    "*.ComposableSingletons*",
                 )
             }
         }
