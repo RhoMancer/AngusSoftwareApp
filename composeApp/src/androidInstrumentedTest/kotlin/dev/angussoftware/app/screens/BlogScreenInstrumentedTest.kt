@@ -330,4 +330,60 @@ class BlogScreenInstrumentedTest {
         // With only 2 test posts, "Load more" should not appear
         composeTestRule.onNodeWithText("Load more posts").assertDoesNotExist()
     }
+
+    @Test
+    fun blogScreen_postWithImage_scrollToShowImagePlaceholder() {
+        val postsWithImage = listOf(
+            BlogPost(
+                id = "img1",
+                title = "Post With Image",
+                url = "https://example.com/post",
+                pubDate = "2025-01-01",
+                summary = "Summary",
+                imageUrl = "https://example.com/image.jpg",
+                content = null,
+            ),
+        )
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                BlogScreen(
+                    initialPosts = postsWithImage,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("BlogList").performScrollToNode(hasText("Image placeholder"))
+        composeTestRule.onNodeWithText("Image placeholder").assertExists()
+    }
+
+    @Test
+    fun blogScreen_multiplePostsWithImages_allReachable() {
+        val postsWithImages = (1..3).map { i ->
+            BlogPost(
+                id = "img$i",
+                title = "Image Post $i",
+                url = "https://example.com/post$i",
+                pubDate = "2025-01-0$i",
+                summary = "Summary $i",
+                imageUrl = "https://example.com/image$i.jpg",
+                content = null,
+            )
+        }
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.COMPACT),
+            ) {
+                BlogScreen(
+                    initialPosts = postsWithImages,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("BlogList").performScrollToNode(hasText("Image Post 2"))
+        composeTestRule.onNodeWithText("Image Post 2").assertExists()
+    }
 }
