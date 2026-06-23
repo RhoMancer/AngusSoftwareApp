@@ -43,6 +43,7 @@ steps:
         $ANDROID_HOME/platform-tools/adb wait-for-device
         sleep 45
       - chmod +x gradlew
+      - ./gradlew --no-daemon --rerun-tasks :composeApp:compileDebugAndroidTestKotlinAndroid
       - ./gradlew --no-daemon :composeApp:connectedDebugAndroidTest :composeApp:androidConnectedTestCoverageReport
       - |
         echo "Polling for staged kover XML"
