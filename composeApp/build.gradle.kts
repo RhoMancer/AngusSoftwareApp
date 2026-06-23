@@ -161,13 +161,16 @@ kover {
                     "*.ProjectsScreenKt\$*",
                     "*.CommonComponentsKt",
                     // @Composable helper functions in file facades
+                    // isCollapsedFor moved to ScrollCollapse.kt
                     "*.CommonScreenStateKt",
+                    "*.CommonScreenStateKt\$*",
                     "*.WindowAdaptiveInfoKt",
                     "*.AppThemeStateKt",
                     "*.AngusSoftwareAppScreenKt",
-                    // NavHost.kt now contains ONLY displayCurrentScreen() @Composable
+                    // NavHost.kt contains ONLY displayCurrentScreen() @Composable
                     // Pure functions moved to NavRoutes.kt
                     "*.NavHostKt",
+                    "*.NavHostKt\$*",
                     // Private data classes used only by @Composable code
                     "*.NavDestination",
                     "*.Project",
