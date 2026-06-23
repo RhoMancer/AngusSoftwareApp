@@ -63,8 +63,10 @@ class SettingsScreenInstrumentedTest : BaseScreenTest() {
             SettingsScreen()
         }
 
+        composeTestRule.waitForIdle()
         // Click the first OutlinedButton (light theme dropdown)
         composeTestRule.onNodeWithText("Angus Light").performClick()
+        composeTestRule.waitForIdle()
 
         // Dropdown should show other themes
         composeTestRule.onNodeWithText("Nord").assertIsDisplayed()
@@ -76,8 +78,10 @@ class SettingsScreenInstrumentedTest : BaseScreenTest() {
             SettingsScreen()
         }
 
+        composeTestRule.waitForIdle()
         // Click the dark theme dropdown (shows Angus Dark by default)
         composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Dracula").assertIsDisplayed()
     }
