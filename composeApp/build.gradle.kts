@@ -144,8 +144,8 @@ kover {
                     "*.ThemePreferences_androidKt",
                     "*.Platform_androidKt",
                     "*.NavigationBarHeightKt",
-                    "dev.angussoftware.app.activity.MainActivity",
-                    "dev.angussoftware.app.activity.MainActivity\$*",
+                    // MainActivity compiled as ComposableSingletons$MainActivityKt by Compose compiler
+                    "*.ComposableSingletons\$MainActivityKt",
                 )
             }
         }
