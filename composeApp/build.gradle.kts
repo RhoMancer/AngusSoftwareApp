@@ -150,6 +150,7 @@ kover {
                     "*.ComposableSingletons*",
                     // Network.android.kt actual impl — needs Java networking, tested via BlogRepository
                     "*.Network_androidKt",
+                    "*.Network_androidKt\$*",
                 )
                 // Screen files — @Composable UI facades only (no tested pure functions)
                 classes(
@@ -164,6 +165,9 @@ kover {
                     "*.WindowAdaptiveInfoKt",
                     "*.AppThemeStateKt",
                     "*.AngusSoftwareAppScreenKt",
+                    // NavHost.kt now contains ONLY displayCurrentScreen() @Composable
+                    // Pure functions moved to NavRoutes.kt
+                    "*.NavHostKt",
                     // Private data classes used only by @Composable code
                     "*.NavDestination",
                     "*.Project",
