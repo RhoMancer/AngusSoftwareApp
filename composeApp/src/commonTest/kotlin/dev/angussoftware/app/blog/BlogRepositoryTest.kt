@@ -150,3 +150,20 @@ internal class BlogRepositoryTest {
             assertEquals(emptyList(), result, "Should return empty list when using default client with invalid URL")
         }
 }
+
+    // Mock that returns invalid XML to trigger parser exception
+    private class MockCorruptNetworkClient : NetworkClient {
+        override suspend fun fetchUrlText(url: String): String = "not valid xml {{{"
+    }
+
+    @Test
+    internal fun fetchPostsHandlesParseException() =
+        runTest {
+            val feedUrl = "https://example.com/feed.xml"
+            val mockClient = MockCorruptNetworkClient()
+            val repository = BlogRepository(feedUrl, mockClient)
+
+            val result = repository.fetchPosts()
+
+            assertEquals(emptyList(), result, "Should return empty list on parse error")
+        }

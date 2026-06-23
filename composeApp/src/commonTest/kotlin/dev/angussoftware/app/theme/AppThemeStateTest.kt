@@ -74,3 +74,10 @@ class AppThemeStateTest {
         assertEquals(ColorTheme.AngusDark, state.activeColorTheme)
     }
 }
+
+    @Test
+    fun createStateWithDefaultPreferences() {
+        // Triggers the default parameter: loadThemePreferences()
+        val state = AppThemeState()
+        assertEquals(ThemeMode.SYSTEM, state.prefs.themeMode)
+    }
