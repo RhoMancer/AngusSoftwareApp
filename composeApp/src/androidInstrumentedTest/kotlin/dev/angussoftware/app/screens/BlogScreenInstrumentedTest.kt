@@ -313,8 +313,8 @@ class BlogScreenInstrumentedTest {
 
     @Test
     fun blogScreen_morePostsThanPageSize_showsLoadMoreButton() {
-        // Create more posts than the default page size
-        val manyPosts = (1..15).map { i ->
+        // PAGE_SIZE is 20, need more than 20 to show "Load More"
+        val manyPosts = (1..25).map { i ->
             BlogPost(
                 id = "post$i",
                 title = "Post Number $i",
