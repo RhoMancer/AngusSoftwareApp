@@ -34,6 +34,8 @@ steps:
           cp composeApp/build/reports/kover/report.xml /shared/kover/${CI_COMMIT_SHA}/report.xml
           echo "=== Staged kover XML for emulator pipeline ==="
           ls -la /shared/kover/${CI_COMMIT_SHA}/
+          echo "=== KOVER LINE COUNT ==="
+          grep '<counter' composeApp/build/reports/kover/report.xml | grep 'type="LINE"' | tail -1
           find /shared/kover -mindepth 1 -maxdepth 1 -type d -mtime +1 -exec rm -rf {} + 2>/dev/null || true
         else
           echo "WARNING: kover XML not found — emulator pipeline will need to regenerate"

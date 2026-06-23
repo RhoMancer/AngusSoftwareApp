@@ -138,6 +138,15 @@ kover {
                 classes(
                     "dev.angussoftware.app.ui.utils.WindowWidthSizeClass",
                 )
+                // Android-only code that cannot be unit tested (needs Context/Activity/platform)
+                // Covered by JaCoCo instrumented tests instead
+                classes(
+                    "*.ThemePreferences_androidKt",
+                    "*.Platform_androidKt",
+                    "*.NavigationBarHeightKt",
+                    "dev.angussoftware.app.activity.MainActivity",
+                    "dev.angussoftware.app.activity.MainActivity\$*",
+                )
             }
         }
     }
