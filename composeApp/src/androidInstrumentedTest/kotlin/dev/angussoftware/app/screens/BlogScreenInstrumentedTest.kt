@@ -386,7 +386,6 @@ class BlogScreenInstrumentedTest {
         composeTestRule.onNodeWithTag("BlogList").performScrollToNode(hasText("Image Post 2"))
         composeTestRule.onNodeWithText("Image Post 2").assertExists()
     }
-}
 
     // === Expanded layout tests (exercise isCompactScreen else branches) ===
 
