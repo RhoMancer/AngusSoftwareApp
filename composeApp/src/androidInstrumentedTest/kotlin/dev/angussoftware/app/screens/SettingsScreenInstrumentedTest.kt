@@ -169,4 +169,167 @@ class SettingsScreenInstrumentedTest : BaseScreenTest() {
         composeTestRule.onNodeWithText("Light Colors").assertExists()
         composeTestRule.onNodeWithText("Dark Colors").assertExists()
     }
+
+    // === Dropdown item click tests (exercises DropdownMenuItem onClick branches) ===
+
+    @Test
+    fun settingsScreen_lightThemeDropdown_selectNord() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Light").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Nord").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_lightThemeDropdown_selectCatppuccinLatte() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Light").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Catppuccin Latte").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_lightThemeDropdown_selectGruvboxLight() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Light").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Gruvbox Light").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_lightThemeDropdown_selectSolarizedLight() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Light").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Solarized Light").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_lightThemeDropdown_selectRosePineDawn() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Light").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Rose Pine Dawn").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_darkThemeDropdown_selectDracula() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Dracula").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_darkThemeDropdown_selectCatppuccinMocha() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Catppuccin Mocha").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_darkThemeDropdown_selectGruvboxDark() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Gruvbox Dark").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_darkThemeDropdown_selectSolarizedDark() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Solarized Dark").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_darkThemeDropdown_selectRosePineMoon() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Rose Pine Moon").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_darkThemeDropdown_selectRosePine() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Rose Pine").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_darkThemeDropdown_selectNordPolar() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Nord Polar").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_darkThemeDropdown_selectCatppuccinFrappe() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Catppuccin Frappe").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun settingsScreen_darkThemeDropdown_selectCatppuccinMacchiato() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Angus Dark").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Catppuccin Macchiato").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    // === Warning text branches (isLightTheme / isDarkTheme) ===
+
+    @Test
+    fun settingsScreen_noWarningWithDefaultThemes() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        // Default: AngusLight for light, AngusDark for dark — no warnings
+        composeTestRule.onNodeWithText("dark theme for light mode", substring = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun settingsScreen_expandedLayout_allChipsAndDropdowns() {
+        setAdaptiveContent(WindowWidthSizeClass.EXPANDED) { SettingsScreen() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("System").assertExists()
+        composeTestRule.onNodeWithText("Light").assertExists()
+        composeTestRule.onNodeWithText("Dark").assertExists()
+        composeTestRule.onNodeWithText("Light Colors").assertExists()
+        composeTestRule.onNodeWithText("Dark Colors").assertExists()
+    }
 }
