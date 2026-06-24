@@ -42,12 +42,6 @@ class HomeScreenInstrumentedTest {
     }
 
     @Test
-    fun homeScreen_showsAboutMeSection() {
-        setContent()
-        composeTestRule.onNodeWithTag(HOME_SCREEN_TEST_TAG).assertExists()
-    }
-
-    @Test
     fun homeScreen_showsContactSection() {
         setContent()
         scrollToText("Contact Information")
@@ -103,21 +97,7 @@ class HomeScreenInstrumentedTest {
         composeTestRule.onNodeWithText("CI/CD").assertExists()
     }
 
-    @Test
-    fun homeScreen_showsContactItem() {
-        setContent()
-        scrollToText("Contact Information")
-        composeTestRule.onNodeWithText("Contact Information").assertExists()
-    }
-
-    @Test
-    fun homeScreen_showsSocialMediaButton() {
-        setContent()
-        // Scroll to contact section where social media buttons live
-        scrollToText("Contact Information")
-        // Social media buttons render after contact items
-        composeTestRule.onNodeWithTag("HomeList").assertExists()
-    }
+    // === Expanded layout tests (exercise isCompactScreen else branches) ===
 
     @Test
     fun homeScreen_expandedLayout_displaysCorrectly() {
@@ -126,23 +106,30 @@ class HomeScreenInstrumentedTest {
     }
 
     @Test
-    fun homeScreen_expandedLayout_showsSkills() {
+    fun homeScreen_expanded_showsSkills() {
         setContent(WindowWidthSizeClass.EXPANDED)
-        composeTestRule.onNodeWithTag("HomeList").performScrollToNode(hasText("Key Skills"))
+        scrollToText("Key Skills")
         composeTestRule.onNodeWithText("Key Skills").assertExists()
     }
 
     @Test
-    fun homeScreen_expandedLayout_showsContact() {
+    fun homeScreen_expanded_showsAndroidSkill() {
         setContent(WindowWidthSizeClass.EXPANDED)
-        composeTestRule.onNodeWithTag("HomeList").performScrollToNode(hasText("Contact Information"))
+        scrollToText("Android")
+        composeTestRule.onNodeWithText("Android").assertExists()
+    }
+
+    @Test
+    fun homeScreen_expanded_showsContact() {
+        setContent(WindowWidthSizeClass.EXPANDED)
+        scrollToText("Contact Information")
         composeTestRule.onNodeWithText("Contact Information").assertExists()
     }
 
     @Test
-    fun homeScreen_expandedLayout_showsAndroidSkill() {
+    fun homeScreen_expanded_showsReactSkill() {
         setContent(WindowWidthSizeClass.EXPANDED)
-        composeTestRule.onNodeWithTag("HomeList").performScrollToNode(hasText("Android"))
-        composeTestRule.onNodeWithText("Android").assertExists()
+        scrollToText("React")
+        composeTestRule.onNodeWithText("React").assertExists()
     }
 }
