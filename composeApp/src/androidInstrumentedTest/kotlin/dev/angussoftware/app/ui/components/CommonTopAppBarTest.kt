@@ -236,7 +236,6 @@ class CommonTopAppBarTest {
         rule.waitForIdle()
         rule.onNodeWithTag(COMMON_TOP_APP_BAR_ICON_TAG).assertExists()
     }
-}
 
     // === Parameter combination tests (exercise debugSemantics × isCompact × showNonCompact branches) ===
 
@@ -302,4 +301,4 @@ class CommonTopAppBarTest {
         rule.waitForIdle()
         rule.onNodeWithText("Home").assertExists()
     }
-
+}
