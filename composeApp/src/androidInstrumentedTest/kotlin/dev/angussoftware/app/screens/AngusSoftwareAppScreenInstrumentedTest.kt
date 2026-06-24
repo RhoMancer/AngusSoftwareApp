@@ -68,4 +68,83 @@ class AngusSoftwareAppScreenInstrumentedTest : BaseScreenTest() {
         composeTestRule.onNodeWithTag(NAV_ITEM_BLOG_TAG).assertIsSelected()
         composeTestRule.onNodeWithTag(NAV_ITEM_PROJECTS_TAG).assertIsNotSelected()
     }
+
+    // === Nav item click tests for each screen (compact) ===
+
+    @Test
+    fun compact_clickSettings_showsSettingsScreen() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) {
+            AngusSoftwareAppScreen()
+        }
+        composeTestRule.onNodeWithTag(NAV_ITEM_SETTINGS_TAG).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(NAV_ITEM_SETTINGS_TAG).assertIsSelected()
+    }
+
+    @Test
+    fun compact_clickHome_showsHomeScreen() {
+        setAdaptiveContent(WindowWidthSizeClass.COMPACT) {
+            AngusSoftwareAppScreen()
+        }
+        composeTestRule.onNodeWithTag(NAV_ITEM_PROJECTS_TAG).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(NAV_ITEM_HOME_TAG).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(NAV_ITEM_HOME_TAG).assertIsSelected()
+    }
+
+    // === Nav item click tests (expanded / NavigationRail) ===
+
+    @Test
+    fun expanded_clickProjects_showsProjectsScreen() {
+        setAdaptiveContent(WindowWidthSizeClass.EXPANDED) {
+            AngusSoftwareAppScreen()
+        }
+        composeTestRule.onNodeWithTag(NAV_ITEM_PROJECTS_TAG).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(NAV_ITEM_PROJECTS_TAG).assertIsSelected()
+    }
+
+    @Test
+    fun expanded_clickBlog_showsBlogScreen() {
+        setAdaptiveContent(WindowWidthSizeClass.EXPANDED) {
+            AngusSoftwareAppScreen()
+        }
+        composeTestRule.onNodeWithTag(NAV_ITEM_BLOG_TAG).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(NAV_ITEM_BLOG_TAG).assertIsSelected()
+    }
+
+    @Test
+    fun expanded_clickSettings_showsSettingsScreen() {
+        setAdaptiveContent(WindowWidthSizeClass.EXPANDED) {
+            AngusSoftwareAppScreen()
+        }
+        composeTestRule.onNodeWithTag(NAV_ITEM_SETTINGS_TAG).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(NAV_ITEM_SETTINGS_TAG).assertIsSelected()
+    }
+
+    @Test
+    fun expanded_clickHome_showsHomeScreen() {
+        setAdaptiveContent(WindowWidthSizeClass.EXPANDED) {
+            AngusSoftwareAppScreen()
+        }
+        composeTestRule.onNodeWithTag(NAV_ITEM_PROJECTS_TAG).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(NAV_ITEM_HOME_TAG).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(NAV_ITEM_HOME_TAG).assertIsSelected()
+    }
+
+    @Test
+    fun expanded_navigationRailItems_allExist() {
+        setAdaptiveContent(WindowWidthSizeClass.EXPANDED) {
+            AngusSoftwareAppScreen()
+        }
+        composeTestRule.onNodeWithTag(NAV_ITEM_HOME_TAG).assertExists()
+        composeTestRule.onNodeWithTag(NAV_ITEM_PROJECTS_TAG).assertExists()
+        composeTestRule.onNodeWithTag(NAV_ITEM_BLOG_TAG).assertExists()
+        composeTestRule.onNodeWithTag(NAV_ITEM_SETTINGS_TAG).assertExists()
+    }
 }
