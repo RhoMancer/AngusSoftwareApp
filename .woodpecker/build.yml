@@ -26,7 +26,6 @@ steps:
       - chmod +x gradlew
       # Run unit tests + generate Kover XML (NO koverVerify — that runs in emulator
       # pipeline after unified coverage with instrumented tests is available)
-      - touch composeApp/src/androidUnitTest/kotlin/dev/angussoftware/app/screens/SettingsScreenRobolectricTest.kt
       - ./gradlew --no-daemon :composeApp:testDebugUnitTest :composeApp:koverXmlReport
       # Stage kover XML for emulator pipeline to consume
       - |
