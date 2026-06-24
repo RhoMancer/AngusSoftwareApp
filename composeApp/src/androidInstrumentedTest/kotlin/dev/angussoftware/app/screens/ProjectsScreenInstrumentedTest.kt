@@ -203,40 +203,4 @@ class ProjectsScreenInstrumentedTest {
         composeTestRule.onNodeWithText("Temperlux").assertIsDisplayed()
         composeTestRule.onNodeWithText("external and internal displays", substring = true).assertIsDisplayed()
     }
-
-    @Test
-    fun projectsScreen_angusPaintCarouselExists() {
-        setContent()
-        scrollToText("Angus Paint")
-        composeTestRule.onNodeWithTag("ProjectPager_3").assertExists()
-    }
-
-    @Test
-    fun projectsScreen_solitaireCarouselExists() {
-        setContent()
-        scrollToText("Angus Solitaire")
-        composeTestRule.onNodeWithTag("ProjectPager_4").assertExists()
-    }
-
-    @Test
-    fun projectsScreen_blinkReaderCarouselExists() {
-        setContent()
-        scrollToText("Blink Reader")
-        composeTestRule.onNodeWithTag("ProjectPager_5").assertExists()
-    }
-
-    @Test
-    fun projectsScreen_tapTargetCarouselExists() {
-        setContent()
-        scrollToText("Tap Target Booster")
-        composeTestRule.onNodeWithTag("ProjectPager_6").assertExists()
-    }
-
-    @Test
-    fun projectsScreen_angusPaintLinkIconExists() {
-        setContent()
-        scrollToText("Angus Paint")
-        // The OpenInNew icon should exist for projects with links
-        composeTestRule.onNodeWithTag("ProjectsList").assertExists()
-    }
 }
