@@ -1,0 +1,31 @@
+name: vibeCheck
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * 1'
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+  issues: write
+  security-events: write
+
+jobs:
+  analyze:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run vibeCheck
+        uses: WolffM/vibecheck@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          severity_threshold: "high"
+          confidence_threshold: "medium"
