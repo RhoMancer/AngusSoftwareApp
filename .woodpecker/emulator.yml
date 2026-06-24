@@ -59,8 +59,6 @@ steps:
         done
       - ./gradlew --no-daemon -PskipJaCoCoRegen :composeApp:unifiedCoverageReport
       - cat composeApp/build/reports/coverage/UNIFIED_COVERAGE.md
-      - echo "=== PER-LINE BRANCH GAPS ==="
-      - sh scripts/jacoco-branch-lines.sh
       - sh scripts/verify-combined-coverage.sh composeApp/build/reports/coverage/UNIFIED_COVERAGE.md 85 60
     volumes:
       - gradle-cache-angusapp:/root/.gradle/caches
