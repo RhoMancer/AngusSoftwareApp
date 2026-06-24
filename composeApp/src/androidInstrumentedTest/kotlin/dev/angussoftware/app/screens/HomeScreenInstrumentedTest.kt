@@ -124,4 +124,25 @@ class HomeScreenInstrumentedTest {
         setContent(WindowWidthSizeClass.EXPANDED)
         composeTestRule.onNodeWithTag(HOME_SCREEN_TEST_TAG).assertExists()
     }
+
+    @Test
+    fun homeScreen_expandedLayout_showsSkills() {
+        setContent(WindowWidthSizeClass.EXPANDED)
+        composeTestRule.onNodeWithTag("HomeList").performScrollToNode(hasText("Key Skills"))
+        composeTestRule.onNodeWithText("Key Skills").assertExists()
+    }
+
+    @Test
+    fun homeScreen_expandedLayout_showsContact() {
+        setContent(WindowWidthSizeClass.EXPANDED)
+        composeTestRule.onNodeWithTag("HomeList").performScrollToNode(hasText("Contact Information"))
+        composeTestRule.onNodeWithText("Contact Information").assertExists()
+    }
+
+    @Test
+    fun homeScreen_expandedLayout_showsAndroidSkill() {
+        setContent(WindowWidthSizeClass.EXPANDED)
+        composeTestRule.onNodeWithTag("HomeList").performScrollToNode(hasText("Android"))
+        composeTestRule.onNodeWithText("Android").assertExists()
+    }
 }

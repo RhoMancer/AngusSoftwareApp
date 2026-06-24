@@ -387,3 +387,39 @@ class BlogScreenInstrumentedTest {
         composeTestRule.onNodeWithText("Image Post 2").assertExists()
     }
 }
+
+    // === Expanded layout tests (exercise isCompactScreen else branches) ===
+
+    @Test
+    fun blogScreen_expandedLayout_showsPosts() {
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED),
+            ) {
+                BlogScreen(
+                    initialPosts = testPosts,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(BLOG_SCREEN_TEST_TAG).assertExists()
+        composeTestRule.onNodeWithText("First Blog Post").assertExists()
+    }
+
+    @Test
+    fun blogScreen_expandedLayout_showsMultiplePosts() {
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalWindowAdaptiveInfoOverride provides WindowAdaptiveInfo(WindowWidthSizeClass.EXPANDED),
+            ) {
+                BlogScreen(
+                    initialPosts = testPosts,
+                    initialIsLoading = false,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Second Blog Post").assertExists()
+    }
+}
