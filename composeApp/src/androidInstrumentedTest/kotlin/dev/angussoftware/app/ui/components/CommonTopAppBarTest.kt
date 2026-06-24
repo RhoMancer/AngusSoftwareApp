@@ -237,3 +237,69 @@ class CommonTopAppBarTest {
         rule.onNodeWithTag(COMMON_TOP_APP_BAR_ICON_TAG).assertExists()
     }
 }
+
+    // === Parameter combination tests (exercise debugSemantics × isCompact × showNonCompact branches) ===
+
+    @Test
+    fun nonCompact_hidden_withDebugSemantics() {
+        setContent {
+            CommonTopAppBar(
+                title = "Home",
+                icon = null,
+                isCompactScreen = false,
+                showNonCompact = false,
+                debugSemantics = true,
+            )
+        }
+        rule.waitForIdle()
+        rule.onNodeWithText("Home").assertDoesNotExist()
+    }
+
+    @Test
+    fun compactMode_withIcon_andDebugSemantics() {
+        val dummyPainter = ColorPainter(Color.Green)
+        setContent {
+            CommonTopAppBar(
+                title = "Home",
+                icon = dummyPainter,
+                isCompactScreen = true,
+                debugSemantics = true,
+                bgAlpha = 0.5f,
+                titleAlpha = 0.5f,
+            )
+        }
+        rule.waitForIdle()
+        rule.onNodeWithTag(COMMON_TOP_APP_BAR_ICON_TAG).assertExists()
+        rule.onNodeWithTag(COMMON_TOP_APP_BAR_TITLE_TAG).assertExists()
+    }
+
+    @Test
+    fun nonCompact_shown_withIcon_andDebugSemantics() {
+        val dummyPainter = ColorPainter(Color.Yellow)
+        setContent {
+            CommonTopAppBar(
+                title = "Home",
+                icon = dummyPainter,
+                isCompactScreen = false,
+                showNonCompact = true,
+                debugSemantics = true,
+            )
+        }
+        rule.waitForIdle()
+        rule.onNodeWithTag(COMMON_TOP_APP_BAR_TITLE_TAG).assertExists()
+    }
+
+    @Test
+    fun compactMode_alphaZero_titleHidden() {
+        setContent {
+            CommonTopAppBar(
+                title = "Home",
+                icon = null,
+                isCompactScreen = true,
+                titleAlpha = 0f,
+            )
+        }
+        rule.waitForIdle()
+        rule.onNodeWithText("Home").assertExists()
+    }
+
