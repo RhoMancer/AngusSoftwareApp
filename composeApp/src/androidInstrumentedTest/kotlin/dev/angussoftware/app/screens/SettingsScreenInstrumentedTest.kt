@@ -146,4 +146,27 @@ class SettingsScreenInstrumentedTest : BaseScreenTest() {
         composeTestRule.onNodeWithTag(SETTINGS_SCREEN_TEST_TAG).assertExists()
         composeTestRule.onNodeWithText("Appearance").assertExists()
     }
+
+    @Test
+    fun settingsScreen_expandedLayout_showsThemeModeChips() {
+        setAdaptiveContent(WindowWidthSizeClass.EXPANDED) {
+            SettingsScreen()
+        }
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("System").assertExists()
+        composeTestRule.onNodeWithText("Light").assertExists()
+        composeTestRule.onNodeWithText("Dark").assertExists()
+    }
+
+    @Test
+    fun settingsScreen_expandedLayout_showsThemeDropdowns() {
+        setAdaptiveContent(WindowWidthSizeClass.EXPANDED) {
+            SettingsScreen()
+        }
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Light Colors").assertExists()
+        composeTestRule.onNodeWithText("Dark Colors").assertExists()
+    }
 }

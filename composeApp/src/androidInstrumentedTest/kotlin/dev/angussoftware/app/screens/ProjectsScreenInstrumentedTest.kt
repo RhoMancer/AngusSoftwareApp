@@ -203,4 +203,31 @@ class ProjectsScreenInstrumentedTest {
         composeTestRule.onNodeWithText("Temperlux").assertIsDisplayed()
         composeTestRule.onNodeWithText("external and internal displays", substring = true).assertIsDisplayed()
     }
+
+    // === Expanded layout tests ===
+
+    @Test
+    fun projectsScreen_expandedLayout_displaysScreen() {
+        setContent(WindowWidthSizeClass.EXPANDED)
+        composeTestRule.onNodeWithTag(PROJECTS_SCREEN_TEST_TAG).assertExists()
+    }
+
+    @Test
+    fun projectsScreen_expandedLayout_showsPortfolioProject() {
+        setContent(WindowWidthSizeClass.EXPANDED)
+        composeTestRule.onNodeWithText("Portfolio Website").assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_expandedLayout_showsTemperluxProject() {
+        setContent(WindowWidthSizeClass.EXPANDED)
+        composeTestRule.onNodeWithText("Temperlux").assertIsDisplayed()
+    }
+
+    @Test
+    fun projectsScreen_expandedLayout_showsTechnologies() {
+        setContent(WindowWidthSizeClass.EXPANDED)
+        composeTestRule.onNodeWithText("Compose").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Rust").assertIsDisplayed()
+    }
 }
