@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run vibeCheck
-        uses: RhoMancer/vibecheck@c3f45ff11f19cde0c10315a80a40d9b797869f32
+        uses: RhoMancer/vibecheck@24b49dccf4764f174fadc2b1bdd1225c62b4a933
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           severity_threshold: "medium"
