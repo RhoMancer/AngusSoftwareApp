@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: RhoMancer/vibecheck@a74a5b4e5e85b711c8e8fdf8d8b0f24ca8a61f4a
+      - uses: RhoMancer/vibecheck@bd9ba9e447d2b05ed6d4acaf60a85047425d358d
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           severity_threshold: "low"
