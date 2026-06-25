@@ -1,0 +1,30 @@
+name: vibeCheck Debug
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  security-events: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: RhoMancer/vibecheck@fix/kmp-and-arg-names
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          severity_threshold: "low"
+          confidence_threshold: "low"
+          skip_issues: "true"
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: vibecheck-results
+          path: .vibecheck-output/
