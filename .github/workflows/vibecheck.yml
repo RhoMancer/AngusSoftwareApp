@@ -8,9 +8,10 @@ on:
     branches: [master]
 
 permissions:
-  contents: read
+  contents: write
   issues: write
   security-events: write
+  pull-requests: write
 
 jobs:
   analyze:
@@ -29,3 +30,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           severity_threshold: "medium"
           confidence_threshold: "medium"
+          create_config_pr: "true"
