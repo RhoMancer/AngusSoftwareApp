@@ -27,5 +27,5 @@ jobs:
         uses: WolffM/vibecheck@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          severity_threshold: "high"
+          severity_threshold: "medium"
           confidence_threshold: "medium"
