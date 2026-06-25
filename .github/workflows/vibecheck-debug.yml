@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: RhoMancer/vibecheck@fix/kmp-and-arg-names
+      - uses: RhoMancer/vibecheck@b2197c3280b30a5ce1cdfdecb57929ee3c55b1e0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           severity_threshold: "low"
