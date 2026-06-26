@@ -26,3 +26,4 @@ captures
 keystore.properties
 *.jks
 *.keystore
+.chainlink/
