@@ -1,6 +1,7 @@
 package dev.angussoftware.app.blog
 
 import kotlinx.coroutines.test.runTest
+import java.io.IOException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -37,7 +38,7 @@ internal class BlogRepositoryTest {
 
     // Mock NetworkClient that throws an exception
     private class MockErrorNetworkClient : NetworkClient {
-        override suspend fun fetchUrlText(url: String): String = throw RuntimeException("Network error")
+        override suspend fun fetchUrlText(url: String): String = throw IOException("Network error")
     }
 
     @Test

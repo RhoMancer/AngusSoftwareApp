@@ -8,42 +8,45 @@ internal object RssParser {
         limit: Int = 20,
     ): List<BlogPost> {
         val items = ITEM_REGEX.findAll(xml).map { it.value }.take(limit)
-        val posts = mutableListOf<BlogPost>()
-        for (itemXml in items) {
-            val guid = extractTag(itemXml, "guid")?.let { stripCdata(it).trim() }
-            val link =
-                extractLink(itemXml).ifBlank {
-                    guid?.takeIf { it.startsWith("http://") || it.startsWith("https://") } ?: ""
-                }
-            if (link.isBlank()) continue
-            val title = extractTag(itemXml, "title")?.let { decodeXmlEntities(stripCdata(it)).trim() }.orEmpty()
-            val pubDate = extractTag(itemXml, "pubDate")?.let { stripCdata(it).trim() }
+        return items.map { itemXml -> parseItem(itemXml) }.toList()
+    }
 
-            // Full content: prefer content:encoded, then <content> if present
-            val contentRaw = extractTag(itemXml, "content:encoded") ?: extractTag(itemXml, "content")
-            val contentPlain = contentRaw?.let { stripHtml(decodeXmlEntities(stripCdata(it))).trim() }
+    private fun parseItem(itemXml: String): BlogPost {
+        val guid = extractTag(itemXml, "guid")?.let { stripCdata(it).trim() }
+        val link =
+            extractLink(itemXml).ifBlank {
+                guid?.takeIf { it.startsWith("http://") || it.startsWith("https://") } ?: ""
+            }
+        if (link.isBlank()) return BlogPost("", DEFAULT_UNTITLED_POST, "", null, null, null, null)
 
-            // Summary: prefer <description>, else derive from content
-            val descriptionRaw = extractTag(itemXml, "description")
-            val summary =
-                (descriptionRaw ?: contentRaw)
-                    ?.let { stripHtml(decodeXmlEntities(stripCdata(it))).trim() }
-                    ?.take(n = 400)
+        val title = extractTag(itemXml, "title")?.let { decodeXmlEntities(stripCdata(it)).trim() }.orEmpty()
+        val pubDate = extractTag(itemXml, "pubDate")?.let { stripCdata(it).trim() }
 
-            val imageUrl = extractEnclosureUrl(itemXml) ?: extractMediaUrl(itemXml)
+        val contentPlain = extractContent(itemXml)
+        val summary = extractSummary(itemXml, contentPlain)
+        val imageUrl = extractEnclosureUrl(itemXml) ?: extractMediaUrl(itemXml)
 
-            posts +=
-                BlogPost(
-                    id = (guid ?: link),
-                    title = title.ifBlank { DEFAULT_UNTITLED_POST },
-                    url = link,
-                    pubDate = pubDate,
-                    summary = summary,
-                    imageUrl = imageUrl,
-                    content = contentPlain,
-                )
-        }
-        return posts
+        return BlogPost(
+            id = (guid ?: link),
+            title = title.ifBlank { DEFAULT_UNTITLED_POST },
+            url = link,
+            pubDate = pubDate,
+            summary = summary,
+            imageUrl = imageUrl,
+            content = contentPlain,
+        )
+    }
+
+    private fun extractContent(itemXml: String): String? {
+        val contentRaw = extractTag(itemXml, "content:encoded") ?: extractTag(itemXml, "content")
+        return contentRaw?.let { stripHtml(decodeXmlEntities(stripCdata(it))).trim() }
+    }
+
+    private fun extractSummary(itemXml: String, contentRaw: String?): String? {
+        val descriptionRaw = extractTag(itemXml, "description")
+        return (descriptionRaw ?: contentRaw)
+            ?.let { stripHtml(decodeXmlEntities(stripCdata(it))).trim() }
+            ?.take(n = 400)
     }
 
     private fun extractTag(
