@@ -10,7 +10,7 @@ private const val KEY_DARK = "angus_dark_theme"
 
 private fun safeGetItem(key: String): String? = try {
     window.localStorage.getItem(key)
-} catch (e: Throwable) { null }
+} catch (e: Exception) { null }
 
 private fun parseLightTheme(raw: String?): ColorTheme {
     val parsed = runCatching { ColorTheme.valueOf(raw ?: "") }.getOrNull()
@@ -44,5 +44,5 @@ actual fun saveThemePreferences(prefs: ThemePreferences) {
         window.localStorage.setItem(KEY_MODE, prefs.themeMode.name)
         window.localStorage.setItem(KEY_LIGHT, prefs.lightTheme.name)
         window.localStorage.setItem(KEY_DARK, prefs.darkTheme.name)
-    } catch (e: Throwable) { }
+    } catch (_: Exception) { /* localStorage may be unavailable in private browsing */ }
 }

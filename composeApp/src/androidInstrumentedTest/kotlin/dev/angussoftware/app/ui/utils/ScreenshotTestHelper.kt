@@ -180,8 +180,8 @@ object ScreenshotTestHelper {
 
         if (!targetDir.exists()) {
             val created = targetDir.mkdirs()
-            if (!created && !targetDir.exists()) {
-                throw IllegalStateException("Failed to create directory: ${targetDir.absolutePath}")
+            check(created || targetDir.exists()) {
+                "Failed to create directory: ${targetDir.absolutePath}"
             }
             Log.d(TAG, "Created directory: ${targetDir.absolutePath}")
         }

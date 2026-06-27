@@ -26,6 +26,7 @@ private external fun jsTriggerInstallPrompt(): Promise<JsAny>
 private external fun jsClearDeferredPrompt()
 
 @JsName("Date")
+@Suppress("UtilityClassWithPublicConstructor") // JS external class mirrors browser Date API
 private external class JsDate {
     companion object {
         fun now(): Double

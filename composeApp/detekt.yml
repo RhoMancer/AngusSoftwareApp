@@ -1,0 +1,25 @@
+style:
+  FunctionNaming:
+    active: true
+    functionPattern: '([a-z][a-zA-Z0-9]*)|([A-Z][a-zA-Z0-9]*)'
+    excludes: ['**/wasmJsMain/**', '**/androidMain/**', '**/commonMain/**']
+  WildcardImport:
+    active: true
+    excludes: []
+  MaxLineLength:
+    active: true
+    maxLineLength: 120
+    excludePackageStatements: true
+    excludeImportStatements: true
+    excludes: ['**/build.gradle.kts', '**/settings.gradle.kts']
+complexity:
+  LongParameterList:
+    active: true
+    functionThreshold: 6
+    constructorThreshold: 7
+  LongMethod:
+    active: true
+    threshold: 60
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 15

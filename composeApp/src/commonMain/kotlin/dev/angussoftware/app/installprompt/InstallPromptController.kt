@@ -180,9 +180,7 @@ internal class InstallPromptController(
     private fun isRecentlyDismissed(key: String): Boolean {
         val dismissedAtStr = platform.getStorageItem(key) ?: return false
         val dismissedAt = dismissedAtStr.toLongOrNull() ?: return false
-        val now = platform.getCurrentTimeMillis()
-        val cooldownMillis = cooldownDays * MILLIS_PER_DAY
-        return (now - dismissedAt) < cooldownMillis
+        return (platform.getCurrentTimeMillis() - dismissedAt) < cooldownDays * MILLIS_PER_DAY
     }
 
     /**

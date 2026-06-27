@@ -15,8 +15,11 @@ pluginManagement {
         // Keep plain google() here; the helper applies only to dependency repositories.
         google()
 
-        // Declare credentials/constants locally: resolve from gradle.properties first, then fall back to env.
-        val githubOwner: String = providers.gradleProperty("githubOwner").orNull ?: System.getenv("GITHUB_OWNER") ?: "RhoMancer"
+        // Declare credentials/constants locally: resolve from gradle.properties first,
+        // then fall back to env.
+        val githubOwner: String =
+            providers.gradleProperty("githubOwner").orNull
+                ?: System.getenv("GITHUB_OWNER") ?: "RhoMancer"
         val githubUsername: String? = providers.gradleProperty("githubUser").orNull ?: System.getenv("GITHUB_USER")
         val githubPassword: String? = providers.gradleProperty("githubToken").orNull ?: System.getenv("GITHUB_TOKEN")
 
