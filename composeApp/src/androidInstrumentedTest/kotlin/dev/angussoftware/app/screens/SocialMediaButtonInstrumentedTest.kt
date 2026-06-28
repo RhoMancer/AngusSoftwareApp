@@ -33,8 +33,6 @@ class SocialMediaButtonInstrumentedTest {
     // Test data
     private val testPlatform = "LinkedIn"
     private val testUrl = "https://www.linkedin.com/in/test"
-    private val githubPlatform = "GitHub"
-    private val githubUrl = "https://github.com/test"
 
     /**
      * Test that the platform name is displayed correctly on the button.
