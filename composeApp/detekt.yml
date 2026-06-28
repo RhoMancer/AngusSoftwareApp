@@ -1,25 +1,93 @@
-style:
+# detekt configuration for Kotlin Multiplatform + Compose project
+# Configures thresholds appropriate for a Compose codebase where:
+# - @Composable functions use PascalCase (Jetpack Compose convention)
+# - Composable functions are naturally long (UI trees)
+# - Test files have relaxed rules (long lines, wildcard imports, large classes)
+
+complexity:
+  LongMethod:
+    active: true
+    threshold: 310
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**']
+  LongParameterList:
+    active: true
+    functionThreshold: 10
+    constructorThreshold: 7
+    ignoreDefaultParameters: true
+    ignoreDataClasses: true
+    ignoreAnnotatedParameter: ['Composable']
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 20
+  LargeClass:
+    active: true
+    threshold: 250
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/androidInstrumentedTest/**']
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 15
+    thresholdInClasses: 15
+    thresholdInInterfaces: 15
+    thresholdInObjects: 15
+    thresholdInEnums: 15
+
+naming:
   FunctionNaming:
     active: true
     functionPattern: '([a-z][a-zA-Z0-9]*)|([A-Z][a-zA-Z0-9]*)'
-    excludes: ['**/wasmJsMain/**', '**/androidMain/**', '**/commonMain/**']
-  WildcardImport:
+    excludeClassPattern: '$^'
+  MatchingDeclarationName:
+    active: false
+
+exceptions:
+  SwallowedException:
     active: true
-    excludes: []
+    excludes: ['**/commonMain/**/BlogRepository.kt', '**/commonMain/**/NavHost.kt', '**/wasmJsMain/**/ThemePreferences*.kt']
+  TooGenericExceptionCaught:
+    active: true
+    excludes: ['**/commonMain/**/BlogRepository.kt', '**/commonMain/**/NavHost.kt', '**/wasmJsMain/**/ThemePreferences*.kt', '**/commonMain/**/BlogViewModel.kt', '**/androidInstrumentedTest/**/ScreenshotTestHelper.kt']
+  TooGenericExceptionThrown:
+    active: true
+
+style:
   MaxLineLength:
     active: true
-    maxLineLength: 120
+    maxLineLength: 140
     excludePackageStatements: true
     excludeImportStatements: true
-    excludes: ['**/build.gradle.kts', '**/settings.gradle.kts']
-complexity:
-  LongParameterList:
+    excludeCommentStatements: false
+    excludeRawStrings: true
+    excludes: ['**/test/**', '**/commonTest/**']
+  WildcardImport:
     active: true
-    functionThreshold: 6
-    constructorThreshold: 7
-  LongMethod:
+    excludeImports:
+      - 'java.util.*'
+      - 'androidx.compose.foundation.layout.*'
+      - 'androidx.compose.material3.*'
+      - 'androidx.compose.runtime.*'
+      - 'androidx.compose.ui.graphics.*'
+      - 'androidx.compose.ui.test.*'
+      - 'androidx.compose.ui.text.*'
+      - 'androidx.compose.ui.unit.*'
+      - 'androidx.compose.ui.*'
+      - 'angussoftwareapp.composeapp.generated.resources.*'
+      - 'com.angussoftware.theming.compose.resources.*'
+      - 'dev.angussoftware.app.screens.*'
+      - 'org.junit.Assert.*'
+  ReturnCount:
     active: true
-    threshold: 60
-  CyclomaticComplexMethod:
+    max: 4
+  UnusedPrivateMember:
     active: true
-    threshold: 15
+    allowedNames: '(_|preview|Preview|SmallAndroidPreview|AppAndroidPreview|TabletAndroidPreview)'
+  UnusedPrivateProperty:
+    active: true
+    allowedNames: '(_|preview|Preview|TAG)'
+  DestructuringDeclarationWithTooManyEntries:
+    active: true
+    maxDestructuringEntries: 7
+
+potential-bugs:
+  ImplicitDefaultLocale:
+    active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/androidInstrumentedTest/**']

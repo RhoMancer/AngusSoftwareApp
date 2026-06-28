@@ -25,8 +25,6 @@ class ContactItemInstrumentedTest : BaseScreenTest() {
     // Test data
     private val testTitle = "Email"
     private val testContent = "contact@example.com"
-    private val locationTitle = "Location"
-    private val locationContent = "San Francisco, CA"
 
     /**
      * Test that both title and content are displayed together.
@@ -199,7 +197,9 @@ class ContactItemInstrumentedTest : BaseScreenTest() {
      */
     @Test
     fun longContent_rendersCorrectly() {
-        val longContent = "This is a very long contact information content that includes multiple words and should still render correctly in the UI without any issues"
+        val longContent =
+            "This is a very long contact information content that includes multiple words" +
+                " and should still render correctly in the UI without any issues"
 
         setContent {
             ContactItem(
