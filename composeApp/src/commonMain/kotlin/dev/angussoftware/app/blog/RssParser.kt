@@ -8,16 +8,16 @@ internal object RssParser {
         limit: Int = 20,
     ): List<BlogPost> {
         val items = ITEM_REGEX.findAll(xml).map { it.value }.take(limit)
-        return items.map { itemXml -> parseItem(itemXml) }.toList()
+        return items.mapNotNull { itemXml -> parseItem(itemXml) }.toList()
     }
 
-    private fun parseItem(itemXml: String): BlogPost {
+    private fun parseItem(itemXml: String): BlogPost? {
         val guid = extractTag(itemXml, "guid")?.let { stripCdata(it).trim() }
         val link =
             extractLink(itemXml).ifBlank {
                 guid?.takeIf { it.startsWith("http://") || it.startsWith("https://") } ?: ""
             }
-        if (link.isBlank()) return BlogPost("", DEFAULT_UNTITLED_POST, "", null, null, null, null)
+        if (link.isBlank()) return null
 
         val title = extractTag(itemXml, "title")?.let { decodeXmlEntities(stripCdata(it)).trim() }.orEmpty()
         val pubDate = extractTag(itemXml, "pubDate")?.let { stripCdata(it).trim() }
