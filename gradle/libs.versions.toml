@@ -1,12 +1,12 @@
 [versions]
-agp = "9.2.1"
+agp = "8.12.3"
 android-compileSdk = "36"
 android-minSdk = "26"
 android-targetSdk = "36"
 androidx-activity = "1.11.0"
 androidx-lifecycle = "2.10.0"
 #noinspection NewerVersionAvailable
-composeMultiplatform = "1.11.1"
+composeMultiplatform = "1.9.0"
 #noinspection NewerVersionAvailable
 kotlin = "2.3.21"
 kover = "0.9.8"
