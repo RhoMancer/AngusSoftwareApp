@@ -4,7 +4,7 @@ android-compileSdk = "36"
 android-minSdk = "26"
 android-targetSdk = "36"
 androidx-activity = "1.11.0"
-androidx-lifecycle = "2.9.5"
+androidx-lifecycle = "2.10.0"
 #noinspection NewerVersionAvailable
 composeMultiplatform = "1.9.0"
 #noinspection NewerVersionAvailable
