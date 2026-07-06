@@ -18,7 +18,7 @@ uiTestJunit4Android = "1.9.4"
 uiTestManifest = "1.9.4"
 sonar = "7.0.1.6134"
 jacoco = "0.9.0.M1"
-robolectric = "4.14.1"
+robolectric = "4.16.1"
 
 [libraries]
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestManifest" }
