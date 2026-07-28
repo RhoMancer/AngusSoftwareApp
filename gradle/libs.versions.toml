@@ -8,7 +8,7 @@ androidx-lifecycle = "2.10.0"
 #noinspection NewerVersionAvailable
 composeMultiplatform = "1.9.0"
 #noinspection NewerVersionAvailable
-kotlin = "2.3.21"
+kotlin = "2.4.10"
 kover = "0.9.8"
 angusSoftware-theming = "0.10.3"
 angusSoftware-gradle = "0.3.0"
