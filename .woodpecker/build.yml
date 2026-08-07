@@ -18,11 +18,12 @@ steps:
         fi
         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null 2>&1 || true
         echo "sdk.dir=$ANDROID_HOME" > local.properties
-      # Configure GPR credentials
+      # Configure GPR + Forgejo Maven credentials
       - |
         mkdir -p ~/.gradle
         echo "githubUser=${GPR_USERNAME}" >> ~/.gradle/gradle.properties
         echo "githubToken=${GPR_TOKEN}" >> ~/.gradle/gradle.properties
+        echo "forgejo.token=${FORGEJO_TOKEN}" >> ~/.gradle/gradle.properties
       - chmod +x gradlew
       # Run unit tests + generate Kover XML (NO koverVerify — that runs in emulator
       # pipeline after unified coverage with instrumented tests is available)
