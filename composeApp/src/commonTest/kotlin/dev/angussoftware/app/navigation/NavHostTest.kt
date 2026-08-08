@@ -163,6 +163,20 @@ internal class NavHostTest {
         assertEquals(title, result.title)
     }
 
+    @Test
+    fun blogPostLoadResultReturnsPostWhenIdExists() {
+        val post = BlogPost("matching-id", "Found", "https://example.com/post", null, null, null, null)
+
+        assertEquals(BlogPostLoadResult.Post(post), blogPostLoadResult(listOf(post), "matching-id"))
+    }
+
+    @Test
+    fun blogPostLoadResultReturnsNotFoundWhenIdIsAbsent() {
+        val post = BlogPost("other-id", "Other", "https://example.com/other", null, null, null, null)
+
+        assertEquals(BlogPostLoadResult.NotFound, blogPostLoadResult(listOf(post), "missing-id"))
+    }
+
     // Edge case tests for BlogPost creation
     @Test
     fun createdBlogPostsAreNotNull() {

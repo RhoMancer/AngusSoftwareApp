@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import java.io.IOException
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 internal class BlogRepositoryTest {
@@ -92,15 +93,15 @@ internal class BlogRepositoryTest {
         }
 
     @Test
-    internal fun fetchPostsHandlesNetworkError() =
+    internal fun fetchPostsPropagatesNetworkError() =
         runTest {
             val feedUrl = "https://example.com/feed.xml"
             val mockClient = MockErrorNetworkClient()
             val repository = BlogRepository(feedUrl, mockClient)
 
-            val result = repository.fetchPosts()
-
-            assertEquals(emptyList(), result, "Should return empty list on network error")
+            assertFailsWith<IOException>("Network failures must be surfaced to the UI") {
+                repository.fetchPosts()
+            }
         }
 
     @Test
@@ -139,17 +140,6 @@ internal class BlogRepositoryTest {
             assertEquals(2, result.size, "Should return all available posts (2) even with large limit")
         }
 
-    @Test
-    internal fun fetchPostsUsesDefaultNetworkClientWhenNotProvided() =
-        runTest {
-            val feedUrl = "https://invalid-url-that-will-fail.com/feed.xml"
-            val repository = BlogRepository(feedUrl) // Using default NetworkClient
-
-            val result = repository.fetchPosts()
-
-            // This will use the actual DefaultNetworkClient which should handle the error
-            assertEquals(emptyList(), result, "Should return empty list when using default client with invalid URL")
-        }
 
     // Mock that returns invalid XML to trigger parser exception
     private class MockCorruptNetworkClient : NetworkClient {

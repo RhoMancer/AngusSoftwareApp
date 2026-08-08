@@ -11,11 +11,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import angussoftwareapp.composeapp.generated.resources.Res
+import angussoftwareapp.composeapp.generated.resources.blog_post_load_error
 import angussoftwareapp.composeapp.generated.resources.blog_post_not_found
 import angussoftwareapp.composeapp.generated.resources.ui_loading
-import dev.angussoftware.app.blog.BlogPost
 import dev.angussoftware.app.blog.BlogRepository
 import dev.angussoftware.app.screens.*
+import kotlinx.coroutines.CancellationException
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -48,38 +49,43 @@ internal fun displayCurrentScreen(navController: NavHostController) {
                 val postId = backStackEntry.savedStateHandle.get<String>("postId").orEmpty()
                 val feedUrl = RSS_FEED_URL
 
-                var blogPost by remember { mutableStateOf<BlogPost?>(null) }
-                var isLoading by remember { mutableStateOf(true) }
+                var loadResult by remember { mutableStateOf<BlogPostLoadResult>(BlogPostLoadResult.Loading) }
 
                 LaunchedEffect(postId) {
                     try {
                         val repository = BlogRepository(feedUrl)
                         val allPosts = repository.fetchPosts(limit = Int.MAX_VALUE)
-                        blogPost = allPosts.find { it.id == postId }
-                        isLoading = false
+                        loadResult = blogPostLoadResult(allPosts, postId)
                     } catch (e: Exception) {
-                        // todo: proper error handling
-                        isLoading = false
+                        if (e is CancellationException) throw e
+                        loadResult = BlogPostLoadResult.Error
                     }
                 }
 
-                if (isLoading) {
-                    BlogPostScreen(
-                        blogPost = createLoadingBlogPost(stringResource(Res.string.ui_loading)),
-                        onBackClick = { navController.popBackStack() },
-                    )
-                } else {
-                    blogPost?.let { post ->
+                when (val result = loadResult) {
+                    BlogPostLoadResult.Loading ->
                         BlogPostScreen(
-                            blogPost = post,
+                            blogPost = createLoadingBlogPost(stringResource(Res.string.ui_loading)),
                             onBackClick = { navController.popBackStack() },
                         )
-                    } ?: run {
+
+                    is BlogPostLoadResult.Post ->
+                        BlogPostScreen(
+                            blogPost = result.value,
+                            onBackClick = { navController.popBackStack() },
+                        )
+
+                    BlogPostLoadResult.NotFound ->
                         BlogPostScreen(
                             blogPost = createErrorBlogPost(stringResource(Res.string.blog_post_not_found)),
                             onBackClick = { navController.popBackStack() },
                         )
-                    }
+
+                    BlogPostLoadResult.Error ->
+                        BlogPostScreen(
+                            blogPost = createErrorBlogPost(stringResource(Res.string.blog_post_load_error)),
+                            onBackClick = { navController.popBackStack() },
+                        )
                 }
             }
         }

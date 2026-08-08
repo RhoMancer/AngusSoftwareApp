@@ -7,6 +7,22 @@ internal const val BLOG_POST_ERROR_ID = "error"
 internal const val RSS_FEED_URL = "https://rhomancer.github.io/angus-blog-content/rss.xml"
 internal const val NAV_HOST_TEST_TAG = "NavHost"
 
+internal sealed interface BlogPostLoadResult {
+    data object Loading : BlogPostLoadResult
+
+    data class Post(val value: BlogPost) : BlogPostLoadResult
+
+    data object NotFound : BlogPostLoadResult
+
+    data object Error : BlogPostLoadResult
+}
+
+internal fun blogPostLoadResult(
+    posts: List<BlogPost>,
+    postId: String,
+): BlogPostLoadResult =
+    posts.find { it.id == postId }?.let(BlogPostLoadResult::Post) ?: BlogPostLoadResult.NotFound
+
 /**
  * Parses the post ID from a navigation route string.
  * Extracts the ID (everything after the last slash) from the route path.

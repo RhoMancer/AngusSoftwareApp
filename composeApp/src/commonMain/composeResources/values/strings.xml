@@ -137,4 +137,5 @@
 
     <!-- Blog post states -->
     <string name="blog_post_not_found">Post not found</string>
+    <string name="blog_post_load_error">Unable to load post. Please try again later.</string>
 </resources>
