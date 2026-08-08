@@ -1,0 +1,37 @@
+{
+  "exclusions": {
+    "generatedResources": [
+      "**/generated/**",
+      "**/build/generated/**",
+      "**/composeResources/**",
+      "**/*ComposableSingletons*",
+      "**/BuildConfig*",
+      "**/R.class",
+      "**/R$*.class",
+      "**/Manifest*"
+    ],
+    "composeCompilerArtifacts": [
+      "**/*$*Composable*",
+      "**/*ComposableSingletons*",
+      "**/ComposableSingletons$*",
+      "**/*$lambda*",
+      "**/*$WhenMappings*",
+      "**/androidx/compose/**"
+    ],
+    "androidFrameworkClasses": [
+      "**/android/**",
+      "**/androidx/**",
+      "**/com/android/**",
+      "**/MainActivity*",
+      "**/*_androidKt*",
+      "**/Platform_androidKt*",
+      "**/LocaleHelper_androidKt*",
+      "**/ThemePreferences_androidKt*",
+      "**/Network_androidKt*"
+    ]
+  },
+  "notes": [
+    "Exclusions consumed by check-tier.sh to filter mutation candidates.",
+    "Generated resources, Compose compiler synthetics, and Android framework glue are excluded because they are not meaningfully unit-testable on the JVM tier."
+  ]
+}

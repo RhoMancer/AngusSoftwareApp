@@ -49,6 +49,34 @@ steps:
       # Shared volume — kover XML staged here for emulator pipeline
       - kover-xml-angusapp:/shared/kover
 
+  check-tier:
+    image: localhost:5000/ci-theming-jdk23:latest
+    commands:
+      # Run JVM unit tests + PIT mutation tests to produce inputs for check-tier.sh
+      - chmod +x gradlew
+      - ./gradlew --no-daemon :composeApp:jvmTest :composeApp:pitest -Ppit.enabled=true
+      # Clone shared ci-scripts and enforce mutation-tier gate (Anvil Testing System)
+      - git clone https://x-access-token:${GPR_TOKEN}@github.com/RhoMancer/ci-scripts.git /tmp/ci-scripts
+      - |
+        bash /tmp/ci-scripts/check-tier.sh \
+          --class-dirs composeApp/build/classes/kotlin/jvm/main \
+          --test-class-dirs composeApp/build/classes/kotlin/jvm/test \
+          --junit-dir composeApp/build/test-results/jvmTest \
+          --mutation-xml composeApp/build/reports/pitest/mutations.xml \
+          --pit-config pit-config.json \
+          --test-src composeApp/src/jvmTest/kotlin \
+          --src composeApp/src/jvmMain/kotlin \
+          --floor Bronze
+    environment:
+      GRADLE_USER_HOME: /root/.gradle
+      ANDROID_HOME: /opt/android-sdk
+    volumes:
+      - gradle-cache-angusapp:/root/.gradle/caches
+      - gradle-wrapper-angusapp:/root/.gradle/wrapper
+      - android-sdk-angusapp:/opt/android-sdk
+    depends_on:
+      - build
+
   validate-commits:
     image: alpine:latest
     commands:

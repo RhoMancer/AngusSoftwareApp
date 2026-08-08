@@ -5,6 +5,12 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.util.Properties
 
+buildscript {
+    dependencies {
+        classpath("info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.15.0")
+    }
+}
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -13,6 +19,24 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.kover)
     alias(libs.plugins.angusGradleTools.coverage)
+    id("info.solidsoft.pitest") version "1.15.0" apply false
+}
+
+// Conditionally apply PIT mutation testing plugin (Anvil Testing System)
+val isPit = providers.gradleProperty("pit.enabled").map { it.toBoolean() }.orElse(false)
+if (isPit.get()) {
+    apply(plugin = "info.solidsoft.pitest")
+
+    extensions.configure<info.solidsoft.gradle.pitest.PitestPluginExtension>("pitest") {
+        targetClasses.set(listOf("dev.angussoftware.app.*"))
+        targetTests.set(listOf("dev.angussoftware.app.*Test"))
+        outputFormats.set(listOf("XML", "HTML"))
+        jvmArgs.set(listOf("-Xmx4g"))
+        mutators.set(listOf("STRONGER"))
+        detectInlinedCode.set(true)
+        timestampedReports.set(false)
+        junit5PluginVersion.set("1.2.1")
+    }
 }
 
 // Centralized App ID to avoid duplicated strings across android block
