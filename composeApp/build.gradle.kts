@@ -1,8 +1,3 @@
-import com.angussoftware.gradletools.coverage.ai
-import com.angussoftware.gradletools.coverage.gaps
-import com.angussoftware.gradletools.coverage.selection
-import com.angussoftware.gradletools.coverage.thresholds
-import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -38,30 +33,6 @@ angusCoverage {
             projectDir.resolve("src/androidMain/kotlin").absolutePath,
         ),
     )
-
-    gaps {
-        contextLines.set(5) // -1 = whole file
-        // topNFiles.set(20)
-
-        thresholds {
-            //            maxTotalMissedBranches.set(0)
-            //            maxMissedBranchesPerFile.set(0)
-        }
-
-        ai {
-            enabled.set(true)
-            allowOnCi.set(false)
-            model.set("qwen3-coder:30b")
-            timeoutSec.set(120)
-            maxPrompt.set(6000)
-            redact.set(true)
-
-            selection {
-                minCoveredBranches.set(1)
-                maxAnalyses.set(20)
-            }
-        }
-    }
 
     this.unifiedReport.enabled.set(true)
     this.unifiedReport.koverExclusions.set(
